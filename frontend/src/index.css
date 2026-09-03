@@ -1,0 +1,86 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  /* PortIN Master Enterprise Theme Tokens */
+  --portin-navy: #0F2747;
+  --portin-deep-navy: #102A4C;
+  --portin-darkest: #0A1C33;
+  --portin-gold: #D6A63B;
+  --portin-soft-gold: #F3E3B7;
+  --portin-warm-ivory: #F8F7F3;
+  --portin-white: #FFFFFF;
+  --portin-text-primary: #172033;
+  --portin-text-secondary: #68717D;
+  --portin-border: #E4E2DC;
+  --portin-border-dark: rgba(214, 166, 59, 0.2);
+  --portin-success: #2F7D4B;
+  --portin-warning: #D98A27;
+  --portin-risk: #C64A3B;
+
+  /* Global background and text aliases */
+  --bg-deep-navy: #102A4C;
+  --bg-navy: #0F2747;
+  --color-ocean: #0F2747;
+  --color-cyan: #D6A63B;
+  --color-light-cyan: #F3E3B7;
+  --color-text-white: #F8F7F3;
+  --color-muted: #68717D;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--portin-warm-ivory);
+  color: var(--portin-text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar for enterprise platform */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F8F7F3;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D6A63B;
+}
+
+/* Accessible focus styling */
+:focus-visible {
+  outline: 2px solid #D6A63B;
+  outline-offset: 2px;
+}
+
+/* Enterprise Card styling */
+.enterprise-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E4E2DC;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(15, 39, 71, 0.04);
+}
+
+.enterprise-card-hover {
+  transition: all 0.2s ease-in-out;
+}
+.enterprise-card-hover:hover {
+  border-color: #D6A63B;
+  box-shadow: 0 4px 12px rgba(15, 39, 71, 0.08);
+}
+
+/* Reduced motion preference support */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
