@@ -9,7 +9,12 @@ Base = declarative_base()
 
 def get_engine():
     target_url = settings.DATABASE_URL
-    connect_args = {"check_same_thread": False} if target_url.startswith("sqlite") else {}
+    if target_url.startswith("sqlite"):
+        connect_args = {"check_same_thread": False}
+    else:
+        # Fast 3-second connect timeout so if remote Supabase DB is blocked/firewalled,
+        # it quickly falls back to high-performance local SQLite without delaying server start
+        connect_args = {"connect_timeout": 3}
     try:
         eng = create_engine(
             target_url,
