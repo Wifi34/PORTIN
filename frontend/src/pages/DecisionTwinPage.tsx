@@ -106,19 +106,21 @@ export const DecisionTwinPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-[#081426] via-[#0A2540] to-[#081426] border border-cyan-500/30 shadow-2xl">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="p-1 rounded bg-cyan-500/20 text-cyan-400">
-              <Sparkles className="w-4 h-4" />
+            <span className="p-1 rounded bg-[#F8F7F3] border border-[#E4E2DC] text-[#D6A63B]">
+              <Sparkles className="w-4 h-4 text-[#D6A63B]" />
             </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">SIH 2026 Killer Feature</span>
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#D6A63B]">
+              Enterprise Simulation
+            </span>
             <DataProvenanceBadge sourceType="SIMULATED DEMO" sourceName="Stochastic Twin Simulation Engine" />
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
+          <h1 className="text-2xl font-black text-[#0F2747] tracking-tight">
             PortIN Decision Twin: Digital World Simulation
           </h1>
-          <p className="text-xs text-slate-300 mt-1">
+          <p className="text-xs text-[#68717D] mt-1">
             Performs 36 multi-parameter perturbations (vessel classes, weather, congestion queues, laycans) to synthesize Plan A, B, and C.
           </p>
         </div>
@@ -127,7 +129,7 @@ export const DecisionTwinPage: React.FC = () => {
           <button
             onClick={runTwin}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-400 to-light-cyan hover:from-cyan-300 hover:to-cyan-200 text-black font-bold text-xs rounded-xl shadow-lg transition-all cursor-pointer disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#D6A63B] hover:bg-[#c49530] text-[#0F2747] font-black uppercase tracking-wider text-xs rounded-[8px] shadow-sm transition-all cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>{loading ? 'Simulating Worlds...' : 'Re-Run Decision Twin'}</span>
@@ -136,13 +138,13 @@ export const DecisionTwinPage: React.FC = () => {
       </div>
 
       {/* Input Parameters Bar */}
-      <div className="p-4 rounded-xl bg-[#081426] border border-slate-800 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
+      <div className="p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
         <div>
-          <label className="block text-slate-400 font-semibold mb-1">Cargo Type</label>
+          <label className="block text-[#0F2747] font-bold mb-1.5">Cargo Type</label>
           <select
             value={cargoType}
             onChange={(e) => setCargoType(e.target.value)}
-            className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white"
+            className="w-full px-2.5 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
           >
             <option value="Coking Coal">Coking Coal</option>
             <option value="Thermal Coal">Thermal Coal</option>
@@ -152,22 +154,22 @@ export const DecisionTwinPage: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-slate-400 font-semibold mb-1">Parcel Size (MT)</label>
+          <label className="block text-[#0F2747] font-bold mb-1.5">Parcel Size (MT)</label>
           <input
             type="number"
             step="5000"
             value={cargoMt}
             onChange={(e) => setCargoMt(Number(e.target.value))}
-            className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white"
+            className="w-full px-2.5 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
           />
         </div>
 
         <div>
-          <label className="block text-slate-400 font-semibold mb-1">Origin Node</label>
+          <label className="block text-[#0F2747] font-bold mb-1.5">Origin Node</label>
           <select
             value={originPort}
             onChange={(e) => setOriginPort(e.target.value)}
-            className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white"
+            className="w-full px-2.5 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
           >
             <option value="Gladstone">Gladstone (Australia)</option>
             <option value="Hay Point">Hay Point (Australia)</option>
@@ -179,11 +181,11 @@ export const DecisionTwinPage: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-slate-400 font-semibold mb-1">Destination Port</label>
+          <label className="block text-[#0F2747] font-bold mb-1.5">Destination Port</label>
           <select
             value={destinationPort}
             onChange={(e) => setDestinationPort(e.target.value)}
-            className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white"
+            className="w-full px-2.5 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
           >
             <option value="Paradip">Paradip (Odisha)</option>
             <option value="Visakhapatnam">Visakhapatnam (AP)</option>
@@ -195,21 +197,21 @@ export const DecisionTwinPage: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-slate-400 font-semibold mb-1">Laycan Window</label>
+          <label className="block text-[#0F2747] font-bold mb-1.5">Laycan Window</label>
           <input
             type="date"
             value={desiredDate}
             onChange={(e) => setDesiredDate(e.target.value)}
-            className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white"
+            className="w-full px-2.5 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
           />
         </div>
 
         <div>
-          <label className="block text-slate-400 font-semibold mb-1">Voyage Count</label>
+          <label className="block text-[#0F2747] font-bold mb-1.5">Voyage Count</label>
           <select
             value={numVoyages}
             onChange={(e) => setNumVoyages(Number(e.target.value))}
-            className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white"
+            className="w-full px-2.5 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
           >
             <option value="1">1 (Single Spot)</option>
             <option value="3">3 (Short-Term COA)</option>
@@ -221,10 +223,10 @@ export const DecisionTwinPage: React.FC = () => {
       {twinData && (
         <>
           {/* Key Strategic Insight Alert */}
-          <div className="p-4 rounded-xl bg-cyan-950/30 border border-cyan-500/40 flex items-start gap-3">
-            <Info className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
-            <div className="text-xs text-slate-200">
-              <span className="font-bold text-cyan-300 mr-1.5">Decision Twin Synthesis:</span>
+          <div className="p-4 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] flex items-start gap-3">
+            <Info className="w-5 h-5 text-[#D6A63B] shrink-0 mt-0.5" />
+            <div className="text-xs text-[#172033] leading-relaxed">
+              <strong className="text-[#0F2747] mr-1.5">Decision Twin Synthesis:</strong>
               {twinData.key_insight}
             </div>
           </div>
@@ -234,51 +236,51 @@ export const DecisionTwinPage: React.FC = () => {
             {/* PLAN A */}
             <div
               onClick={() => setSelectedPlanCode('PLAN A')}
-              className={`p-5 rounded-2xl cursor-pointer transition-all duration-200 relative ${
+              className={`p-6 rounded-[10px] cursor-pointer transition-all duration-200 relative bg-white ${
                 selectedPlanCode === 'PLAN A'
-                  ? 'bg-[#081426] border-2 border-cyan-400 shadow-xl shadow-cyan-500/10'
-                  : 'bg-[#081426]/70 border border-slate-800 hover:border-slate-700'
+                  ? 'border-2 border-[#D6A63B] shadow-md'
+                  : 'border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] hover:border-[#D6A63B]'
               }`}
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-black text-cyan-300 uppercase tracking-wider px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/30">
+                <span className="text-[10px] font-black text-[#0F2747] uppercase tracking-wider px-2.5 py-1 rounded-[4px] bg-[#F8F7F3] border border-[#E4E2DC]">
                   {twinData.plan_a.plan_code} • {twinData.plan_a.plan_label}
                 </span>
-                <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/60">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#2F7D4B] px-2.5 py-1 rounded-[4px] bg-[#F3FAF7] border border-[#BCF0DA]">
                   RECOMMENDED
                 </span>
               </div>
 
-              <div className="text-3xl font-black text-white tracking-tight my-2">
+              <div className="text-3xl font-black text-[#0F2747] tracking-tight my-2">
                 ${twinData.plan_a.expected_freight_rate.toFixed(2)}
-                <span className="text-xs font-normal text-slate-400 ml-1">/ MT</span>
+                <span className="text-xs font-normal text-[#68717D] ml-1">/ MT</span>
               </div>
-              <div className="text-xs font-bold text-slate-200 mb-4">{twinData.plan_a.contract_strategy}</div>
+              <div className="text-xs font-bold text-[#0F2747] mb-4">{twinData.plan_a.contract_strategy}</div>
 
-              <div className="space-y-2 text-xs text-slate-300 border-t border-slate-800/80 pt-3">
+              <div className="space-y-2 text-xs text-[#172033] border-t border-[#E4E2DC] pt-3">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Vessel:</span>
-                  <span className="font-semibold text-white">{twinData.plan_a.vessel_class}</span>
+                  <span className="text-[#68717D]">Vessel:</span>
+                  <span className="font-bold text-[#0F2747]">{twinData.plan_a.vessel_class}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Booking Window:</span>
-                  <span className="font-semibold text-cyan-400">{twinData.plan_a.booking_window}</span>
+                  <span className="text-[#68717D]">Booking Window:</span>
+                  <span className="font-bold text-[#2F7D4B]">{twinData.plan_a.booking_window}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Est. Idle Days:</span>
-                  <span className="font-semibold text-white">{twinData.plan_a.expected_idle_days} days</span>
+                  <span className="text-[#68717D]">Est. Idle Days:</span>
+                  <span className="font-bold text-[#0F2747]">{twinData.plan_a.expected_idle_days} days</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Risk Rating:</span>
-                  <span className="font-bold text-emerald-400">{twinData.plan_a.risk_level} ({twinData.plan_a.risk_score}/100)</span>
+                  <span className="text-[#68717D]">Risk Rating:</span>
+                  <span className="font-bold text-[#2F7D4B]">{twinData.plan_a.risk_level} ({twinData.plan_a.risk_score}/100)</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Total Logistics Cost:</span>
-                  <span className="font-mono font-bold text-white">${twinData.plan_a.estimated_logistics_cost_usd.toLocaleString()}</span>
+                  <span className="text-[#68717D]">Total Logistics Cost:</span>
+                  <span className="font-mono font-black text-[#0F2747]">${twinData.plan_a.estimated_logistics_cost_usd.toLocaleString()}</span>
                 </div>
               </div>
 
-              <p className="text-[11px] text-slate-400 mt-4 leading-relaxed line-clamp-3">
+              <p className="text-xs text-[#68717D] mt-4 leading-relaxed line-clamp-3">
                 {twinData.plan_a.rationale}
               </p>
             </div>
@@ -286,51 +288,51 @@ export const DecisionTwinPage: React.FC = () => {
             {/* PLAN B */}
             <div
               onClick={() => setSelectedPlanCode('PLAN B')}
-              className={`p-5 rounded-2xl cursor-pointer transition-all duration-200 relative ${
+              className={`p-6 rounded-[10px] cursor-pointer transition-all duration-200 relative bg-white ${
                 selectedPlanCode === 'PLAN B'
-                  ? 'bg-[#081426] border-2 border-emerald-400 shadow-xl shadow-emerald-500/10'
-                  : 'bg-[#081426]/70 border border-slate-800 hover:border-slate-700'
+                  ? 'border-2 border-[#2F7D4B] shadow-md'
+                  : 'border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] hover:border-[#2F7D4B]'
               }`}
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-black text-emerald-300 uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/30">
+                <span className="text-[10px] font-black text-[#0F2747] uppercase tracking-wider px-2.5 py-1 rounded-[4px] bg-[#F8F7F3] border border-[#E4E2DC]">
                   {twinData.plan_b.plan_code} • {twinData.plan_b.plan_label}
                 </span>
-                <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/60">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#2F7D4B] px-2.5 py-1 rounded-[4px] bg-[#F3FAF7] border border-[#BCF0DA]">
                   MINIMAL RISK
                 </span>
               </div>
 
-              <div className="text-3xl font-black text-white tracking-tight my-2">
+              <div className="text-3xl font-black text-[#0F2747] tracking-tight my-2">
                 ${twinData.plan_b.expected_freight_rate.toFixed(2)}
-                <span className="text-xs font-normal text-slate-400 ml-1">/ MT</span>
+                <span className="text-xs font-normal text-[#68717D] ml-1">/ MT</span>
               </div>
-              <div className="text-xs font-bold text-slate-200 mb-4">{twinData.plan_b.contract_strategy}</div>
+              <div className="text-xs font-bold text-[#0F2747] mb-4">{twinData.plan_b.contract_strategy}</div>
 
-              <div className="space-y-2 text-xs text-slate-300 border-t border-slate-800/80 pt-3">
+              <div className="space-y-2 text-xs text-[#172033] border-t border-[#E4E2DC] pt-3">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Vessel:</span>
-                  <span className="font-semibold text-white">{twinData.plan_b.vessel_class}</span>
+                  <span className="text-[#68717D]">Vessel:</span>
+                  <span className="font-bold text-[#0F2747]">{twinData.plan_b.vessel_class}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Booking Window:</span>
-                  <span className="font-semibold text-emerald-400">{twinData.plan_b.booking_window}</span>
+                  <span className="text-[#68717D]">Booking Window:</span>
+                  <span className="font-bold text-[#2F7D4B]">{twinData.plan_b.booking_window}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Est. Idle Days:</span>
-                  <span className="font-semibold text-white">{twinData.plan_b.expected_idle_days} days</span>
+                  <span className="text-[#68717D]">Est. Idle Days:</span>
+                  <span className="font-bold text-[#0F2747]">{twinData.plan_b.expected_idle_days} days</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Risk Rating:</span>
-                  <span className="font-bold text-emerald-400">{twinData.plan_b.risk_level} ({twinData.plan_b.risk_score}/100)</span>
+                  <span className="text-[#68717D]">Risk Rating:</span>
+                  <span className="font-bold text-[#2F7D4B]">{twinData.plan_b.risk_level} ({twinData.plan_b.risk_score}/100)</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Total Logistics Cost:</span>
-                  <span className="font-mono font-bold text-white">${twinData.plan_b.estimated_logistics_cost_usd.toLocaleString()}</span>
+                  <span className="text-[#68717D]">Total Logistics Cost:</span>
+                  <span className="font-mono font-black text-[#0F2747]">${twinData.plan_b.estimated_logistics_cost_usd.toLocaleString()}</span>
                 </div>
               </div>
 
-              <p className="text-[11px] text-slate-400 mt-4 leading-relaxed line-clamp-3">
+              <p className="text-xs text-[#68717D] mt-4 leading-relaxed line-clamp-3">
                 {twinData.plan_b.rationale}
               </p>
             </div>
@@ -338,51 +340,51 @@ export const DecisionTwinPage: React.FC = () => {
             {/* PLAN C */}
             <div
               onClick={() => setSelectedPlanCode('PLAN C')}
-              className={`p-5 rounded-2xl cursor-pointer transition-all duration-200 relative ${
+              className={`p-6 rounded-[10px] cursor-pointer transition-all duration-200 relative bg-white ${
                 selectedPlanCode === 'PLAN C'
-                  ? 'bg-[#081426] border-2 border-amber-400 shadow-xl shadow-amber-500/10'
-                  : 'bg-[#081426]/70 border border-slate-800 hover:border-slate-700'
+                  ? 'border-2 border-[#D98A27] shadow-md'
+                  : 'border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] hover:border-[#D98A27]'
               }`}
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-black text-amber-300 uppercase tracking-wider px-2 py-0.5 rounded bg-amber-950/80 border border-amber-500/30">
+                <span className="text-[10px] font-black text-[#0F2747] uppercase tracking-wider px-2.5 py-1 rounded-[4px] bg-[#F8F7F3] border border-[#E4E2DC]">
                   {twinData.plan_c.plan_code} • {twinData.plan_c.plan_label}
                 </span>
-                <span className="text-[10px] font-bold text-amber-400 px-2 py-0.5 rounded bg-amber-950/60">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#D98A27] px-2.5 py-1 rounded-[4px] bg-[#FEF7EC] border border-[#FBE6C2]">
                   LOWEST UNIT COST
                 </span>
               </div>
 
-              <div className="text-3xl font-black text-white tracking-tight my-2">
+              <div className="text-3xl font-black text-[#0F2747] tracking-tight my-2">
                 ${twinData.plan_c.expected_freight_rate.toFixed(2)}
-                <span className="text-xs font-normal text-slate-400 ml-1">/ MT</span>
+                <span className="text-xs font-normal text-[#68717D] ml-1">/ MT</span>
               </div>
-              <div className="text-xs font-bold text-slate-200 mb-4">{twinData.plan_c.contract_strategy}</div>
+              <div className="text-xs font-bold text-[#0F2747] mb-4">{twinData.plan_c.contract_strategy}</div>
 
-              <div className="space-y-2 text-xs text-slate-300 border-t border-slate-800/80 pt-3">
+              <div className="space-y-2 text-xs text-[#172033] border-t border-[#E4E2DC] pt-3">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Vessel:</span>
-                  <span className="font-semibold text-white">{twinData.plan_c.vessel_class}</span>
+                  <span className="text-[#68717D]">Vessel:</span>
+                  <span className="font-bold text-[#0F2747]">{twinData.plan_c.vessel_class}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Booking Window:</span>
-                  <span className="font-semibold text-amber-400">{twinData.plan_c.booking_window}</span>
+                  <span className="text-[#68717D]">Booking Window:</span>
+                  <span className="font-bold text-[#D98A27]">{twinData.plan_c.booking_window}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Est. Idle Days:</span>
-                  <span className="font-semibold text-white">{twinData.plan_c.expected_idle_days} days</span>
+                  <span className="text-[#68717D]">Est. Idle Days:</span>
+                  <span className="font-bold text-[#0F2747]">{twinData.plan_c.expected_idle_days} days</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Risk Rating:</span>
-                  <span className="font-bold text-amber-400">{twinData.plan_c.risk_level} ({twinData.plan_c.risk_score}/100)</span>
+                  <span className="text-[#68717D]">Risk Rating:</span>
+                  <span className="font-bold text-[#D98A27]">{twinData.plan_c.risk_level} ({twinData.plan_c.risk_score}/100)</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Total Logistics Cost:</span>
-                  <span className="font-mono font-bold text-white">${twinData.plan_c.estimated_logistics_cost_usd.toLocaleString()}</span>
+                  <span className="text-[#68717D]">Total Logistics Cost:</span>
+                  <span className="font-mono font-black text-[#0F2747]">${twinData.plan_c.estimated_logistics_cost_usd.toLocaleString()}</span>
                 </div>
               </div>
 
-              <p className="text-[11px] text-slate-400 mt-4 leading-relaxed line-clamp-3">
+              <p className="text-xs text-[#68717D] mt-4 leading-relaxed line-clamp-3">
                 {twinData.plan_c.rationale}
               </p>
             </div>
@@ -390,13 +392,13 @@ export const DecisionTwinPage: React.FC = () => {
 
           {/* Active Selected Plan Detailed Deep-Dive */}
           {activePlan && (
-            <div className="p-6 rounded-2xl bg-[#081426] border border-cyan-500/30 space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+            <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E4E2DC]">
                 <div>
-                  <span className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                  <span className="text-[11px] font-black text-[#D6A63B] uppercase tracking-widest">
                     Selected Execution Strategy
                   </span>
-                  <h3 className="text-xl font-bold text-white mt-0.5">
+                  <h3 className="text-xl font-black text-[#0F2747] mt-0.5">
                     {activePlan.plan_code}: {activePlan.plan_label} — {activePlan.vessel_class} ({activePlan.contract_strategy})
                   </h3>
                 </div>
@@ -405,15 +407,15 @@ export const DecisionTwinPage: React.FC = () => {
                   <button
                     onClick={() => handleSaveDecision(activePlan)}
                     disabled={saving}
-                    className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl border border-slate-700 transition-all cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-[#F8F7F3] text-[#0F2747] text-xs font-bold rounded-[8px] border border-[#E4E2DC] shadow-sm transition-all cursor-pointer"
                   >
-                    <Save className="w-4 h-4 text-cyan-400" />
+                    <Save className="w-4 h-4 text-[#D6A63B]" />
                     <span>{saveSuccess ? 'Decision Saved!' : saving ? 'Saving...' : 'Save Decision'}</span>
                   </button>
 
                   <button
                     onClick={() => navigate('/reports')}
-                    className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold rounded-xl transition-all cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-[#D6A63B] hover:bg-[#c49530] text-[#0F2747] text-xs font-black uppercase tracking-wider rounded-[8px] shadow-sm transition-all cursor-pointer"
                   >
                     <FileDown className="w-4 h-4" />
                     <span>Generate PDF Report</span>
@@ -423,48 +425,48 @@ export const DecisionTwinPage: React.FC = () => {
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[#0F2747] mb-2.5">
                     Operational Feasibility & Port Constraints
                   </h4>
-                  <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2 text-xs">
+                  <div className="p-4 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] space-y-2 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Target Berth:</span>
-                      <span className="font-semibold text-white">{activePlan.compatible_berth}</span>
+                      <span className="text-[#68717D]">Target Berth:</span>
+                      <span className="font-bold text-[#0F2747]">{activePlan.compatible_berth}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Berth Compatibility:</span>
-                      <span className="font-bold text-emerald-400">{activePlan.port_compatibility}</span>
+                      <span className="text-[#68717D]">Berth Compatibility:</span>
+                      <span className="font-bold text-[#2F7D4B]">{activePlan.port_compatibility}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Freight Variance Range:</span>
-                      <span className="font-mono text-cyan-400">{activePlan.freight_range}</span>
+                      <span className="text-[#68717D]">Freight Variance Range:</span>
+                      <span className="font-mono font-bold text-[#0F2747]">{activePlan.freight_range}</span>
                     </div>
                   </div>
 
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 mt-4 mb-2">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[#0F2747] mt-5 mb-2.5">
                     Why Was This Plan Selected?
                   </h4>
-                  <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+                  <div className="p-4 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-xs text-[#172033] leading-relaxed">
                     {activePlan.rationale}
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[#0F2747] mb-2.5">
                     Trade-Offs & Risk Considerations
                   </h4>
                   <ul className="space-y-2">
                     {activePlan.tradeoffs.map((t, idx) => (
-                      <li key={idx} className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 flex items-start gap-2.5">
-                        <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                      <li key={idx} className="p-3 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-xs text-[#172033] flex items-start gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-[#2F7D4B] shrink-0 mt-0.5" />
                         <span>{t}</span>
                       </li>
                     ))}
                   </ul>
 
-                  <div className="mt-4 p-4 rounded-xl bg-cyan-950/20 border border-cyan-500/20 text-xs text-slate-400 flex items-center justify-between">
+                  <div className="mt-4 p-3.5 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-xs text-[#68717D] flex items-center justify-between">
                     <span>Stochastic Simulation Run ID:</span>
-                    <span className="font-mono text-cyan-400 font-bold">{twinData.run_id}</span>
+                    <span className="font-mono text-[#0F2747] font-bold">{twinData.run_id}</span>
                   </div>
                 </div>
               </div>

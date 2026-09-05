@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   BarChart3, TrendingUp, AlertCircle, RefreshCw, ShieldCheck,
   DollarSign, Compass, Info, ArrowUpRight, ArrowDownRight
@@ -38,32 +38,35 @@ export const MarketIntelligencePage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">Freight Market Intelligence</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#D6A63B]">
+              Freight Market Intelligence
+            </span>
             <DataProvenanceBadge sourceType="SIMULATED DEMO" sourceName="Fixed Seed 42 Historical Benchmark Dataset" />
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-[#0F2747] tracking-tight">
             Trade Lane Dynamics & Baltic Index Proxies
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          </h2>
+          <p className="text-xs text-[#68717D] mt-0.5 font-medium">
             Historical freight trends, VLSFO bunker benchmarks, and Baltic Dry index indicators for major Indian bulk corridors.
           </p>
         </div>
       </div>
 
       {/* Trade Lane Table */}
-      <div className="bg-[#081426] border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <div className="p-4 border-b border-slate-800">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+      <div className="bg-white border border-[#E4E2DC] rounded-[10px] overflow-hidden shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+        <div className="p-4 border-b border-[#E4E2DC] flex items-center justify-between">
+          <h3 className="text-xs font-bold text-[#0F2747] uppercase tracking-wider">
             Major East Coast India Bulk Trade Lanes
           </h3>
+          <span className="text-[11px] font-semibold text-[#68717D]">Spot & Short-Term Indices</span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-900 text-slate-400 uppercase text-[10px] border-b border-slate-800">
+            <thead className="bg-[#F8F7F3] text-[#68717D] uppercase text-[10px] font-bold border-b border-[#E4E2DC]">
               <tr>
                 <th className="py-3 px-4">Trade Corridor</th>
                 <th className="py-3 px-4">Current Benchmark</th>
@@ -72,25 +75,25 @@ export const MarketIntelligencePage: React.FC = () => {
                 <th className="py-3 px-4">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
+            <tbody className="divide-y divide-[#E4E2DC]">
               {lanes.map((l, i) => (
-                <tr key={i} className="hover:bg-slate-900/40">
-                  <td className="py-3.5 px-4 font-bold text-white">{l.route}</td>
-                  <td className="py-3.5 px-4 font-mono font-bold text-cyan-300">${l.rate.toFixed(2)}/MT</td>
-                  <td className="py-3.5 px-4 font-semibold text-slate-200">
-                    <span className={l.change.startsWith('+') ? 'text-rose-400' : 'text-emerald-400'}>
+                <tr key={i} className="hover:bg-[#F8F7F3]">
+                  <td className="py-3.5 px-4 font-bold text-[#0F2747]">{l.route}</td>
+                  <td className="py-3.5 px-4 font-mono font-black text-[#0F2747]">${l.rate.toFixed(2)}/MT</td>
+                  <td className="py-3.5 px-4 font-bold">
+                    <span className={l.change.startsWith('+') ? 'text-[#C64A3B]' : 'text-[#2F7D4B]'}>
                       {l.change}
                     </span>
                   </td>
                   <td className="py-3.5 px-4">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-black border ${
-                      l.signal === 'BOOK NOW' ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40' :
-                      l.signal === 'WAIT' ? 'bg-amber-950 text-amber-300 border-amber-500/40' : 'bg-cyan-950 text-cyan-300 border-cyan-500/40'
+                    <span className={`px-2.5 py-1 rounded-[6px] text-xs font-black uppercase tracking-wider border ${
+                      l.signal === 'BOOK NOW' ? 'bg-[#F3FAF7] text-[#2F7D4B] border-[#BCF0DA]' :
+                      l.signal === 'WAIT' ? 'bg-[#FEF7EC] text-[#D98A27] border-[#FBE6C2]' : 'bg-[#F8F7F3] text-[#0F2747] border-[#E4E2DC]'
                     }`}>
                       {l.signal}
                     </span>
                   </td>
-                  <td className="py-3.5 px-4 text-slate-400">{l.status}</td>
+                  <td className="py-3.5 px-4 text-[#68717D] font-medium">{l.status}</td>
                 </tr>
               ))}
             </tbody>
@@ -99,30 +102,37 @@ export const MarketIntelligencePage: React.FC = () => {
       </div>
 
       {/* Historical Trend Chart */}
-      <div className="p-6 rounded-2xl bg-[#081426] border border-slate-800">
-        <div className="flex items-center justify-between mb-4">
+      <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-[#E4E2DC]">
           <div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+            <h3 className="text-sm font-bold text-[#0F2747] uppercase tracking-wider">
               12-Month Multi-Corridor Freight Trajectory
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">Comparative freight movement across key metallurgical corridors.</p>
+            <p className="text-xs text-[#68717D] mt-0.5 font-medium">Comparative freight movement across key metallurgical corridors.</p>
           </div>
-          <span className="text-xs text-slate-400 font-mono">USD / Metric Ton</span>
+          <span className="text-xs text-[#68717D] font-mono font-semibold">USD / Metric Ton</span>
         </div>
 
-        <div className="h-72 w-full">
+        <div className="h-72 w-full pt-2">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={historicalIndices} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-              <XAxis dataKey="month" stroke="#64748B" fontSize={10} />
-              <YAxis stroke="#64748B" fontSize={10} domain={['dataMin - 1', 'dataMax + 1']} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#E4E2DC" vertical={false} />
+              <XAxis dataKey="month" stroke="#68717D" fontSize={10} />
+              <YAxis stroke="#68717D" fontSize={10} domain={['dataMin - 1', 'dataMax + 1']} tickFormatter={(v) => `$${v}`} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#081426', borderColor: '#00B8D9', borderRadius: '8px', fontSize: '11px' }}
-                formatter={(v: any) => [`$${v}/MT`]}
+                contentStyle={{
+                  backgroundColor: '#FFFFFF',
+                  borderColor: '#E4E2DC',
+                  borderRadius: '8px',
+                  fontSize: '11px',
+                  color: '#172033',
+                  boxShadow: '0 4px 12px rgba(15, 39, 71, 0.08)',
+                }}
+                formatter={(val: any) => [`$${Number(val).toFixed(2)}/MT`]}
               />
-              <Legend wrapperStyle={{ fontSize: '11px' }} />
-              <Line type="monotone" dataKey="Australia" stroke="#00B8D9" strokeWidth={2.5} dot={{ r: 3 }} name="Australia -> Paradip" />
-              <Line type="monotone" dataKey="Indonesia" stroke="#62E5F2" strokeWidth={2} dot={{ r: 3 }} name="Indonesia -> Dhamra" />
+              <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+              <Line type="monotone" dataKey="Australia" stroke="#0F2747" strokeWidth={2.5} dot={{ r: 3, fill: '#D6A63B' }} />
+              <Line type="monotone" dataKey="Indonesia" stroke="#2F7D4B" strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>

@@ -43,85 +43,88 @@ export const ContractIntelligencePage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="p-5 rounded-2xl bg-gradient-to-r from-[#081426] via-[#0A2540] to-[#081426] border border-cyan-500/30 shadow-2xl">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="p-1 rounded bg-cyan-500/20 text-cyan-400">
-                <Zap className="w-4 h-4" />
-              </span>
-              <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">Official SIH Core Objective</span>
-              <DataProvenanceBadge sourceType="SIMULATED DEMO" sourceName="Multi-Voyage Volatility Optimization Model" />
-            </div>
-            <h1 className="text-2xl font-black text-white tracking-tight">
-              Spot Chartering &rarr; Multi-Voyage Contract Optimization
-            </h1>
-            <p className="text-xs text-slate-300 mt-1">
-              Evaluates financial savings, rate volatility insulation, and priority berthing benefits of transitioning from repeated spot fixtures to structured Consecutive Voyage Contracts (COA).
-            </p>
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#D6A63B]">
+              Core Decision Objective
+            </span>
+            <DataProvenanceBadge sourceType="SIMULATED DEMO" sourceName="Multi-Voyage Volatility Optimization Model" />
           </div>
-
-          <button
-            onClick={evaluateContracts}
-            disabled={loading}
-            className="px-4 py-2 bg-gradient-to-r from-cyan-400 to-light-cyan hover:from-cyan-300 text-black font-bold text-xs rounded-xl shadow-lg transition-all self-start cursor-pointer"
-          >
-            {loading ? 'Optimizing...' : 'Calculate Contract Strategies'}
-          </button>
+          <h2 className="text-xl sm:text-2xl font-black text-[#0F2747] tracking-tight">
+            Spot Chartering &rarr; Multi-Voyage Contract Optimization
+          </h2>
+          <p className="text-xs text-[#68717D] mt-0.5 font-medium">
+            Evaluates financial savings, rate volatility insulation, and priority berthing benefits of transitioning from repeated spot fixtures to structured Consecutive Voyage Contracts (COA).
+          </p>
         </div>
+
+        <button
+          onClick={evaluateContracts}
+          disabled={loading}
+          className="px-4 py-2.5 rounded-[8px] text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm self-start"
+          style={{
+            backgroundColor: '#D6A63B',
+            color: '#0F2747',
+          }}
+        >
+          {loading ? 'Optimizing...' : 'Calculate Contract Strategies'}
+        </button>
       </div>
 
       {/* Recommended Strategy Spotlight Card */}
       {recommendedContract && (
-        <div className="p-6 rounded-2xl bg-gradient-to-br from-cyan-950/40 to-[#081426] border-2 border-cyan-400 shadow-xl">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-            <div className="flex items-center gap-2.5">
-              <Award className="w-6 h-6 text-cyan-400" />
+        <div className="p-6 rounded-[10px] bg-white border-2 border-[#D6A63B] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E4E2DC]">
+            <div className="flex items-center gap-3">
+              <span className="p-2 rounded-lg bg-[#F8F7F3] text-[#D6A63B] border border-[#E4E2DC]">
+                <Award className="w-5 h-5" />
+              </span>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-cyan-400">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#D6A63B] block">
                   RECOMMENDED STRATEGY FOR SAIL
                 </span>
-                <h2 className="text-2xl font-black text-white">
+                <h3 className="text-2xl font-black text-[#0F2747]">
                   {recommendedContract.contract_type}
-                </h2>
+                </h3>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs px-3 py-1 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+              <span className="text-xs px-3 py-1 rounded-[6px] font-black bg-[#F3FAF7] text-[#2F7D4B] border border-[#BCF0DA]">
                 Direct Savings: ${recommendedContract.savings_vs_spot_usd.toLocaleString()} USD
               </span>
-              <span className="text-xs px-3 py-1 rounded-full font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/40">
+              <span className="text-xs px-3 py-1 rounded-[6px] font-bold bg-[#F8F7F3] text-[#0F2747] border border-[#E4E2DC]">
                 Certainty: {recommendedContract.planning_certainty_pct}%
               </span>
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-4 gap-4 text-xs text-slate-300 mt-4 pt-4 border-t border-slate-800">
-            <div>
-              <span className="text-slate-400 block text-[11px]">Negotiated Unit Freight:</span>
-              <span className="text-lg font-black text-white font-mono">${recommendedContract.avg_freight_per_mt.toFixed(2)} / MT</span>
+          <div className="grid sm:grid-cols-4 gap-3 text-xs text-[#68717D]">
+            <div className="p-3 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC]">
+              <span className="text-[10px] font-bold uppercase block text-[#68717D]">Negotiated Unit Freight:</span>
+              <span className="text-xl font-black text-[#0F2747] font-mono mt-0.5 block">${recommendedContract.avg_freight_per_mt.toFixed(2)} / MT</span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Total Cargo Commitment:</span>
-              <span className="text-lg font-black text-white font-mono">{recommendedContract.total_cargo_mt.toLocaleString()} MT</span>
+            <div className="p-3 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC]">
+              <span className="text-[10px] font-bold uppercase block text-[#68717D]">Total Cargo Commitment:</span>
+              <span className="text-xl font-black text-[#0F2747] font-mono mt-0.5 block">{recommendedContract.total_cargo_mt.toLocaleString()} MT</span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Anchorage Waiting:</span>
-              <span className="text-lg font-black text-cyan-300 font-mono">{recommendedContract.idle_time_days} Days Total</span>
+            <div className="p-3 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC]">
+              <span className="text-[10px] font-bold uppercase block text-[#68717D]">Anchorage Waiting:</span>
+              <span className="text-xl font-black text-[#2F7D4B] font-mono mt-0.5 block">{recommendedContract.idle_time_days} Days Total</span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Volatility Exposure:</span>
-              <span className="text-lg font-black text-emerald-400 font-mono">{recommendedContract.rate_volatility_exposure}</span>
+            <div className="p-3 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC]">
+              <span className="text-[10px] font-bold uppercase block text-[#68717D]">Volatility Exposure:</span>
+              <span className="text-xl font-black text-[#2F7D4B] font-mono mt-0.5 block">{recommendedContract.rate_volatility_exposure}</span>
             </div>
           </div>
 
-          <div className="mt-4 p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
-            <span className="font-bold text-cyan-300 block mb-1">Key Operational Advantages:</span>
-            <ul className="list-disc list-inside space-y-1 text-slate-300">
+          <div className="p-3.5 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-xs text-[#172033] font-medium leading-relaxed">
+            <span className="font-bold text-[#0F2747] block mb-1">Key Operational Advantages:</span>
+            <ul className="list-disc list-inside space-y-1 text-[#68717D]">
               {recommendedContract.pros.map((pro, idx) => (
-                <li key={idx}>{pro}</li>
+                <li key={idx}><span className="text-[#172033]">{pro}</span></li>
               ))}
             </ul>
           </div>
@@ -133,69 +136,69 @@ export const ContractIntelligencePage: React.FC = () => {
         {contracts.map((c, idx) => (
           <div
             key={idx}
-            className={`p-5 rounded-2xl border transition-all ${
+            className={`p-6 rounded-[10px] border transition-all ${
               c.is_recommended
-                ? 'bg-[#081426] border-cyan-400 shadow-xl shadow-cyan-500/5'
-                : 'bg-[#081426]/70 border-slate-800'
+                ? 'bg-white border-2 border-[#D6A63B] shadow-[0_1px_3px_rgba(15,39,71,0.04)]'
+                : 'bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]'
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-200">
+            <div className="flex items-center justify-between pb-2 border-b border-[#E4E2DC] mb-3">
+              <span className="text-xs font-black uppercase tracking-wider text-[#0F2747]">
                 {c.contract_type}
               </span>
               {c.is_recommended && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500 text-black uppercase">
-                  Selected
+                <span className="text-[9px] font-black px-2 py-0.5 rounded-[4px] bg-[#D6A63B] text-[#0F2747] uppercase">
+                  SELECTED
                 </span>
               )}
             </div>
 
-            <div className="text-3xl font-black text-white tracking-tight my-2">
+            <div className="text-3xl font-black text-[#0F2747] tracking-tight my-2">
               ${c.avg_freight_per_mt.toFixed(2)}
-              <span className="text-xs font-normal text-slate-400 ml-1">/ MT</span>
+              <span className="text-xs font-normal text-[#68717D] ml-1">/ MT</span>
             </div>
 
-            <div className="space-y-2.5 text-xs text-slate-300 border-t border-slate-800 pt-3 my-3">
+            <div className="space-y-2.5 text-xs text-[#68717D] border-t border-[#E4E2DC] pt-3 my-3">
               <div className="flex justify-between">
-                <span className="text-slate-400">Voyages:</span>
-                <span className="font-semibold text-white">{c.num_voyages} Voyages</span>
+                <span>Voyages:</span>
+                <span className="font-bold text-[#0F2747]">{c.num_voyages} Voyages</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Total Logistics Cost:</span>
-                <span className="font-mono font-bold text-white">${c.total_logistics_cost_usd.toLocaleString()}</span>
+                <span>Total Logistics Cost:</span>
+                <span className="font-mono font-bold text-[#0F2747]">${c.total_logistics_cost_usd.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Volatility Risk:</span>
-                <span className={`font-bold ${c.rate_volatility_exposure === 'HIGH' ? 'text-rose-400' : 'text-emerald-400'}`}>
+                <span>Volatility Risk:</span>
+                <span className={`font-bold ${c.rate_volatility_exposure === 'HIGH' ? 'text-[#C64A3B]' : 'text-[#2F7D4B]'}`}>
                   {c.rate_volatility_exposure}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Anchorage Idle Days:</span>
-                <span className="font-semibold text-white">{c.idle_time_days} days</span>
+                <span>Anchorage Idle Days:</span>
+                <span className="font-bold text-[#0F2747]">{c.idle_time_days} days</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Planning Certainty:</span>
-                <span className="font-semibold text-cyan-400">{c.planning_certainty_pct}%</span>
+                <span>Planning Certainty:</span>
+                <span className="font-bold text-[#0F2747]">{c.planning_certainty_pct}%</span>
               </div>
             </div>
 
-            <div className="border-t border-slate-800 pt-3 space-y-2">
-              <div className="text-[11px] text-slate-300">
-                <span className="text-cyan-400 font-bold block mb-1">Pros:</span>
+            <div className="border-t border-[#E4E2DC] pt-3 space-y-2">
+              <div className="text-[11px] text-[#172033]">
+                <span className="text-[#2F7D4B] font-bold block mb-1">Pros:</span>
                 {c.pros.map((p, i) => (
-                  <div key={i} className="flex items-start gap-1.5 text-slate-400">
-                    <span className="text-cyan-400 font-bold">✓</span>
+                  <div key={i} className="flex items-start gap-1.5 text-[#68717D]">
+                    <span className="text-[#2F7D4B] font-bold">✓</span>
                     <span>{p}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="text-[11px] text-slate-300 mt-2">
-                <span className="text-rose-400 font-bold block mb-1">Cons:</span>
+              <div className="text-[11px] text-[#172033] mt-2">
+                <span className="text-[#C64A3B] font-bold block mb-1">Cons:</span>
                 {c.cons.map((con, i) => (
-                  <div key={i} className="flex items-start gap-1.5 text-slate-400">
-                    <span className="text-rose-400 font-bold">✕</span>
+                  <div key={i} className="flex items-start gap-1.5 text-[#68717D]">
+                    <span className="text-[#C64A3B] font-bold">✕</span>
                     <span>{con}</span>
                   </div>
                 ))}

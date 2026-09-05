@@ -83,16 +83,18 @@ export const ScenarioLabPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">Interactive What-If Simulation</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#D6A63B]">
+              Interactive What-If Simulation
+            </span>
             <DataProvenanceBadge sourceType="SIMULATED DEMO" sourceName="Real-Time Sensitivity Engine" />
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-[#0F2747] tracking-tight">
             Scenario Lab & Sensitivity Engine
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          </h2>
+          <p className="text-xs text-[#68717D] mt-0.5 font-medium">
             Adjust market shocks, bunker fluctuations, weather delays, and tidal draft restrictions to evaluate operational impact.
           </p>
         </div>
@@ -100,20 +102,24 @@ export const ScenarioLabPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={handleReset}
-            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300 transition-colors"
+            className="px-3.5 py-2 rounded-[8px] bg-[#F8F7F3] hover:bg-[#E4E2DC] border border-[#E4E2DC] text-xs font-bold text-[#0F2747] transition-colors"
           >
             Reset
           </button>
           <button
             onClick={handleDuplicate}
-            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300 transition-colors flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-[8px] bg-[#F8F7F3] hover:bg-[#E4E2DC] border border-[#E4E2DC] text-xs font-bold text-[#0F2747] transition-colors flex items-center gap-1.5"
           >
-            <Copy className="w-3.5 h-3.5 text-cyan-400" />
+            <Copy className="w-3.5 h-3.5 text-[#D6A63B]" />
             <span>Duplicate</span>
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2 rounded-[8px] text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+            style={{
+              backgroundColor: '#D6A63B',
+              color: '#0F2747',
+            }}
           >
             <Save className="w-3.5 h-3.5" />
             <span>{saveSuccess ? 'Saved!' : 'Save Scenario'}</span>
@@ -121,20 +127,20 @@ export const ScenarioLabPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Interactive Sliders Controls */}
-        <div className="bg-[#081426] border border-slate-800 rounded-2xl p-5 space-y-4">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-cyan-400 pb-2 border-b border-slate-800 flex items-center justify-between">
-            <span>Stress Testing Levers</span>
-            <Sliders className="w-4 h-4" />
-          </h2>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left: Interactive Sliders Controls (5 cols) */}
+        <div className="lg:col-span-5 bg-white border border-[#E4E2DC] rounded-[10px] p-5 shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+          <div className="pb-3 border-b border-[#E4E2DC] flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0F2747]">Stress Testing Levers</span>
+            <Sliders className="w-4 h-4 text-[#D6A63B]" />
+          </div>
 
           <div className="space-y-4 text-xs">
             {/* Freight Rate Shift */}
             <div>
-              <div className="flex justify-between text-slate-300 font-semibold mb-1">
+              <div className="flex justify-between text-[#172033] font-bold mb-1">
                 <span>Spot Freight Rate Shift:</span>
-                <span className={`font-mono font-bold ${freightDelta > 0 ? 'text-rose-400' : freightDelta < 0 ? 'text-emerald-400' : 'text-cyan-400'}`}>
+                <span className={`font-mono font-black ${freightDelta > 0 ? 'text-[#C64A3B]' : freightDelta < 0 ? 'text-[#2F7D4B]' : 'text-[#0F2747]'}`}>
                   {freightDelta > 0 ? `+${freightDelta}%` : `${freightDelta}%`}
                 </span>
               </div>
@@ -145,15 +151,15 @@ export const ScenarioLabPage: React.FC = () => {
                 step="5"
                 value={freightDelta}
                 onChange={(e) => setFreightDelta(Number(e.target.value))}
-                className="w-full accent-cyan-400"
+                className="w-full accent-[#D6A63B]"
               />
             </div>
 
             {/* Bunker Price Shift */}
             <div>
-              <div className="flex justify-between text-slate-300 font-semibold mb-1">
+              <div className="flex justify-between text-[#172033] font-bold mb-1">
                 <span>VLSFO Bunker Fuel Price Shift:</span>
-                <span className={`font-mono font-bold ${bunkerDelta > 0 ? 'text-rose-400' : bunkerDelta < 0 ? 'text-emerald-400' : 'text-cyan-400'}`}>
+                <span className={`font-mono font-black ${bunkerDelta > 0 ? 'text-[#C64A3B]' : bunkerDelta < 0 ? 'text-[#2F7D4B]' : 'text-[#0F2747]'}`}>
                   {bunkerDelta > 0 ? `+${bunkerDelta}%` : `${bunkerDelta}%`}
                 </span>
               </div>
@@ -164,15 +170,15 @@ export const ScenarioLabPage: React.FC = () => {
                 step="5"
                 value={bunkerDelta}
                 onChange={(e) => setBunkerDelta(Number(e.target.value))}
-                className="w-full accent-cyan-400"
+                className="w-full accent-[#D6A63B]"
               />
             </div>
 
             {/* Port Anchorage Delay */}
             <div>
-              <div className="flex justify-between text-slate-300 font-semibold mb-1">
+              <div className="flex justify-between text-[#172033] font-bold mb-1">
                 <span>Anchorage Congestion Delay:</span>
-                <span className="font-mono font-bold text-amber-400">
+                <span className="font-mono font-black text-[#D98A27]">
                   {congestionDelta > 0 ? `+${congestionDelta} Days` : `${congestionDelta} Days`}
                 </span>
               </div>
@@ -183,15 +189,15 @@ export const ScenarioLabPage: React.FC = () => {
                 step="1"
                 value={congestionDelta}
                 onChange={(e) => setCongestionDelta(Number(e.target.value))}
-                className="w-full accent-cyan-400"
+                className="w-full accent-[#D6A63B]"
               />
             </div>
 
             {/* Weather Risk Factor */}
             <div>
-              <div className="flex justify-between text-slate-300 font-semibold mb-1">
+              <div className="flex justify-between text-[#172033] font-bold mb-1">
                 <span>Bay of Bengal Wave/Weather Factor:</span>
-                <span className="font-mono font-bold text-white">{weatherFactor}x</span>
+                <span className="font-mono font-black text-[#0F2747]">{weatherFactor}x</span>
               </div>
               <input
                 type="range"
@@ -200,15 +206,15 @@ export const ScenarioLabPage: React.FC = () => {
                 step="0.25"
                 value={weatherFactor}
                 onChange={(e) => setWeatherFactor(Number(e.target.value))}
-                className="w-full accent-cyan-400"
+                className="w-full accent-[#D6A63B]"
               />
             </div>
 
             {/* Tidal / Draft Restriction */}
             <div>
-              <div className="flex justify-between text-slate-300 font-semibold mb-1">
+              <div className="flex justify-between text-[#172033] font-bold mb-1">
                 <span>Berth Permissible Draft Reduction:</span>
-                <span className="font-mono font-bold text-rose-400">{draftRestriction} m</span>
+                <span className="font-mono font-black text-[#C64A3B]">{draftRestriction} m</span>
               </div>
               <input
                 type="range"
@@ -217,17 +223,17 @@ export const ScenarioLabPage: React.FC = () => {
                 step="0.5"
                 value={draftRestriction}
                 onChange={(e) => setDraftRestriction(Number(e.target.value))}
-                className="w-full accent-cyan-400"
+                className="w-full accent-[#D6A63B]"
               />
             </div>
 
             {/* Vessel Category Dropdown */}
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Tested Vessel Category</label>
+              <label className="block text-[#172033] font-bold mb-1">Tested Vessel Category</label>
               <select
                 value={vessel}
                 onChange={(e) => setVessel(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white"
+                className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
               >
                 <option value="Panamax">Panamax (Typical Draft 14.2m)</option>
                 <option value="Supramax">Supramax (Typical Draft 12.8m)</option>
@@ -238,11 +244,11 @@ export const ScenarioLabPage: React.FC = () => {
 
             {/* Contract Type Dropdown */}
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Contract Strategy</label>
+              <label className="block text-[#172033] font-bold mb-1">Contract Strategy</label>
               <select
                 value={contractType}
                 onChange={(e) => setContractType(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white"
+                className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
               >
                 <option value="Single Spot Charter">Single Spot Charter (High Volatility)</option>
                 <option value="Short-Term Multi-Voyage (3 Voyages)">Short-Term Multi-Voyage (3 Voyages)</option>
@@ -252,70 +258,70 @@ export const ScenarioLabPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Real-Time Dynamic Impact Analytics */}
-        <div className="lg:col-span-2 space-y-4">
+        {/* Right: Real-Time Dynamic Impact Analytics (7 cols) */}
+        <div className="lg:col-span-7 space-y-4">
           {result && (
             <>
               {/* Verdict Banner */}
-              <div className="p-4 rounded-2xl bg-cyan-950/30 border border-cyan-500/30">
-                <span className="text-[10px] font-black uppercase text-cyan-400 tracking-wider">Dynamic Scenario Verdict</span>
-                <div className="text-base font-bold text-white mt-1">{result.scenario_verdict}</div>
+              <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+                <span className="text-[10px] font-black uppercase text-[#D6A63B] tracking-wider block">Dynamic Scenario Verdict</span>
+                <div className="text-base font-black text-[#0F2747] mt-1">{result.scenario_verdict}</div>
               </div>
 
               {/* Metrics Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-4 rounded-xl bg-[#081426] border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Adjusted Freight</span>
-                  <div className="text-xl font-black text-cyan-300 font-mono mt-1">
+                <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+                  <span className="text-[10px] font-bold text-[#68717D] uppercase block">Adjusted Freight</span>
+                  <div className="text-xl font-black text-[#0F2747] font-mono mt-1">
                     ${result.adjusted_unit_freight.toFixed(2)}
                   </div>
-                  <span className="text-[10px] text-slate-500">USD / MT</span>
+                  <span className="text-[10px] text-[#68717D] block mt-0.5">USD / MT</span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-[#081426] border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Demurrage Loss</span>
-                  <div className="text-xl font-black text-rose-400 font-mono mt-1">
+                <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+                  <span className="text-[10px] font-bold text-[#68717D] uppercase block">Demurrage Loss</span>
+                  <div className="text-xl font-black text-[#C64A3B] font-mono mt-1">
                     ${result.demurrage_cost_usd.toLocaleString()}
                   </div>
-                  <span className="text-[10px] text-slate-500">{result.estimated_idle_days} Idle Days</span>
+                  <span className="text-[10px] text-[#68717D] block mt-0.5">{result.estimated_idle_days} Idle Days</span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-[#081426] border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Total Logistics Cost</span>
-                  <div className="text-xl font-black text-white font-mono mt-1">
+                <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+                  <span className="text-[10px] font-bold text-[#68717D] uppercase block">Total Cost</span>
+                  <div className="text-xl font-black text-[#0F2747] font-mono mt-1">
                     ${result.total_logistics_cost_usd.toLocaleString()}
                   </div>
-                  <span className="text-[10px] text-slate-500">Freight + Demurrage</span>
+                  <span className="text-[10px] text-[#68717D] block mt-0.5">Freight + Demurrage</span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-[#081426] border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Operational Risk</span>
-                  <div className={`text-xl font-black font-mono mt-1 ${result.risk_evaluation.risk_color === 'red' ? 'text-rose-400' : result.risk_evaluation.risk_color === 'amber' ? 'text-amber-400' : 'text-emerald-400'}`}>
+                <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+                  <span className="text-[10px] font-bold text-[#68717D] uppercase block">Operational Risk</span>
+                  <div className={`text-xl font-black font-mono mt-1 ${result.risk_evaluation.risk_color === 'red' ? 'text-[#C64A3B]' : result.risk_evaluation.risk_color === 'amber' ? 'text-[#D98A27]' : 'text-[#2F7D4B]'}`}>
                     {result.risk_evaluation.risk_score} / 100
                   </div>
-                  <span className="text-[10px] text-slate-500">{result.risk_evaluation.risk_category}</span>
+                  <span className="text-[10px] text-[#68717D] block mt-0.5">{result.risk_evaluation.risk_category}</span>
                 </div>
               </div>
 
               {/* Compatibility & Draft Clearance */}
-              <div className="p-5 rounded-2xl bg-[#081426] border border-slate-800">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+              <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-[#E4E2DC]">
+                  <h3 className="text-xs font-bold text-[#0F2747] uppercase tracking-wider">
                     Physical Draft & Berth Clearance Under Restriction
                   </h3>
-                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
+                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded-[6px] border ${
                     result.is_port_compatible
-                      ? 'bg-emerald-950 text-emerald-400 border-emerald-500/40'
-                      : 'bg-rose-950 text-rose-400 border-rose-500/40'
+                      ? 'bg-[#F3FAF7] text-[#2F7D4B] border-[#BCF0DA]'
+                      : 'bg-[#FDF2F2] text-[#C64A3B] border-[#F8B4B4]'
                   }`}>
                     {result.is_port_compatible ? 'FEASIBLE' : 'INFEASIBLE (Draft Violation)'}
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
+                <div className="p-3.5 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-xs text-[#172033] font-medium leading-relaxed">
                   Under the simulated draft adjustment ({draftRestriction}m), effective permissible draft is {14.5 + draftRestriction}m.
                   The tested {vessel} requires {vessel === 'Panamax' ? '14.2m' : vessel === 'Capesize' ? '18.2m' : '12.8m'}.
-                  Resulting draft margin: <span className="font-mono font-bold text-white">{result.draft_margin_m} meters</span>.
+                  Resulting draft margin: <span className="font-mono font-black text-[#0F2747]">{result.draft_margin_m} meters</span>.
                 </div>
               </div>
             </>

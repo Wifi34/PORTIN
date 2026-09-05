@@ -29,81 +29,87 @@ export const ProfilePage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-2xl">
       {/* Header */}
-      <div className="pb-4 border-b border-slate-800">
-        <h1 className="text-2xl font-black text-white tracking-tight">
+      <div className="pb-4 border-b border-[#E4E2DC]">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[11px] font-black uppercase tracking-widest text-[#D6A63B]">
+            Operator Security & Credentials
+          </span>
+          <DataProvenanceBadge sourceType="OFFICIAL STATIC" />
+        </div>
+        <h1 className="text-2xl font-black text-[#0F2747] tracking-tight">
           Operator Profile & Account Credentials
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-[#68717D] mt-1">
           Manage your organizational designation and security access privileges.
         </p>
       </div>
 
       {success && (
-        <div className="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="p-3.5 rounded-[8px] bg-[#F3FAF7] border border-[#BCF0DA] text-[#2F7D4B] text-xs flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-[#2F7D4B]" />
           <span>Profile information updated successfully.</span>
         </div>
       )}
 
-      <form onSubmit={handleUpdate} className="p-6 rounded-2xl bg-[#081426] border border-slate-800 space-y-4">
+      <form onSubmit={handleUpdate} className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+          <label className="block text-[11px] font-black uppercase tracking-wider text-[#0F2747] mb-1.5">
             Full Name
           </label>
           <div className="relative">
-            <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <User className="w-4 h-4 text-[#68717D] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:border-cyan-400"
+              className="w-full pl-10 pr-4 py-2.5 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-xs text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+          <label className="block text-[11px] font-black uppercase tracking-wider text-[#0F2747] mb-1.5">
             Official Email (Read-Only)
           </label>
           <div className="relative">
-            <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Mail className="w-4 h-4 text-[#68717D] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="email"
               disabled
               value={user?.email || ''}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-400 cursor-not-allowed"
+              className="w-full pl-10 pr-4 py-2.5 bg-[#F8F7F3]/70 border border-[#E4E2DC] rounded-[8px] text-xs text-[#68717D] cursor-not-allowed font-medium"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+          <label className="block text-[11px] font-black uppercase tracking-wider text-[#0F2747] mb-1.5">
             Organization / Department
           </label>
           <div className="relative">
-            <Building className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Building className="w-4 h-4 text-[#68717D] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               required
               value={organization}
               onChange={(e) => setOrganization(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:border-cyan-400"
+              className="w-full pl-10 pr-4 py-2.5 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-xs text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+          <label className="block text-[11px] font-black uppercase tracking-wider text-[#0F2747] mb-1.5">
             Assigned System Role
           </label>
           <div className="relative">
-            <Shield className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Shield className="w-4 h-4 text-[#68717D] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               disabled
               value={user?.role?.toUpperCase().replace('_', ' ') || 'ANALYST'}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-cyan-400 cursor-not-allowed"
+              className="w-full pl-10 pr-4 py-2.5 bg-[#F8F7F3]/70 border border-[#E4E2DC] rounded-[8px] text-xs font-bold text-[#0F2747] cursor-not-allowed"
             />
           </div>
         </div>
@@ -111,7 +117,7 @@ export const ProfilePage: React.FC = () => {
         <button
           type="submit"
           disabled={saving}
-          className="w-full py-2.5 bg-gradient-to-r from-cyan-400 to-light-cyan hover:from-cyan-300 text-black font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer mt-4"
+          className="w-full py-3 bg-[#D6A63B] hover:bg-[#c49530] text-[#0F2747] font-black uppercase tracking-wider text-xs rounded-[8px] shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer mt-4"
         >
           <Save className="w-4 h-4" />
           <span>{saving ? 'Saving Profile...' : 'Save Profile Changes'}</span>

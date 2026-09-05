@@ -171,63 +171,66 @@ export const AdminPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E4E2DC]">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="p-1 rounded bg-amber-500/20 text-amber-400">
-              <Shield className="w-4 h-4" />
+            <span className="p-1 rounded-[6px] bg-[#F8F7F3] border border-[#E4E2DC] text-[#D6A63B]">
+              <Shield className="w-4 h-4 text-[#D6A63B]" />
             </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-400">System Administration & Master Data</span>
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#D6A63B]">
+              System Administration & Master Data
+            </span>
             <DataProvenanceBadge sourceType="OFFICIAL STATIC" />
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
+          <h1 className="text-2xl font-black text-[#0F2747] tracking-tight">
             Administrator Control Center
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[#68717D] mt-1">
             Manage production cloud credentials, OpenAI GPT model lifecycles, and gazetted port master data.
           </p>
         </div>
 
         <button
           onClick={loadData}
-          className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition-colors"
+          className="p-2.5 rounded-[8px] bg-white hover:bg-[#F8F7F3] border border-[#E4E2DC] text-[#0F2747] shadow-sm transition-colors self-start sm:self-center"
+          title="Refresh Admin Data"
         >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-cyan-400' : ''}`} />
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#D6A63B]' : ''}`} />
         </button>
       </div>
 
       {/* Admin KPI Ribbon */}
       {overview && (
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-          <div className="p-3.5 rounded-xl bg-[#081426] border border-slate-800">
-            <span className="text-[10px] uppercase font-bold text-slate-400">System Status</span>
-            <div className="text-lg font-black text-emerald-400 mt-0.5">{overview.system_status}</div>
+          <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+            <span className="text-[10px] uppercase font-bold text-[#68717D]">System Status</span>
+            <div className="text-lg font-black text-[#2F7D4B] mt-0.5">{overview.system_status}</div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#081426] border border-slate-800">
-            <span className="text-[10px] uppercase font-bold text-slate-400">Active Database</span>
-            <div className="text-lg font-black text-white mt-0.5">{integrations?.database?.dialect || 'SQLite'}</div>
+          <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+            <span className="text-[10px] uppercase font-bold text-[#68717D]">Active Database</span>
+            <div className="text-lg font-black text-[#0F2747] mt-0.5">{integrations?.database?.dialect || 'SQLite'}</div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#081426] border border-slate-800">
-            <span className="text-[10px] uppercase font-bold text-slate-400">AI LLM Model</span>
-            <div className="text-lg font-black text-cyan-300 mt-0.5">{integrations?.openai?.model || 'GPT-4o'}</div>
+          <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+            <span className="text-[10px] uppercase font-bold text-[#68717D]">AI LLM Model</span>
+            <div className="text-lg font-black text-[#0F2747] mt-0.5">{integrations?.openai?.model || 'GPT-4o'}</div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#081426] border border-slate-800">
-            <span className="text-[10px] uppercase font-bold text-slate-400">Master Ports</span>
-            <div className="text-lg font-black text-white mt-0.5">{overview.total_ports}</div>
+          <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+            <span className="text-[10px] uppercase font-bold text-[#68717D]">Master Ports</span>
+            <div className="text-lg font-black text-[#0F2747] mt-0.5">{overview.total_ports}</div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#081426] border border-slate-800">
-            <span className="text-[10px] uppercase font-bold text-slate-400">Berth Records</span>
-            <div className="text-lg font-black text-cyan-300 mt-0.5">{overview.total_berths}</div>
+          <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+            <span className="text-[10px] uppercase font-bold text-[#68717D]">Berth Records</span>
+            <div className="text-lg font-black text-[#0F2747] mt-0.5">{overview.total_berths}</div>
           </div>
         </div>
       )}
 
       {/* Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-[#E4E2DC] pb-2">
         <button
           onClick={() => setActiveTab('credentials')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-            activeTab === 'credentials' ? 'bg-cyan-500 text-black shadow-md' : 'text-slate-400 hover:text-white'
+          className={`px-4 py-2 rounded-[8px] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            activeTab === 'credentials' ? 'bg-[#0F2747] text-white shadow-sm' : 'text-[#68717D] hover:text-[#0F2747] hover:bg-white'
           }`}
         >
           <Key className="w-3.5 h-3.5" />
@@ -235,8 +238,8 @@ export const AdminPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('models')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-            activeTab === 'models' ? 'bg-cyan-500 text-black' : 'text-slate-400 hover:text-white'
+          className={`px-4 py-2 rounded-[8px] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            activeTab === 'models' ? 'bg-[#0F2747] text-white shadow-sm' : 'text-[#68717D] hover:text-[#0F2747] hover:bg-white'
           }`}
         >
           <Cpu className="w-3.5 h-3.5" />
@@ -244,8 +247,8 @@ export const AdminPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('ports')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-            activeTab === 'ports' ? 'bg-cyan-500 text-black' : 'text-slate-400 hover:text-white'
+          className={`px-4 py-2 rounded-[8px] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            activeTab === 'ports' ? 'bg-[#0F2747] text-white shadow-sm' : 'text-[#68717D] hover:text-[#0F2747] hover:bg-white'
           }`}
         >
           <MapPin className="w-3.5 h-3.5" />
@@ -253,8 +256,8 @@ export const AdminPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('audit')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-            activeTab === 'audit' ? 'bg-cyan-500 text-black' : 'text-slate-400 hover:text-white'
+          className={`px-4 py-2 rounded-[8px] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            activeTab === 'audit' ? 'bg-[#0F2747] text-white shadow-sm' : 'text-[#68717D] hover:text-[#0F2747] hover:bg-white'
           }`}
         >
           <Activity className="w-3.5 h-3.5" />
@@ -262,11 +265,11 @@ export const AdminPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('data')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'data' ? 'bg-cyan-500 text-black' : 'text-slate-400 hover:text-white'
+          className={`px-4 py-2 rounded-[8px] text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'data' ? 'bg-[#0F2747] text-white shadow-sm' : 'text-[#68717D] hover:text-[#0F2747] hover:bg-white'
           }`}
         >
-          Data Provenance Layer
+          <span>Data Provenance Layer</span>
         </button>
       </div>
 
@@ -274,8 +277,8 @@ export const AdminPage: React.FC = () => {
       {activeTab === 'credentials' && (
         <div className="space-y-6">
           {keysSavedMessage && (
-            <div className="p-4 rounded-xl bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <div className="p-4 rounded-[8px] bg-[#F3FAF7] border border-[#BCF0DA] text-[#2F7D4B] text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#2F7D4B] shrink-0" />
               <span>{keysSavedMessage}</span>
             </div>
           )}
@@ -283,42 +286,42 @@ export const AdminPage: React.FC = () => {
           <form onSubmit={handleSaveIntegrations} className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* 1. OpenAI Integration Card */}
-              <div className="p-5 rounded-2xl bg-[#081426] border border-slate-800 space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[#E4E2DC]">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-cyan-400" />
+                    <Sparkles className="w-5 h-5 text-[#D6A63B]" />
                     <div>
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">OpenAI Reasoning API</h3>
-                      <span className="text-[10px] text-slate-400">Powering PortIN Decision Advisor</span>
+                      <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider">OpenAI Reasoning API</h3>
+                      <span className="text-[10px] text-[#68717D]">Powering PortIN Decision Advisor</span>
                     </div>
                   </div>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                  <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
                     integrations?.openai?.is_configured
-                      ? 'bg-emerald-950 text-emerald-300 border-emerald-500/30'
-                      : 'bg-amber-950 text-amber-300 border-amber-500/30'
+                      ? 'bg-[#F3FAF7] text-[#2F7D4B] border-[#BCF0DA]'
+                      : 'bg-[#FEF7EC] text-[#D98A27] border-[#FBE6C2]'
                   }`}>
                     {integrations?.openai?.is_configured ? 'KEY ACTIVE' : 'DETERMINISTIC FALLBACK'}
                   </span>
                 </div>
 
-                <div className="space-y-3 text-xs">
+                <div className="space-y-3.5 text-xs">
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">OpenAI API Key (sk-...)</label>
+                    <label className="block text-[#0F2747] font-bold mb-1.5">OpenAI API Key (sk-...)</label>
                     <input
                       type="password"
                       value={openaiKey}
                       onChange={(e) => setOpenaiKey(e.target.value)}
                       placeholder={integrations?.openai?.key_masked || "Paste your OpenAI API Key (sk-...)"}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-mono text-xs focus:border-cyan-400"
+                      className="w-full px-3 py-2.5 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-mono text-xs focus:bg-white focus:border-[#D6A63B] transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">Model Selection</label>
+                    <label className="block text-[#0F2747] font-bold mb-1.5">Model Selection</label>
                     <select
                       value={openaiModel}
                       onChange={(e) => setOpenaiModel(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs"
+                      className="w-full px-3 py-2.5 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] text-xs font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
                     >
                       <option value="gpt-4o">OpenAI GPT-4o (High Speed & Deep Domain Intelligence)</option>
                       <option value="gpt-4o-mini">OpenAI GPT-4o-mini (Cost Efficient)</option>
@@ -331,15 +334,15 @@ export const AdminPage: React.FC = () => {
                       type="button"
                       onClick={handleTestOpenAi}
                       disabled={testAiLoading}
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer"
+                      className="px-3.5 py-1.5 bg-white hover:bg-[#F8F7F3] text-[#0F2747] text-xs font-bold rounded-[6px] border border-[#E4E2DC] shadow-sm transition-colors cursor-pointer"
                     >
                       {testAiLoading ? 'Testing API...' : 'Test AI Query'}
                     </button>
-                    <span className="text-[11px] text-slate-500">Live chat available in /ai-advisor</span>
+                    <span className="text-[11px] text-[#68717D]">Live chat available in /ai-advisor</span>
                   </div>
 
                   {testAiMessage && (
-                    <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-[11px] text-slate-300">
+                    <div className="p-3 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-xs text-[#172033]">
                       {testAiMessage}
                     </div>
                   )}
@@ -347,82 +350,82 @@ export const AdminPage: React.FC = () => {
               </div>
 
               {/* 2. PostgreSQL Database Connection */}
-              <div className="p-5 rounded-2xl bg-[#081426] border border-slate-800 space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[#E4E2DC]">
                   <div className="flex items-center gap-2">
-                    <Database className="w-5 h-5 text-cyan-400" />
+                    <Database className="w-5 h-5 text-[#D6A63B]" />
                     <div>
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">PostgreSQL Cloud Persistence</h3>
-                      <span className="text-[10px] text-slate-400">Supabase / Neon / Render / Local</span>
+                      <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider">PostgreSQL Cloud Persistence</h3>
+                      <span className="text-[10px] text-[#68717D]">Supabase / Neon / Render / Local</span>
                     </div>
                   </div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/30">
+                  <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-bold bg-[#F8F7F3] text-[#0F2747] border border-[#E4E2DC]">
                     {integrations?.database?.dialect || 'SQLite'}
                   </span>
                 </div>
 
-                <div className="space-y-3 text-xs">
+                <div className="space-y-3.5 text-xs">
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">PostgreSQL Connection URI</label>
+                    <label className="block text-[#0F2747] font-bold mb-1.5">PostgreSQL Connection URI</label>
                     <input
                       type="password"
                       value={postgresUrl}
                       onChange={(e) => setPostgresUrl(e.target.value)}
                       placeholder="postgresql://user:password@db.supabase.co:5432/postgres"
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-mono text-xs focus:border-cyan-400"
+                      className="w-full px-3 py-2.5 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-mono text-xs focus:bg-white focus:border-[#D6A63B] transition-colors"
                     />
-                    <span className="text-[10px] text-slate-500 mt-1 block">
+                    <span className="text-[10px] text-[#68717D] mt-1.5 block">
                       Leave blank to continue using local zero-config SQLite.
                     </span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-400">
-                    Active URL: <span className="font-mono text-white">{integrations?.database?.connection_url_masked || 'sqlite:///./portin.db'}</span>
+                  <div className="p-3 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-[11px] text-[#68717D]">
+                    Active URL: <span className="font-mono text-[#0F2747] font-semibold">{integrations?.database?.connection_url_masked || 'sqlite:///./portin.db'}</span>
                   </div>
                 </div>
               </div>
 
               {/* 3. Gmail SMTP Configuration */}
-              <div className="p-5 rounded-2xl bg-[#081426] border border-slate-800 space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[#E4E2DC]">
                   <div className="flex items-center gap-2">
-                    <Mail className="w-5 h-5 text-cyan-400" />
+                    <Mail className="w-5 h-5 text-[#D6A63B]" />
                     <div>
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">Gmail SMTP Service</h3>
-                      <span className="text-[10px] text-slate-400">Official Password Reset & Alert Delivery</span>
+                      <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider">Gmail SMTP Service</h3>
+                      <span className="text-[10px] text-[#68717D]">Official Password Reset & Alert Delivery</span>
                     </div>
                   </div>
-                  <label className="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer">
+                  <label className="flex items-center gap-1.5 text-xs text-[#0F2747] font-bold cursor-pointer">
                     <input
                       type="checkbox"
                       checked={smtpEnabled}
                       onChange={(e) => setSmtpEnabled(e.target.checked)}
-                      className="rounded accent-cyan-400"
+                      className="rounded accent-[#D6A63B]"
                     />
                     <span>Enabled</span>
                   </label>
                 </div>
 
-                <div className="space-y-3 text-xs">
+                <div className="space-y-3.5 text-xs">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-slate-300 font-semibold mb-1">Gmail Address (SMTP User)</label>
+                      <label className="block text-[#0F2747] font-bold mb-1.5">Gmail Address (SMTP User)</label>
                       <input
                         type="email"
                         value={smtpUser}
                         onChange={(e) => setSmtpUser(e.target.value)}
                         placeholder="yourname@gmail.com"
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs focus:border-cyan-400"
+                        className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] text-xs focus:bg-white focus:border-[#D6A63B] transition-colors"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-300 font-semibold mb-1">Google App Password (16-char)</label>
+                      <label className="block text-[#0F2747] font-bold mb-1.5">Google App Password</label>
                       <input
                         type="password"
                         value={smtpPassword}
                         onChange={(e) => setSmtpPassword(e.target.value)}
                         placeholder="abcd efgh ijkl mnop"
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs focus:border-cyan-400"
+                        className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] text-xs focus:bg-white focus:border-[#D6A63B] transition-colors"
                       />
                     </div>
                   </div>
@@ -432,15 +435,15 @@ export const AdminPage: React.FC = () => {
                       type="button"
                       onClick={handleTestSmtp}
                       disabled={testSmtpLoading}
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer"
+                      className="px-3.5 py-1.5 bg-white hover:bg-[#F8F7F3] text-[#0F2747] text-xs font-bold rounded-[6px] border border-[#E4E2DC] shadow-sm transition-colors cursor-pointer"
                     >
                       {testSmtpLoading ? 'Sending...' : 'Send Test Email'}
                     </button>
-                    <span className="text-[10px] text-slate-500">Host: smtp.gmail.com:587 (TLS)</span>
+                    <span className="text-[10px] text-[#68717D]">Host: smtp.gmail.com:587 (TLS)</span>
                   </div>
 
                   {testSmtpMessage && (
-                    <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-[11px] text-slate-300">
+                    <div className="p-3 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-xs text-[#172033]">
                       {testSmtpMessage}
                     </div>
                   )}
@@ -448,32 +451,32 @@ export const AdminPage: React.FC = () => {
               </div>
 
               {/* 4. Alpha Vantage Commodity Key */}
-              <div className="p-5 rounded-2xl bg-[#081426] border border-slate-800 space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[#E4E2DC]">
                   <div className="flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-cyan-400" />
+                    <Activity className="w-5 h-5 text-[#D6A63B]" />
                     <div>
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">Alpha Vantage Commodity Feed</h3>
-                      <span className="text-[10px] text-slate-400">Live Metallurgical Coal & Energy Pricing</span>
+                      <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider">Alpha Vantage Commodity Feed</h3>
+                      <span className="text-[10px] text-[#68717D]">Live Metallurgical Coal & Energy Pricing</span>
                     </div>
                   </div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-900 text-slate-300 border border-slate-700">
+                  <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-bold bg-[#F8F7F3] text-[#0F2747] border border-[#E4E2DC]">
                     {integrations?.alpha_vantage?.is_configured ? 'API ACTIVE' : 'WORLD BANK BENCHMARK'}
                   </span>
                 </div>
 
-                <div className="space-y-3 text-xs">
+                <div className="space-y-3.5 text-xs">
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">Alpha Vantage API Key</label>
+                    <label className="block text-[#0F2747] font-bold mb-1.5">Alpha Vantage API Key</label>
                     <input
                       type="password"
                       value={alphaVantageKey}
                       onChange={(e) => setAlphaVantageKey(e.target.value)}
                       placeholder={integrations?.alpha_vantage?.key_masked || "Paste Alpha Vantage API key (Free at alphavantage.co)"}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-mono text-xs focus:border-cyan-400"
+                      className="w-full px-3 py-2.5 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-mono text-xs focus:bg-white focus:border-[#D6A63B] transition-colors"
                     />
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-400">
+                  <div className="p-3 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-[11px] text-[#68717D]">
                     If key is not provided, PortIN seamlessly serves historical World Bank Pink Sheet commodity indices.
                   </div>
                 </div>
@@ -485,7 +488,7 @@ export const AdminPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={savingKeys}
-                className="px-6 py-3 bg-gradient-to-r from-cyan-400 to-light-cyan hover:from-cyan-300 text-black font-black text-xs rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                className="px-6 py-3 bg-[#D6A63B] hover:bg-[#c49530] text-[#0F2747] font-black uppercase tracking-wider text-xs rounded-[8px] shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 <span>{savingKeys ? 'Saving Production Credentials...' : 'Save & Apply All Credentials'}</span>
@@ -497,19 +500,19 @@ export const AdminPage: React.FC = () => {
 
       {/* TAB 1: MODEL LIFECYCLE */}
       {activeTab === 'models' && overview && (
-        <div className="p-6 rounded-2xl bg-[#081426] border border-slate-800 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E4E2DC]">
             <div>
               <div className="flex items-center gap-2">
-                <Cpu className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-base font-bold text-white">
+                <Cpu className="w-5 h-5 text-[#D6A63B]" />
+                <h3 className="text-base font-black text-[#0F2747]">
                   Active Forecasting Model: {overview.active_model.name}
                 </h3>
-                <span className="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+                <span className="px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase bg-[#F3FAF7] text-[#2F7D4B] border border-[#BCF0DA]">
                   {overview.active_model.status}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-[#68717D] mt-1">
                 Version: {overview.active_model.version} • Trained: {overview.active_model.trained_at} • Sample Rows: {overview.active_model.row_count.toLocaleString()}
               </p>
             </div>
@@ -517,7 +520,7 @@ export const AdminPage: React.FC = () => {
             <button
               onClick={handleRetrainModel}
               disabled={retraining}
-              className="px-4 py-2 bg-gradient-to-r from-cyan-400 to-light-cyan hover:from-cyan-300 text-black font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="px-4 py-2.5 bg-[#D6A63B] hover:bg-[#c49530] text-[#0F2747] font-black uppercase tracking-wider text-xs rounded-[8px] shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${retraining ? 'animate-spin' : ''}`} />
               <span>{retraining ? 'Retraining ML Pipeline...' : 'Retrain & Validate Model'}</span>
@@ -525,36 +528,36 @@ export const AdminPage: React.FC = () => {
           </div>
 
           {retrainSuccess && (
-            <div className="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <div className="p-3.5 rounded-[8px] bg-[#F3FAF7] border border-[#BCF0DA] text-[#2F7D4B] text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#2F7D4B]" />
               <span>Pipeline retrained successfully. Model validation metrics updated.</span>
             </div>
           )}
 
           {/* Validation Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400 text-xs block">Mean Absolute Error (MAE):</span>
-              <span className="text-2xl font-black text-white font-mono mt-1 block">
+            <div className="p-4 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC]">
+              <span className="text-[#68717D] text-xs font-semibold block">Mean Absolute Error (MAE):</span>
+              <span className="text-2xl font-black text-[#0F2747] font-mono mt-1.5 block">
                 {overview.active_model.mae} USD/MT
               </span>
-              <span className="text-[10px] text-emerald-400">Validated on chronological holdout</span>
+              <span className="text-[11px] text-[#2F7D4B] font-bold">Validated on chronological holdout</span>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400 text-xs block">Root Mean Squared Error:</span>
-              <span className="text-2xl font-black text-white font-mono mt-1 block">
+            <div className="p-4 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC]">
+              <span className="text-[#68717D] text-xs font-semibold block">Root Mean Squared Error:</span>
+              <span className="text-2xl font-black text-[#0F2747] font-mono mt-1.5 block">
                 {overview.active_model.rmse} USD/MT
               </span>
-              <span className="text-[10px] text-slate-400">Quantile loss objective</span>
+              <span className="text-[11px] text-[#68717D]">Quantile loss objective</span>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400 text-xs block">Percentage Error (MAPE):</span>
-              <span className="text-2xl font-black text-cyan-300 font-mono mt-1 block">
+            <div className="p-4 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC]">
+              <span className="text-[#68717D] text-xs font-semibold block">Percentage Error (MAPE):</span>
+              <span className="text-2xl font-black text-[#0F2747] font-mono mt-1.5 block">
                 {overview.active_model.mape}%
               </span>
-              <span className="text-[10px] text-emerald-400">Within industry standard</span>
+              <span className="text-[11px] text-[#2F7D4B] font-bold">Within industry standard</span>
             </div>
           </div>
         </div>
@@ -562,14 +565,14 @@ export const AdminPage: React.FC = () => {
 
       {/* TAB 2: PORT CRUD */}
       {activeTab === 'ports' && (
-        <div className="p-6 rounded-2xl bg-[#081426] border border-slate-800 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+        <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E4E2DC]">
+            <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider">
               Gazetted Port Directory ({ports.length} Records)
             </h3>
             <button
               onClick={() => setShowAddPort(!showAddPort)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-lg transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-[#D6A63B] hover:bg-[#c49530] text-[#0F2747] font-black uppercase tracking-wider text-xs rounded-[8px] shadow-sm transition-all cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Custom Port</span>
@@ -577,44 +580,44 @@ export const AdminPage: React.FC = () => {
           </div>
 
           {showAddPort && (
-            <form onSubmit={handleCreatePort} className="p-4 rounded-xl bg-slate-900 border border-slate-700 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <form onSubmit={handleCreatePort} className="p-4 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
-                <label className="block text-slate-300 mb-1">Port Code</label>
+                <label className="block text-[#0F2747] font-bold mb-1">Port Code</label>
                 <input
                   type="text"
                   required
                   value={newPortCode}
                   onChange={(e) => setNewPortCode(e.target.value)}
                   placeholder="e.g. KDL"
-                  className="w-full px-2.5 py-1.5 bg-slate-800 border border-slate-600 rounded text-white"
+                  className="w-full px-2.5 py-2 bg-white border border-[#E4E2DC] rounded-[6px] text-[#172033] focus:border-[#D6A63B]"
                 />
               </div>
               <div>
-                <label className="block text-slate-300 mb-1">Port Name</label>
+                <label className="block text-[#0F2747] font-bold mb-1">Port Name</label>
                 <input
                   type="text"
                   required
                   value={newPortName}
                   onChange={(e) => setNewPortName(e.target.value)}
                   placeholder="e.g. Kandla Port"
-                  className="w-full px-2.5 py-1.5 bg-slate-800 border border-slate-600 rounded text-white"
+                  className="w-full px-2.5 py-2 bg-white border border-[#E4E2DC] rounded-[6px] text-[#172033] focus:border-[#D6A63B]"
                 />
               </div>
               <div>
-                <label className="block text-slate-300 mb-1">State</label>
+                <label className="block text-[#0F2747] font-bold mb-1">State</label>
                 <input
                   type="text"
                   required
                   value={newPortState}
                   onChange={(e) => setNewPortState(e.target.value)}
                   placeholder="e.g. Gujarat"
-                  className="w-full px-2.5 py-1.5 bg-slate-800 border border-slate-600 rounded text-white"
+                  className="w-full px-2.5 py-2 bg-white border border-[#E4E2DC] rounded-[6px] text-[#172033] focus:border-[#D6A63B]"
                 />
               </div>
               <div className="flex items-end">
                 <button
                   type="submit"
-                  className="w-full py-1.5 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded cursor-pointer"
+                  className="w-full py-2 bg-[#D6A63B] hover:bg-[#c49530] text-[#0F2747] font-black uppercase tracking-wider text-xs rounded-[6px] shadow-sm cursor-pointer"
                 >
                   Save Port
                 </button>
@@ -624,7 +627,7 @@ export const AdminPage: React.FC = () => {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="text-slate-400 uppercase text-[10px] border-b border-slate-800">
+              <thead className="bg-[#F8F7F3] text-[#0F2747] uppercase text-[10px] font-black border-b border-[#E4E2DC]">
                 <tr>
                   <th className="py-2.5 px-3">Code</th>
                   <th className="py-2.5 px-3">Port Name</th>
@@ -635,19 +638,19 @@ export const AdminPage: React.FC = () => {
                   <th className="py-2.5 px-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-[#E4E2DC]">
                 {ports.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-900/40">
-                    <td className="py-2.5 px-3 font-mono font-bold text-cyan-400">{p.code}</td>
-                    <td className="py-2.5 px-3 font-semibold text-white">{p.name}</td>
-                    <td className="py-2.5 px-3 text-slate-300">{p.state}</td>
-                    <td className="py-2.5 px-3 font-mono text-cyan-300">{p.max_draft}m</td>
-                    <td className="py-2.5 px-3 font-mono text-slate-300">{p.max_loa}m</td>
-                    <td className="py-2.5 px-3 text-[11px] text-slate-400 truncate max-w-xs">{p.source}</td>
+                  <tr key={p.id} className="hover:bg-[#F8F7F3]/60">
+                    <td className="py-2.5 px-3 font-mono font-bold text-[#0F2747]">{p.code}</td>
+                    <td className="py-2.5 px-3 font-bold text-[#0F2747]">{p.name}</td>
+                    <td className="py-2.5 px-3 text-[#172033]">{p.state}</td>
+                    <td className="py-2.5 px-3 font-mono text-[#0F2747] font-semibold">{p.max_draft}m</td>
+                    <td className="py-2.5 px-3 font-mono text-[#172033]">{p.max_loa}m</td>
+                    <td className="py-2.5 px-3 text-[11px] text-[#68717D] truncate max-w-xs">{p.source}</td>
                     <td className="py-2.5 px-3 text-right">
                       <button
                         onClick={() => handleDeletePort(p.id)}
-                        className="text-rose-400 hover:text-rose-300 p-1 cursor-pointer"
+                        className="text-[#C64A3B] hover:text-rose-700 p-1 cursor-pointer"
                         title="Delete Port"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -663,32 +666,32 @@ export const AdminPage: React.FC = () => {
 
       {/* TAB 3: SYSTEM AUDIT LOG */}
       {activeTab === 'audit' && (
-        <div className="p-6 rounded-2xl bg-[#081426] border border-slate-800 space-y-4">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider pb-3 border-b border-slate-800">
+        <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+          <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider pb-3 border-b border-[#E4E2DC]">
             Security & Operational Audit Trail
           </h3>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="text-slate-400 uppercase text-[10px] border-b border-slate-800">
+              <thead className="bg-[#F8F7F3] text-[#0F2747] uppercase text-[10px] font-black border-b border-[#E4E2DC]">
                 <tr>
-                  <th className="py-2 px-3">Timestamp</th>
-                  <th className="py-2 px-3">Action</th>
-                  <th className="py-2 px-3">Resource</th>
-                  <th className="py-2 px-3">Details</th>
-                  <th className="py-2 px-3">User ID</th>
+                  <th className="py-2.5 px-3">Timestamp</th>
+                  <th className="py-2.5 px-3">Action</th>
+                  <th className="py-2.5 px-3">Resource</th>
+                  <th className="py-2.5 px-3">Details</th>
+                  <th className="py-2.5 px-3">User ID</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-[#E4E2DC]">
                 {auditLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-slate-900/40">
-                    <td className="py-2.5 px-3 text-slate-400 font-mono text-[11px]">
+                  <tr key={log.id} className="hover:bg-[#F8F7F3]/60">
+                    <td className="py-2.5 px-3 text-[#68717D] font-mono text-[11px]">
                       {new Date(log.timestamp).toLocaleString()}
                     </td>
-                    <td className="py-2.5 px-3 font-bold text-cyan-300">{log.action}</td>
-                    <td className="py-2.5 px-3 text-slate-300">{log.resource}</td>
-                    <td className="py-2.5 px-3 text-slate-400 truncate max-w-md">{log.details}</td>
-                    <td className="py-2.5 px-3 font-mono text-slate-500">#{log.user_id || 'System'}</td>
+                    <td className="py-2.5 px-3 font-bold text-[#0F2747]">{log.action}</td>
+                    <td className="py-2.5 px-3 text-[#172033] font-medium">{log.resource}</td>
+                    <td className="py-2.5 px-3 text-[#68717D] truncate max-w-md">{log.details}</td>
+                    <td className="py-2.5 px-3 font-mono text-[#68717D]">#{log.user_id || 'System'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -699,17 +702,17 @@ export const AdminPage: React.FC = () => {
 
       {/* TAB 4: DATA PROVENANCE LAYER */}
       {activeTab === 'data' && overview && (
-        <div className="p-6 rounded-2xl bg-[#081426] border border-slate-800 space-y-4">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider pb-3 border-b border-slate-800">
+        <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+          <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider pb-3 border-b border-[#E4E2DC]">
             Government Compliance Data Provenance Status
           </h3>
 
           <div className="space-y-3">
             {Object.entries(overview.data_provenance).map(([k, v]: [string, any]) => (
-              <div key={k} className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+              <div key={k} className="p-4 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] flex items-center justify-between">
                 <div>
-                  <span className="font-bold text-white text-xs capitalize">{k.replace('_', ' ')}</span>
-                  <p className="text-[11px] text-slate-400 mt-0.5">{v}</p>
+                  <span className="font-bold text-[#0F2747] text-xs capitalize">{k.replace('_', ' ')}</span>
+                  <p className="text-[11px] text-[#68717D] mt-0.5">{v}</p>
                 </div>
                 <DataProvenanceBadge sourceType={v.includes('OFFICIAL') ? 'OFFICIAL STATIC' : v.includes('LIVE') ? 'LIVE' : 'SIMULATED DEMO'} />
               </div>

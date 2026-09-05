@@ -95,29 +95,29 @@ export const ProcurementIntelligencePage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">Global Supply Node Comparison</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#D6A63B]">Global Supply Node Comparison</span>
             <DataProvenanceBadge sourceType="PUBLIC HISTORICAL + SIMULATED FREIGHT" sourceName="World Bank Pink Sheet & PortIN Model" />
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-[#0F2747] tracking-tight">
             Procurement Logistics & Landed Cost Intelligence
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          </h2>
+          <p className="text-xs text-[#68717D] mt-0.5 font-medium">
             Multi-origin comparative sourcing evaluating freight rates, transit days, and FOB commodity benchmarks.
           </p>
         </div>
       </div>
 
       {/* Control Selector Bar */}
-      <div className="p-4 rounded-xl bg-[#081426] border border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+      <div className="p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
         <div>
-          <label className="block text-slate-400 font-semibold mb-1">Procured Commodity</label>
+          <label className="block text-[#172033] font-bold mb-1">Procured Commodity</label>
           <select
             value={commodity}
             onChange={(e) => setCommodity(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
+            className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
           >
             <option value="Coking Coal">Coking Coal (Metallurgical)</option>
             <option value="Thermal Coal">Thermal Coal</option>
@@ -126,21 +126,21 @@ export const ProcurementIntelligencePage: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-slate-400 font-semibold mb-1">Parcel Requirement (MT)</label>
+          <label className="block text-[#172033] font-bold mb-1">Parcel Requirement (MT)</label>
           <input
             type="number"
             value={cargoMt}
             onChange={(e) => setCargoMt(Number(e.target.value))}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
+            className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
           />
         </div>
 
         <div>
-          <label className="block text-slate-400 font-semibold mb-1">Discharge Destination</label>
+          <label className="block text-[#172033] font-bold mb-1">Discharge Destination</label>
           <select
             value={destinationPort}
             onChange={(e) => setDestinationPort(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
+            className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
           >
             <option value="Paradip">Paradip (Odisha)</option>
             <option value="Visakhapatnam">Visakhapatnam (AP)</option>
@@ -153,43 +153,43 @@ export const ProcurementIntelligencePage: React.FC = () => {
       {/* Sourcing Node Comparison Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {sourcingNodes.map((n) => (
-          <div key={n.country} className="p-5 rounded-2xl bg-[#081426] border border-slate-800 hover:border-cyan-500/40 transition-all flex flex-col justify-between">
+          <div key={n.country} className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] hover:border-[#D6A63B] shadow-[0_1px_3px_rgba(15,39,71,0.04)] transition-all flex flex-col justify-between space-y-4">
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-black text-white">{n.country} ({n.port})</span>
-                <span className="text-xs font-mono font-bold text-cyan-400">{n.distance_nm.toLocaleString()} NM</span>
+              <div className="flex items-center justify-between pb-2 border-b border-[#E4E2DC]">
+                <span className="text-sm font-black text-[#0F2747]">{n.country} ({n.port})</span>
+                <span className="text-xs font-mono font-bold text-[#0F2747]">{n.distance_nm.toLocaleString()} NM</span>
               </div>
 
-              <div className="text-2xl font-black text-white my-2">
+              <div className="text-2xl font-black text-[#0F2747] my-3">
                 ${n.total_landed_usd_mt.toFixed(2)}
-                <span className="text-xs font-normal text-slate-400 ml-1">Est. Landed / MT</span>
+                <span className="text-xs font-normal text-[#68717D] ml-1">Est. Landed / MT</span>
               </div>
 
-              <div className="space-y-2 text-xs text-slate-300 border-t border-slate-800 pt-3 my-3">
+              <div className="space-y-2 text-xs text-[#68717D] border-t border-[#E4E2DC] pt-3">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Freight Rate:</span>
-                  <span className="font-mono font-bold text-cyan-300">${n.freight_usd_mt.toFixed(2)} / MT</span>
+                  <span>Freight Rate:</span>
+                  <span className="font-mono font-black text-[#0F2747]">${n.freight_usd_mt.toFixed(2)} / MT</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">FOB Price Benchmark:</span>
-                  <span className="font-mono text-slate-200">${n.comm_benchmark_usd.toFixed(2)} / MT</span>
+                  <span>FOB Price Benchmark:</span>
+                  <span className="font-mono text-[#172033] font-bold">${n.comm_benchmark_usd.toFixed(2)} / MT</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Transit Days:</span>
-                  <span className="font-semibold text-white">{n.transit_days} Days</span>
+                  <span>Transit Days:</span>
+                  <span className="font-bold text-[#0F2747]">{n.transit_days} Days</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Vessel Class:</span>
-                  <span className="font-semibold text-white">{n.vessel}</span>
+                  <span>Vessel Class:</span>
+                  <span className="font-bold text-[#0F2747]">{n.vessel}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Commodity Trend:</span>
-                  <span className="font-bold text-emerald-400">{n.comm_trend}</span>
+                  <span>Commodity Trend:</span>
+                  <span className="font-bold text-[#2F7D4B]">{n.comm_trend}</span>
                 </div>
               </div>
             </div>
 
-            <div className="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800 text-[11px] text-slate-300">
+            <div className="p-3 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-[11px] text-[#172033] font-medium leading-relaxed">
               {n.recommendation}
             </div>
           </div>
