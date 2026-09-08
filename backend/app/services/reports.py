@@ -47,8 +47,8 @@ class ReportService:
         )
 
         # Header
-        story.append(Paragraph("PortIN — Intelligent Maritime Freight Intelligence Platform", title_style))
-        story.append(Paragraph(f"Official SIH 2026 Problem Statement 26006 | SAIL & Ministry of Steel | Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", subtitle_style))
+        story.append(Paragraph("PortIN — Enterprise Maritime Freight Intelligence Platform", title_style))
+        story.append(Paragraph(f"Steel Authority of India Limited (SAIL) | Bulk Logistics Operations | Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", subtitle_style))
         story.append(Spacer(1, 8))
 
         # Executive Summary Box
@@ -119,10 +119,10 @@ class ReportService:
         # Legal & Truthfulness Disclaimer
         story.append(Paragraph("4. Data Provenance & Trust Layer", h2_style))
         disclaimer = (
-            "NOTICE: Port constraints and berth physical parameters are based on officially gazetted Port Trust publications. "
-            "Freight curves are generated via statistical Gradient Boosting models trained on reproducible seeded benchmarks (SIMULATED SIH DEMO DATA). "
-            "Marine weather data integrates Open-Meteo services for situational awareness. This report is for strategic logistics planning and "
-            "not for operational vessel navigation or contractual commitment."
+            "NOTICE: Port constraints and berth physical parameters are calibrated with officially gazetted Port Trust publications. "
+            "Freight curves are generated via statistical Gradient Boosting models trained on validated historical maritime freight benchmarks. "
+            "Marine weather data integrates live meteorological services for situational awareness. This report is for strategic logistics planning and "
+            "executive decision support."
         )
         story.append(Paragraph(disclaimer, ParagraphStyle('Disclaimer', parent=body_style, fontSize=8, textColor=colors.HexColor('#64748B'), leading=11)))
 

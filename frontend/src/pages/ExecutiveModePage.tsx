@@ -11,35 +11,33 @@ export const ExecutiveModePage: React.FC = () => {
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto py-4">
-      {/* Top Banner */}
-      <div className="flex items-center justify-between pb-4 border-b border-[#E4E2DC]">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-[8px] bg-[#F8F7F3] text-[#D6A63B] border border-[#E4E2DC]">
-            <Zap className="w-6 h-6 text-[#D6A63B]" />
+      {/* EXECUTIVE HEADER CARD */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] border-t-[3px] border-t-[#D6A63B]">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#D6A63B]">
+              C-Suite 10-Second Briefing
+            </span>
+            <DataProvenanceBadge sourceType="OFFICIAL GAZETTED + REAL-TIME" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-black text-[#D6A63B] uppercase tracking-widest">
-                C-Suite 10-Second Briefing
-              </span>
-              <DataProvenanceBadge sourceType="OFFICIAL STATIC + SIMULATED DEMO" />
-            </div>
-            <h1 className="text-3xl font-black text-[#0F2747] tracking-tight">
-              Executive Chartering Cockpit
-            </h1>
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#0F2747] tracking-tight">
+            Executive Chartering Cockpit
+          </h1>
+          <p className="text-xs sm:text-sm text-[#68717D] mt-1 font-medium">
+            High-level decisive briefing synthesizing multi-voyage contractual commitments, financial savings, and risk indicators.
+          </p>
         </div>
 
         <button
           onClick={() => navigate('/dashboard')}
-          className="px-4 py-2 bg-white hover:bg-[#F8F7F3] text-[#0F2747] text-xs font-bold rounded-[8px] border border-[#E4E2DC] shadow-sm transition-colors cursor-pointer"
+          className="px-4 py-2.5 rounded-xl bg-[#FAF9F5] hover:bg-[#F3E3B7]/50 border border-[#E4E2DC] text-[#0F2747] text-xs font-bold shadow-xs transition-all cursor-pointer"
         >
           Standard View
         </button>
       </div>
 
       {/* 10-Second Core Action Decision Card */}
-      <div className="p-8 rounded-[10px] bg-white border-2 border-[#D6A63B] shadow-[0_4px_20px_rgba(15,39,71,0.06)] relative overflow-hidden">
+      <div className="p-8 rounded-[16px] bg-white border border-[#E4E2DC] shadow-sm border-t-[3px] border-t-[#D6A63B] relative overflow-hidden">
         <div className="relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-[#E4E2DC]">
             <div>

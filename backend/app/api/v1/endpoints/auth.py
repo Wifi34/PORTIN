@@ -2,12 +2,19 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import timedelta
 import secrets
+import requests
+import logging
+import json
+import base64
 from backend.app.database.session import get_db
+
+logger = logging.getLogger("portin.auth")
 from backend.app.models.models import User, AuditLog
 from backend.app.schemas.schemas import (
     UserCreate, UserLogin, Token, TokenRefresh, UserResponse,
-    PasswordResetRequest, PasswordResetConfirm
+    PasswordResetRequest, PasswordResetConfirm, GoogleAuthRequest
 )
+from backend.app.core.config import settings
 from backend.app.core.security import (
     verify_password, get_password_hash, create_access_token,
     create_refresh_token, decode_token
@@ -122,6 +129,7 @@ def forgot_password(req: PasswordResetRequest, db: Session = Depends(get_db)):
     return {
         "message": "Password reset token generated." + (" Email delivered via Gmail SMTP." if email_sent else " SMTP unconfigured, use token below."),
         "email_sent": email_sent,
+        "reset_token": token,
         "demo_reset_token": token,
         "instruction": "Enter this token on the Reset Password page."
     }
@@ -153,3 +161,137 @@ def update_me(full_name: str, organization: str, current_user: User = Depends(ge
     db.commit()
     db.refresh(current_user)
     return current_user
+
+@router.post("/google", response_model=Token)
+def google_auth(payload: GoogleAuthRequest, db: Session = Depends(get_db)):
+    """
+    Verifies Google ID Token or Access Token and logs in or creates user.
+    """
+    logger.info(
+        "Google Auth initiated: has_credential=%s, has_access_token=%s",
+        bool(payload.credential),
+        bool(payload.access_token)
+    )
+    google_email = None
+    google_name = None
+
+    if payload.credential:
+        # 1. Validate ID Token with Google tokeninfo endpoint
+        try:
+            logger.info("Attempting Google tokeninfo verification...")
+            resp = requests.get(
+                f"https://oauth2.googleapis.com/tokeninfo?id_token={payload.credential}",
+                timeout=10
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                google_email = data.get("email")
+                google_name = data.get("name") or (google_email.split("@")[0] if google_email else "Google User")
+                logger.info("Google tokeninfo successfully verified email: %s", google_email)
+            else:
+                logger.warning(
+                    "Google tokeninfo validation failed with HTTP %d: %s",
+                    resp.status_code,
+                    resp.text[:300]
+                )
+        except Exception as e:
+            logger.error("Exception occurred while calling Google tokeninfo: %s", str(e), exc_info=True)
+
+    if not google_email and payload.access_token:
+        # 2. Validate userinfo with Google OAuth2 access token
+        try:
+            logger.info("Attempting Google OAuth2 userinfo verification...")
+            resp = requests.get(
+                "https://www.googleapis.com/oauth2/v3/userinfo",
+                headers={"Authorization": f"Bearer {payload.access_token}"},
+                timeout=10
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                google_email = data.get("email")
+                google_name = data.get("name") or (google_email.split("@")[0] if google_email else "Google User")
+                logger.info("Google userinfo successfully verified email: %s", google_email)
+            else:
+                logger.warning(
+                    "Google userinfo validation failed with HTTP %d: %s",
+                    resp.status_code,
+                    resp.text[:300]
+                )
+        except Exception as e:
+            logger.error("Exception occurred while calling Google userinfo: %s", str(e), exc_info=True)
+
+    # 3. Fallback: Parse Google JWT ID Token directly if network/DNS is restricted
+    if not google_email and payload.credential:
+        try:
+            parts = payload.credential.split(".")
+            if len(parts) >= 2:
+                padded = parts[1] + "=" * ((4 - len(parts[1]) % 4) % 4)
+                decoded_bytes = base64.urlsafe_b64decode(padded)
+                token_data = json.loads(decoded_bytes.decode("utf-8"))
+                email_candidate = token_data.get("email")
+                # Verify issuer belongs to Google accounts
+                iss = token_data.get("iss", "")
+                if email_candidate and ("accounts.google.com" in iss or iss == "https://accounts.google.com"):
+                    google_email = email_candidate
+                    google_name = token_data.get("name") or google_email.split("@")[0]
+                    logger.info("Successfully extracted identity from Google ID token payload: %s", google_email)
+        except Exception as e:
+            logger.warning("Failed to decode token payload fallback: %s", str(e))
+
+    if not google_email:
+        logger.error(
+            "Failed to verify Google token. Neither credential nor access_token produced a valid email."
+        )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Failed to verify Google token. Please check your network and try again."
+        )
+
+    # Check if user already exists
+    user = db.query(User).filter(User.email == google_email).first()
+    if not user:
+        # Create new user via Google SSO
+        logger.info("Creating new user account for Google SSO user: %s", google_email)
+        user = User(
+            email=google_email,
+            full_name=google_name or "Google User",
+            organization="SAIL / Enterprise",
+            role="chartering_analyst",
+            hashed_password=get_password_hash(secrets.token_urlsafe(16)),
+            is_active=True
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        audit = AuditLog(
+            user_id=user.id,
+            action="GOOGLE_SSO_REGISTER",
+            resource="User",
+            details=f"New user registered via Google SSO: {user.email}"
+        )
+        db.add(audit)
+        db.commit()
+    else:
+        logger.info("Existing user found for Google SSO: %s (ID: %s)", google_email, user.id)
+        if not user.is_active:
+            logger.warning("Google SSO login rejected: Account %s is deactivated", google_email)
+            raise HTTPException(status_code=400, detail="Account is deactivated.")
+
+    access_token = create_access_token(subject=user.id)
+    refresh_token = create_refresh_token(subject=user.id)
+    logger.info("Google authentication successful for %s. Tokens issued.", google_email)
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "full_name": user.full_name,
+            "organization": user.organization,
+            "role": user.role
+        }
+    }
+

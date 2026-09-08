@@ -8,6 +8,8 @@ import { DataProvenanceBadge } from '../components/common/DataProvenanceBadge';
 import { ContractOption } from '../types';
 
 export const ContractIntelligencePage: React.FC = () => {
+  const [cargoType, setCargoType] = useState('Coal - Coking');
+  const [customCargoName, setCustomCargoName] = useState('');
   const [cargoMt, setCargoMt] = useState(70000);
   const [numVoyages, setNumVoyages] = useState(3);
   const [originCountry, setOriginCountry] = useState('Australia');
@@ -15,6 +17,10 @@ export const ContractIntelligencePage: React.FC = () => {
   const [vesselClass, setVesselClass] = useState('Panamax');
   const [contracts, setContracts] = useState<ContractOption[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const effectiveCargoName = cargoType === 'Other Bulk Cargo' && customCargoName.trim()
+    ? customCargoName.trim()
+    : cargoType;
 
   const evaluateContracts = async () => {
     setLoading(true);
@@ -44,13 +50,13 @@ export const ContractIntelligencePage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] border-t-[3px] border-t-[#D6A63B]">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#D6A63B]">
               Core Decision Objective
             </span>
-            <DataProvenanceBadge sourceType="SIMULATED DEMO" sourceName="Multi-Voyage Volatility Optimization Model" />
+            <DataProvenanceBadge sourceType="REAL-TIME PREDICTIVE ENGINE" sourceName="Multi-Voyage Volatility Optimization Model" />
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-[#0F2747] tracking-tight">
             Spot Chartering &rarr; Multi-Voyage Contract Optimization
@@ -73,9 +79,86 @@ export const ContractIntelligencePage: React.FC = () => {
         </button>
       </div>
 
+      {/* Commodity & Contract Parameters Filter Card */}
+      <div className="p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-sm border-t-[3px] border-t-[#D6A63B]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          <div>
+            <label className="block text-[#172033] font-bold mb-1">Commodity Type</label>
+            <select
+              value={cargoType}
+              onChange={(e) => setCargoType(e.target.value)}
+              className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-bold focus:bg-white focus:border-[#D6A63B] transition-colors"
+            >
+              <option value="Coal - Thermal">Coal - Thermal</option>
+              <option value="Coal - Coking">Coal - Coking</option>
+              <option value="Iron Ore">Iron Ore</option>
+              <option value="Grain">Grain</option>
+              <option value="Fertilizer">Fertilizer</option>
+              <option value="Bauxite">Bauxite</option>
+              <option value="Steel">Steel</option>
+              <option value="Limestone">Limestone</option>
+              <option value="Other Bulk Cargo">Other Bulk Cargo</option>
+            </select>
+            {cargoType === 'Other Bulk Cargo' && (
+              <div className="mt-2 p-2 rounded-lg bg-[#FAF9F5] border border-[#D6A63B]">
+                <label className="block text-[10px] uppercase font-bold text-[#0F2747] mb-1">
+                  Specify Custom Cargo Name *
+                </label>
+                <input
+                  type="text"
+                  value={customCargoName}
+                  onChange={(e) => setCustomCargoName(e.target.value)}
+                  placeholder="e.g. Copper Concentrate, Manganese Ore"
+                  className="w-full px-2.5 py-1.5 bg-white border border-[#D6A63B] rounded text-xs font-bold text-[#172033]"
+                />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-[#172033] font-bold mb-1">Parcel Requirement (MT)</label>
+            <input
+              type="number"
+              step="5000"
+              value={cargoMt}
+              onChange={(e) => setCargoMt(Number(e.target.value))}
+              className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[#172033] font-bold mb-1">Consecutive Voyages</label>
+            <select
+              value={numVoyages}
+              onChange={(e) => setNumVoyages(Number(e.target.value))}
+              className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
+            >
+              <option value={1}>1 Single Spot Voyage</option>
+              <option value={3}>3 Voyages (Short-Term COA)</option>
+              <option value={6}>6 Voyages (Quarterly COA)</option>
+              <option value={12}>12 Voyages (Annual Strategic COA)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[#172033] font-bold mb-1">Vessel Allocation</label>
+            <select
+              value={vesselClass}
+              onChange={(e) => setVesselClass(e.target.value)}
+              className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
+            >
+              <option value="Panamax">Panamax (75,000 DWT)</option>
+              <option value="Supramax">Supramax (58,000 DWT)</option>
+              <option value="Handysize">Handysize (35,000 DWT)</option>
+              <option value="Capesize">Capesize (180,000 DWT)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       {/* Recommended Strategy Spotlight Card */}
       {recommendedContract && (
-        <div className="p-6 rounded-[10px] bg-white border-2 border-[#D6A63B] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+        <div className="p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-sm border-t-[3px] border-t-[#D6A63B] space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E4E2DC]">
             <div className="flex items-center gap-3">
               <span className="p-2 rounded-lg bg-[#F8F7F3] text-[#D6A63B] border border-[#E4E2DC]">

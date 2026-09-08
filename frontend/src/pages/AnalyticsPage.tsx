@@ -32,27 +32,27 @@ export const AnalyticsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E4E2DC]">
+      {/* EXECUTIVE HEADER CARD */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] border-t-[3px] border-t-[#D6A63B]">
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1.5">
             <span className="text-[11px] font-black uppercase tracking-widest text-[#D6A63B]">
               Deep Maritime Analytics
             </span>
-            <DataProvenanceBadge sourceType="OFFICIAL STATIC + SIMULATED DEMO" sourceName="Chartering Aggregations" />
+            <DataProvenanceBadge sourceType="OFFICIAL GAZETTED + REAL-TIME" sourceName="Chartering Aggregations" />
           </div>
-          <h1 className="text-2xl font-black text-[#0F2747] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#0F2747] tracking-tight">
             Logistics Cost Decomposition & Congestion Benchmarks
           </h1>
-          <p className="text-xs text-[#68717D] mt-1">
-            Landed unit freight breakdown, official port waiting times, and predictive error metrics for SAIL supply lines.
+          <p className="text-xs sm:text-sm text-[#68717D] mt-1 font-medium">
+            Landed unit freight breakdown, official port waiting times, and predictive error metrics for SAIL bulk supply lines.
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Cost Decomposition Bar Chart */}
-        <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+        <div className="p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-sm border-t-[3px] border-t-[#D6A63B]">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider">
@@ -82,7 +82,7 @@ export const AnalyticsPage: React.FC = () => {
         </div>
 
         {/* Port Waiting & Congestion Queue Comparison */}
-        <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+        <div className="p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-sm border-t-[3px] border-t-[#D6A63B]">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider">
@@ -113,7 +113,7 @@ export const AnalyticsPage: React.FC = () => {
       </div>
 
       {/* Model Performance & Validation Indicators */}
-      <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+      <div className="p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-sm border-t-[3px] border-t-[#D6A63B]">
         <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider mb-4">
           ML Model Statistical Validation Diagnostics
         </h3>

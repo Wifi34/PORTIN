@@ -38,6 +38,10 @@ class Token(BaseModel):
 class TokenRefresh(BaseModel):
     refresh_token: str
 
+class GoogleAuthRequest(BaseModel):
+    credential: Optional[str] = None
+    access_token: Optional[str] = None
+
 class UserResponse(UserBase):
     id: int
     is_active: bool

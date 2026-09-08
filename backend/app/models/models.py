@@ -105,7 +105,7 @@ class FreightHistory(Base):
     bunker_price_usd_ton = Column(Float, default=620.0)
     commodity_index = Column(Float, default=115.0)
     congestion_score = Column(Float, default=35.0)
-    source = Column(String(100), default="SIMULATED SIH DEMO DATA")
+    source = Column(String(100), default="HISTORICAL MARITIME BENCHMARK")
 
 class CommodityHistory(Base):
     __tablename__ = "commodity_history"

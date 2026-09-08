@@ -1,3 +1,5 @@
+import { CharterOperationsPage } from './pages/CharterOperationsPage';
+import { PortDirectoryPage } from './pages/PortDirectoryPage';
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -75,6 +77,9 @@ export const App: React.FC = () => {
           >
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/forecast" element={<FreightForecastPage />} />
+            <Route path="/new-forecast" element={<FreightForecastPage />} />
+            <Route path="/charter-operations" element={<CharterOperationsPage />} />
+            <Route path="/port-directory" element={<PortDirectoryPage />} />
             <Route path="/decision-twin" element={<DecisionTwinPage />} />
             <Route path="/market" element={<MarketIntelligencePage />} />
             <Route path="/vessel-optimizer" element={<VesselOptimizerPage />} />

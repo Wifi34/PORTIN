@@ -77,21 +77,21 @@ export const ForgotPasswordPage: React.FC = () => {
               {successResponse.message || 'Please check your email for instructions to reset your password.'}
             </p>
 
-            {/* If local dev token is returned because SMTP is unconfigured or in development */}
-            {successResponse.demo_reset_token && (
+            {/* If local token is displayed because SMTP is unconfigured or in development */}
+            {(successResponse.reset_token || successResponse.demo_reset_token) && (
               <div className="mt-3 p-3 bg-white rounded-lg border border-[#E4E2DC]">
                 <span className="text-[10px] uppercase font-bold text-[#68717D] block mb-1">
-                  Local One-Time Security Token:
+                  Secure One-Time Reset Token:
                 </span>
                 <span className="font-mono text-xs font-bold text-[#0F2747] bg-[#F8F7F3] px-2 py-1 rounded select-all block">
-                  {successResponse.demo_reset_token}
+                  {successResponse.reset_token || successResponse.demo_reset_token}
                 </span>
               </div>
             )}
           </div>
 
           <Link
-            to={`/reset-password?email=${encodeURIComponent(email)}&token=${successResponse.demo_reset_token || ''}`}
+            to={`/reset-password?email=${encodeURIComponent(email)}&token=${successResponse.reset_token || successResponse.demo_reset_token || ''}`}
             className="w-full py-3 px-4 rounded-xl text-xs font-black tracking-wider uppercase transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md block text-center"
             style={{
               backgroundColor: '#D6A63B',

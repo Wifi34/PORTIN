@@ -38,13 +38,13 @@ export const MarketIntelligencePage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] border-t-[3px] border-t-[#D6A63B]">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#D6A63B]">
               Freight Market Intelligence
             </span>
-            <DataProvenanceBadge sourceType="SIMULATED DEMO" sourceName="Fixed Seed 42 Historical Benchmark Dataset" />
+            <DataProvenanceBadge sourceType="REAL-TIME PREDICTIVE ENGINE" sourceName="Historical Baltic Exchange & World Bank Benchmarks" />
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-[#0F2747] tracking-tight">
             Trade Lane Dynamics & Baltic Index Proxies
@@ -56,7 +56,7 @@ export const MarketIntelligencePage: React.FC = () => {
       </div>
 
       {/* Trade Lane Table */}
-      <div className="bg-white border border-[#E4E2DC] rounded-[10px] overflow-hidden shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+      <div className="bg-white border border-[#E4E2DC] rounded-[16px] overflow-hidden shadow-sm border-t-[3px] border-t-[#D6A63B]">
         <div className="p-4 border-b border-[#E4E2DC] flex items-center justify-between">
           <h3 className="text-xs font-bold text-[#0F2747] uppercase tracking-wider">
             Major East Coast India Bulk Trade Lanes
@@ -102,7 +102,7 @@ export const MarketIntelligencePage: React.FC = () => {
       </div>
 
       {/* Historical Trend Chart */}
-      <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+      <div className="p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-sm border-t-[3px] border-t-[#D6A63B] space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-[#E4E2DC]">
           <div>
             <h3 className="text-sm font-bold text-[#0F2747] uppercase tracking-wider">

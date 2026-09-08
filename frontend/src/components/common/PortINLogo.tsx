@@ -6,6 +6,7 @@ interface PortINLogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   variant?: 'light' | 'dark';
   showTagline?: boolean;
+  taglineClassName?: string;
   linkTo?: string;
   className?: string;
 }
@@ -14,11 +15,12 @@ export const PortINLogo: React.FC<PortINLogoProps> = ({
   size = 'md',
   variant = 'light',
   showTagline = true,
+  taglineClassName = '',
   linkTo = '/',
   className = '',
 }) => {
   const iconSizeClasses = {
-    sm: 'p-1.5 rounded-lg',
+    sm: 'p-1.5 rounded-xl',
     md: 'p-2 rounded-xl',
     lg: 'p-2.5 rounded-xl',
     xl: 'p-3 rounded-2xl',
@@ -32,7 +34,7 @@ export const PortINLogo: React.FC<PortINLogoProps> = ({
   };
 
   const titleSizes = {
-    sm: 'text-base',
+    sm: 'text-lg',
     md: 'text-xl',
     lg: 'text-2xl',
     xl: 'text-3xl',
@@ -70,7 +72,7 @@ export const PortINLogo: React.FC<PortINLogoProps> = ({
         </span>
         {showTagline && (
           <span
-            className={`${taglineSizes[size]} uppercase tracking-widest block font-semibold`}
+            className={`${taglineSizes[size]} uppercase tracking-widest block font-semibold ${taglineClassName}`}
             style={{ color: isLight ? '#D6A63B' : '#68717D' }}
           >
             Intelligent Maritime Decisions

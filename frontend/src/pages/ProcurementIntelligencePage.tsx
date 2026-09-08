@@ -20,7 +20,8 @@ interface SourcingNode {
 }
 
 export const ProcurementIntelligencePage: React.FC = () => {
-  const [commodity, setCommodity] = useState('Coking Coal');
+  const [commodity, setCommodity] = useState('Coal - Coking');
+  const [customCommodity, setCustomCommodity] = useState('');
   const [cargoMt, setCargoMt] = useState(70000);
   const [destinationPort, setDestinationPort] = useState('Paradip');
 
@@ -95,11 +96,11 @@ export const ProcurementIntelligencePage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] border-t-[3px] border-t-[#D6A63B]">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#D6A63B]">Global Supply Node Comparison</span>
-            <DataProvenanceBadge sourceType="PUBLIC HISTORICAL + SIMULATED FREIGHT" sourceName="World Bank Pink Sheet & PortIN Model" />
+            <DataProvenanceBadge sourceType="PUBLIC HISTORICAL + REAL-TIME FREIGHT" sourceName="World Bank Pink Sheet & PortIN Model" />
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-[#0F2747] tracking-tight">
             Procurement Logistics & Landed Cost Intelligence
@@ -111,42 +112,64 @@ export const ProcurementIntelligencePage: React.FC = () => {
       </div>
 
       {/* Control Selector Bar */}
-      <div className="p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-        <div>
-          <label className="block text-[#172033] font-bold mb-1">Procured Commodity</label>
-          <select
-            value={commodity}
-            onChange={(e) => setCommodity(e.target.value)}
-            className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
-          >
-            <option value="Coking Coal">Coking Coal (Metallurgical)</option>
-            <option value="Thermal Coal">Thermal Coal</option>
-            <option value="Iron Ore">Iron Ore</option>
-          </select>
-        </div>
+      <div className="p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-sm border-t-[3px] border-t-[#D6A63B]">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div>
+            <label className="block text-[#172033] font-bold mb-1">Procured Commodity</label>
+            <select
+              value={commodity}
+              onChange={(e) => setCommodity(e.target.value)}
+              className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-bold focus:bg-white focus:border-[#D6A63B] transition-colors"
+            >
+              <option value="Coal - Coking">Coal - Coking (Metallurgical)</option>
+              <option value="Coal - Thermal">Coal - Thermal</option>
+              <option value="Iron Ore">Iron Ore</option>
+              <option value="Limestone">Limestone</option>
+              <option value="Grain">Grain</option>
+              <option value="Fertilizer">Fertilizer</option>
+              <option value="Bauxite">Bauxite</option>
+              <option value="Steel">Steel</option>
+              <option value="Other Bulk Cargo">Other Bulk Cargo</option>
+            </select>
+            {commodity === 'Other Bulk Cargo' && (
+              <div className="mt-2 p-2 rounded-lg bg-[#FAF9F5] border border-[#D6A63B]">
+                <label className="block text-[10px] uppercase font-bold text-[#0F2747] mb-1">
+                  Specify Custom Cargo Name *
+                </label>
+                <input
+                  type="text"
+                  value={customCommodity}
+                  onChange={(e) => setCustomCommodity(e.target.value)}
+                  placeholder="e.g. Copper Concentrate, Petcoke"
+                  className="w-full px-2.5 py-1.5 bg-white border border-[#D6A63B] rounded text-xs font-bold text-[#172033]"
+                />
+              </div>
+            )}
+          </div>
 
-        <div>
-          <label className="block text-[#172033] font-bold mb-1">Parcel Requirement (MT)</label>
-          <input
-            type="number"
-            value={cargoMt}
-            onChange={(e) => setCargoMt(Number(e.target.value))}
-            className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
-          />
-        </div>
+          <div>
+            <label className="block text-[#172033] font-bold mb-1">Parcel Requirement (MT)</label>
+            <input
+              type="number"
+              value={cargoMt}
+              onChange={(e) => setCargoMt(Number(e.target.value))}
+              className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
+            />
+          </div>
 
-        <div>
-          <label className="block text-[#172033] font-bold mb-1">Discharge Destination</label>
-          <select
-            value={destinationPort}
-            onChange={(e) => setDestinationPort(e.target.value)}
-            className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
-          >
-            <option value="Paradip">Paradip (Odisha)</option>
-            <option value="Visakhapatnam">Visakhapatnam (AP)</option>
-            <option value="Gangavaram">Gangavaram (AP)</option>
-            <option value="Dhamra">Dhamra (Odisha)</option>
-          </select>
+          <div>
+            <label className="block text-[#172033] font-bold mb-1">Discharge Destination</label>
+            <select
+              value={destinationPort}
+              onChange={(e) => setDestinationPort(e.target.value)}
+              className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
+            >
+              <option value="Paradip">Paradip (Odisha)</option>
+              <option value="Visakhapatnam">Visakhapatnam (AP)</option>
+              <option value="Gangavaram">Gangavaram (AP)</option>
+              <option value="Dhamra">Dhamra (Odisha)</option>
+            </select>
+          </div>
         </div>
       </div>
 

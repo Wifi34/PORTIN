@@ -22,9 +22,10 @@ def run_e2e():
         print(f"Title: {page.title()}")
         page.wait_for_selector("input[type='email']", timeout=10000)
 
-        # Click Analyst 1-click Demo Fill
-        print("[Step 3] Clicking 1-click Demo Fill for Analyst...")
-        page.click("button:has-text('Analyst')")
+        # Fill Analyst credentials directly (production login)
+        print("[Step 3] Entering analyst credentials and authenticating...")
+        page.fill("input[type='email']", "analyst@portin.maritime.gov.in")
+        page.fill("input[type='password']", "password123")
         page.click("button[type='submit']")
 
         # Wait for dashboard

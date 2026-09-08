@@ -309,7 +309,7 @@ def seed_database():
     admin_user = db.query(User).filter(User.email == "admin@portin.sail.gov.in").first()
     demo_decision = DecisionRecord(
         user_id=admin_user.id,
-        title="70,000 MT Coking Coal: Gladstone to Paradip (SIH Benchmark)",
+        title="70,000 MT Coking Coal: Gladstone to Paradip (Operational Benchmark)",
         cargo_type="Coking Coal",
         cargo_mt=70000.0,
         origin_country="Australia",

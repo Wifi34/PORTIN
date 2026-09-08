@@ -28,20 +28,22 @@ export const ProfilePage: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      {/* Header */}
-      <div className="pb-4 border-b border-[#E4E2DC]">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[11px] font-black uppercase tracking-widest text-[#D6A63B]">
-            Operator Security & Credentials
-          </span>
-          <DataProvenanceBadge sourceType="OFFICIAL STATIC" />
+      {/* EXECUTIVE HEADER CARD */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] border-t-[3px] border-t-[#D6A63B]">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#D6A63B]">
+              Operator Security & Credentials
+            </span>
+            <DataProvenanceBadge sourceType="OFFICIAL STATIC" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#0F2747] tracking-tight">
+            Operator Profile & Account Credentials
+          </h1>
+          <p className="text-xs sm:text-sm text-[#68717D] mt-1 font-medium">
+            Manage your organizational designation, department clearances, and security access privileges.
+          </p>
         </div>
-        <h1 className="text-2xl font-black text-[#0F2747] tracking-tight">
-          Operator Profile & Account Credentials
-        </h1>
-        <p className="text-xs text-[#68717D] mt-1">
-          Manage your organizational designation and security access privileges.
-        </p>
       </div>
 
       {success && (
@@ -51,7 +53,7 @@ export const ProfilePage: React.FC = () => {
         </div>
       )}
 
-      <form onSubmit={handleUpdate} className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+      <form onSubmit={handleUpdate} className="p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-sm border-t-[3px] border-t-[#D6A63B] space-y-4">
         <div>
           <label className="block text-[11px] font-black uppercase tracking-wider text-[#0F2747] mb-1.5">
             Full Name

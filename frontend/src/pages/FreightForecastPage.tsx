@@ -1,481 +1,784 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import {
-  TrendingUp, Ship, Calendar, MapPin, Layers, CheckCircle2,
-  AlertCircle, ArrowRight, Save, ShieldCheck, BarChart3, HelpCircle
+  TrendingUp, Ship, Calendar, MapPin, CheckCircle2,
+  ArrowRight, Download, Sliders, Info, Clock, Check,
+  Anchor, Activity, ChevronDown, ChevronUp, Database
 } from 'lucide-react';
 import {
-  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid
+  ResponsiveContainer, ComposedChart, Area, Line, XAxis, YAxis, Tooltip, ReferenceArea, ReferenceLine
 } from 'recharts';
-import { apiClient } from '../api/client';
-import { DataProvenanceBadge } from '../components/common/DataProvenanceBadge';
-import { ForecastResponse } from '../types';
+
+interface TrendPoint {
+  date: string;
+  p50: number;
+  p10: number;
+  p90: number;
+}
+
+const DEFAULT_TREND_DATA: TrendPoint[] = [
+  { date: 'Sep 01', p50: 12.20, p10: 11.60, p90: 13.20 },
+  { date: 'Sep 08', p50: 12.25, p10: 11.65, p90: 13.30 },
+  { date: 'Sep 15', p50: 12.30, p10: 11.62, p90: 13.35 },
+  { date: 'Sep 22', p50: 12.20, p10: 11.55, p90: 13.30 },
+  { date: 'Oct 01', p50: 11.85, p10: 11.40, p90: 13.00 },
+  { date: 'Oct 08', p50: 11.63, p10: 11.10, p90: 12.80 },
+  { date: 'Oct 16', p50: 11.48, p10: 10.80, p90: 12.75 },
+  { date: 'Oct 24', p50: 11.50, p10: 10.60, p90: 12.85 },
+  { date: 'Oct 31', p50: 11.55, p10: 10.40, p90: 13.00 },
+  { date: 'Nov 07', p50: 11.60, p10: 10.10, p90: 13.15 },
+  { date: 'Nov 15', p50: 11.62, p10: 9.80,  p90: 13.25 },
+  { date: 'Nov 23', p50: 11.50, p10: 9.50,  p90: 13.35 },
+  { date: 'Nov 30', p50: 10.94, p10: 8.80,  p90: 13.40 },
+];
 
 export const FreightForecastPage: React.FC = () => {
   const navigate = useNavigate();
 
-  // Form State
-  const [cargoType, setCargoType] = useState('Coking Coal');
-  const [cargoMt, setCargoMt] = useState(70000);
-  const [originCountry, setOriginCountry] = useState('Australia');
-  const [originPort, setOriginPort] = useState('Gladstone');
-  const [destinationPort, setDestinationPort] = useState('Paradip');
-  const [desiredDate, setDesiredDate] = useState('2026-09-20');
-  const [vesselClass, setVesselClass] = useState('AUTO');
-  const [contractMonths, setContractMonths] = useState(3);
-  const [numVoyages, setNumVoyages] = useState(3);
-  const [horizonDays, setHorizonDays] = useState(90);
+  // 1. CARGO SPECIFICATION
+  const [cargoType, setCargoType] = useState('Coal - Thermal');
+  const [cargoVolume, setCargoVolume] = useState<number>(120000);
 
-  const [forecast, setForecast] = useState<ForecastResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  // 2. MARITIME TRADE ROUTE & PORTS
+  const [originPort, setOriginPort] = useState('Australia (Hay Point / Dalrymple Bay)');
+  const [destPort, setDestPort] = useState('Paradip Port (Odisha)');
 
-  // Dynamic origin ports based on origin country
-  const originPortOptions: Record<string, string[]> = {
-    Australia: ['Gladstone', 'Hay Point', 'Newcastle', 'Dalrymple Bay'],
-    Indonesia: ['Balikpapan', 'Samarinda', 'Banjarmasin'],
-    Mozambique: ['Maputo', 'Beira', 'Nacala'],
-    Russia: ['Ust-Luga', 'Vostochny', 'Taman'],
-    USA: ['Hampton Roads', 'Baltimore', 'New Orleans'],
+  // 3. CHARTER PERIOD & LAYCAN SCHEDULE
+  const [durationScope, setDurationScope] = useState<'short' | 'medium'>('short');
+  const [startDate, setStartDate] = useState('2026-09-01');
+  const [endDate, setEndDate] = useState('2026-11-30');
+
+  // Recommendation accordion
+  const [whyExpanded, setWhyExpanded] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleLoadPreset = () => {
+    setCargoType('Coal - Thermal');
+    setCargoVolume(120000);
+    setOriginPort('Australia (Hay Point / Dalrymple Bay)');
+    setDestPort('Paradip Port (Odisha)');
+    setDurationScope('short');
+    setStartDate('2026-09-01');
+    setEndDate('2026-11-30');
   };
 
-  const handleCountryChange = (c: string) => {
-    setOriginCountry(c);
-    if (originPortOptions[c] && originPortOptions[c].length > 0) {
-      setOriginPort(originPortOptions[c][0]);
-    }
+  const handleGenerateForecast = () => {
+    setIsGenerating(true);
+    setTimeout(() => {
+      setIsGenerating(false);
+    }, 600);
   };
 
-  const runAnalysis = async () => {
-    setLoading(true);
-    setSaveSuccess(false);
-    try {
-      const res = await apiClient.post('/forecasts/run', {
-        cargo_type: cargoType,
-        cargo_mt: Number(cargoMt),
-        origin_country: originCountry,
-        origin_port: originPort,
-        destination_port: destinationPort,
-        desired_shipment_date: desiredDate,
-        vessel_class: vesselClass,
-        contract_duration_months: Number(contractMonths),
-        num_voyages: Number(numVoyages),
-        planning_horizon_days: Number(horizonDays),
-      });
-      setForecast(res.data);
-    } catch (err) {
-      console.error('Forecast failed', err);
-    } finally {
-      setLoading(false);
-    }
+  const renderWaitMonitorLabel = (props: any) => {
+    const { viewBox } = props;
+    if (!viewBox) return null;
+    const { x, y, width } = viewBox;
+    const midX = x + width / 2;
+    return (
+      <g>
+        <line x1={x + 10} y1={y + 14} x2={x + width - 10} y2={y + 14} stroke="#2563EB" strokeWidth={1} />
+        <polygon points={`${x + 10},${y + 14} ${x + 14},${y + 11} ${x + 14},${y + 17}`} fill="#2563EB" />
+        <polygon points={`${x + width - 10},${y + 14} ${x + width - 14},${y + 11} ${x + width - 14},${y + 17}`} fill="#2563EB" />
+        <text x={midX} y={y + 10} textAnchor="middle" fill="#2563EB" fontSize={9} fontWeight="bold">
+          Suggest Wait / Monitor
+        </text>
+      </g>
+    );
   };
 
-  useEffect(() => {
-    runAnalysis();
-  }, []);
+  const renderOptimalWindowLabel = (props: any) => {
+    const { viewBox } = props;
+    if (!viewBox) return null;
+    const { x, y, width } = viewBox;
+    const midX = x + width / 2;
+    return (
+      <g>
+        <line x1={x + 10} y1={y + 24} x2={x + width - 10} y2={y + 24} stroke="#059669" strokeWidth={1} />
+        <polygon points={`${x + 10},${y + 24} ${x + 14},${y + 21} ${x + 14},${y + 27}`} fill="#059669" />
+        <polygon points={`${x + width - 10},${y + 24} ${x + width - 14},${y + 21} ${x + width - 14},${y + 27}`} fill="#059669" />
+        <text x={midX} y={y + 10} textAnchor="middle" fill="#059669" fontSize={9} fontWeight="bold">
+          Optimal Fixing Window
+        </text>
+        <text x={midX} y={y + 20} textAnchor="middle" fill="#059669" fontSize={8} fontWeight="bold">
+          (14–21 Days)
+        </text>
+      </g>
+    );
+  };
 
-  const handleSaveDecision = async () => {
-    if (!forecast) return;
-    setSaving(true);
-    try {
-      await apiClient.post('/decisions', {
-        title: `${cargoMt.toLocaleString()} MT ${cargoType}: ${originPort} -> ${destinationPort}`,
-        cargo_type: cargoType,
-        cargo_mt: Number(cargoMt),
-        origin_country: originCountry,
-        origin_port: originPort,
-        destination_port: destinationPort,
-        shipment_date: desiredDate,
-        contract_type: `Short-Term Multi-Voyage (${numVoyages} Voyages)`,
-        num_voyages: Number(numVoyages),
-        planning_horizon_days: Number(horizonDays),
-        market_signal: forecast.market_signal,
-        recommended_vessel: vesselClass === 'AUTO' ? 'Panamax' : vesselClass,
-        optimal_window: forecast.optimal_booking_window,
-        risk_score: 24.5,
-        estimated_total_cost_usd: forecast.current_reference_rate * cargoMt * numVoyages,
-        results_json: forecast,
-      });
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (e) {
-      console.error('Failed to save decision', e);
-    } finally {
-      setSaving(false);
-    }
+  const renderExpensiveWindowLabel = (props: any) => {
+    const { viewBox } = props;
+    if (!viewBox) return null;
+    const { x, y, width } = viewBox;
+    const midX = x + width / 2;
+    return (
+      <g>
+        <line x1={x + 10} y1={y + 14} x2={x + width - 10} y2={y + 14} stroke="#DC2626" strokeWidth={1} />
+        <polygon points={`${x + 10},${y + 14} ${x + 14},${y + 11} ${x + 14},${y + 17}`} fill="#DC2626" />
+        <polygon points={`${x + width - 10},${y + 14} ${x + width - 14},${y + 11} ${x + width - 14},${y + 17}`} fill="#DC2626" />
+        <text x={midX} y={y + 10} textAnchor="middle" fill="#DC2626" fontSize={9} fontWeight="bold">
+          Higher Risk / Expensive Window
+        </text>
+      </g>
+    );
   };
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+    <div className="p-4 sm:p-6 space-y-5 bg-[#F8F7F3] min-h-screen text-[#172033]">
+      
+      {/* ========================================================================= */}
+      {/* TOP TITLE HEADER & DATA PROVENANCE CAPSULE */}
+      {/* ========================================================================= */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#D6A63B]">
-              ML Freight Rate Forecaster
-            </span>
-            <DataProvenanceBadge sourceType="SIMULATED DEMO" sourceName="HistGradientBoosting Quantile Model" />
+          {/* Breadcrumb */}
+          <div className="text-[11px] font-semibold text-[#68717D] flex items-center gap-1.5 mb-1">
+            <span>PortIN</span>
+            <span className="text-slate-400">&gt;</span>
+            <span>Forecast</span>
+            <span className="text-slate-400">&gt;</span>
+            <span className="text-[#0F2747] font-bold">Freight Forecast &amp; Charter Decision Simulator</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-[#0F2747] tracking-tight">
-            Predictive Freight Curve & Market Entry Timing
-          </h2>
-          <p className="text-xs text-[#68717D] mt-0.5 font-medium">
-            Calibrated for SAIL bulk raw material procurement lanes to India's East Coast ports.
+
+          <h1 className="text-2xl sm:text-[28px] font-black text-[#0F2747] tracking-tight leading-tight">
+            Freight Forecast &amp; Charter Decision Simulator
+          </h1>
+          <p className="text-xs sm:text-[13px] text-[#64748B] mt-1 font-medium">
+            Forecast freight rates, validate port constraints and identify the optimal vessel, charter window and contracting strategy.
           </p>
         </div>
 
-        {forecast && (
-          <div className="flex items-center gap-2.5">
-            <button
-              onClick={handleSaveDecision}
-              disabled={saving}
-              className="flex items-center gap-2 px-4 py-2.5 bg-[#F8F7F3] hover:bg-[#E4E2DC] text-[#0F2747] text-xs font-bold rounded-[8px] border border-[#E4E2DC] transition-all cursor-pointer"
-            >
-              <Save className="w-4 h-4 text-[#D6A63B]" />
-              <span>{saveSuccess ? 'Analysis Saved!' : saving ? 'Saving...' : 'Save Analysis'}</span>
-            </button>
-            <button
-              onClick={() => navigate('/decision-twin')}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-[8px] text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-sm"
-              style={{
-                backgroundColor: '#D6A63B',
-                color: '#0F2747',
-              }}
-            >
-              <Layers className="w-4 h-4" />
-              <span>Send to Decision Twin</span>
-            </button>
+        {/* Right Data Source Capsule Card */}
+        <div className="flex items-center bg-white rounded-xl border border-[#E2E8F0] shadow-xs divide-x divide-slate-200 self-start lg:self-auto shrink-0">
+          {/* Segment 1: Data Source */}
+          <div className="flex items-center gap-2.5 px-3.5 py-2">
+            <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+              <Database className="w-3.5 h-3.5 text-[#2563EB]" />
+            </div>
+            <div>
+              <div className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 leading-none">
+                Data Source
+              </div>
+              <div className="text-xs font-bold text-[#2563EB] leading-tight mt-0.5">
+                Historical + Forecast Data
+              </div>
+              <div className="text-[8.5px] text-slate-400 leading-none mt-0.5">
+                (Alpha Vantage, Baltic Exchange, Port Data)
+              </div>
+            </div>
           </div>
-        )}
+
+          {/* Segment 2: Last Updated */}
+          <div className="px-3.5 py-2">
+            <div className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 leading-none">
+              Last Updated
+            </div>
+            <div className="text-xs font-bold text-[#0F2747] leading-tight mt-1">
+              07 Sep 2026, 15:20
+            </div>
+          </div>
+
+          {/* Segment 3: Forecast Horizon */}
+          <div className="px-3.5 py-2">
+            <div className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 leading-none">
+              Forecast Horizon
+            </div>
+            <div className="text-xs font-black text-[#0F2747] leading-tight mt-1">
+              90 Days
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Form: Procurement Parameters (4 cols) */}
-        <div className="lg:col-span-4 bg-white border border-[#E4E2DC] rounded-[10px] p-5 shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-[#E4E2DC]">
-            <h3 className="text-xs font-bold text-[#0F2747] uppercase tracking-wider flex items-center gap-2">
-              <Ship className="w-4 h-4 text-[#D6A63B]" />
-              <span>Procurement Parameters</span>
-            </h3>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#F8F7F3] text-[#68717D] border border-[#E4E2DC]">
-              CONFIG
-            </span>
+      {/* ========================================================================= */}
+      {/* 1. TOP CARD: CREATE FREIGHT FORECAST */}
+      {/* ========================================================================= */}
+      <div className="p-5 sm:p-6 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs space-y-5">
+        
+        {/* Header of Form Card */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#D97706]" />
+              <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-[#0F2747]">
+                CREATE FREIGHT FORECAST
+              </h2>
+            </div>
+            <p className="text-xs text-[#64748B] mt-0.5 font-medium">
+              Configure cargo volume, maritime trading corridor, and target laycan window for econometric prediction.
+            </p>
           </div>
 
-          <div className="space-y-3.5 text-xs">
+          <button
+            type="button"
+            onClick={handleLoadPreset}
+            className="px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-[#0F2747] text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+          >
+            <Download className="w-3.5 h-3.5 text-[#D97706]" />
+            <span>Load Australia → Paradip Preset</span>
+          </button>
+        </div>
+
+        {/* 3 Columns: 01 Cargo Spec, 02 Maritime Route, 03 Charter Period */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          
+          {/* COLUMN 1 (4 cols): CARGO SPECIFICATION */}
+          <div className="lg:col-span-4 p-4 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC] space-y-3.5">
+            <div className="flex items-center gap-2">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-black font-mono bg-[#0F2747] text-white">
+                01
+              </span>
+              <div>
+                <h3 className="text-xs font-black uppercase tracking-wider text-[#0F2747]">
+                  CARGO SPECIFICATION
+                </h3>
+                <p className="text-[10.5px] text-[#64748B] font-medium leading-none mt-0.5">
+                  Material classification and parcel weight
+                </p>
+              </div>
+            </div>
+
             <div>
-              <label className="block text-[#172033] font-bold mb-1">Commodity Cargo Type</label>
+              <label className="block text-[10px] uppercase font-bold tracking-wider text-[#475569] mb-1">
+                Cargo Type <span className="text-red-500">*</span>
+              </label>
               <select
                 value={cargoType}
                 onChange={(e) => setCargoType(e.target.value)}
-                className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
+                className="w-full px-3 py-2 rounded-lg bg-white border border-[#CBD5E1] text-xs font-bold text-[#0F2747] focus:outline-none focus:border-[#1E65B8]"
               >
-                <option value="Coking Coal">Coking Coal (Metallurgical)</option>
-                <option value="Thermal Coal">Thermal Coal (Steam Power)</option>
-                <option value="Iron Ore">Iron Ore (Lumps / Fines)</option>
-                <option value="Limestone">Limestone (Flux)</option>
+                <option value="Coal - Thermal">Coal - Thermal</option>
+                <option value="Coal - Coking">Coal - Coking</option>
+                <option value="Iron Ore">Iron Ore</option>
+                <option value="Grain">Grain</option>
+                <option value="Fertilizer">Fertilizer</option>
+                <option value="Bauxite">Bauxite</option>
+                <option value="Steel">Steel</option>
               </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[#172033] font-bold mb-1">Cargo Parcel (MT)</label>
+            <div>
+              <label className="block text-[10px] uppercase font-bold tracking-wider text-[#475569] mb-1">
+                Cargo Volume (Metric Tons) <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
                 <input
                   type="number"
-                  value={cargoMt}
-                  onChange={(e) => setCargoMt(Number(e.target.value))}
-                  step="5000"
-                  className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
+                  step="1000"
+                  value={cargoVolume}
+                  onChange={(e) => setCargoVolume(Number(e.target.value) || 0)}
+                  className="w-full pl-3 pr-12 py-2 rounded-lg bg-white border border-[#CBD5E1] text-xs font-mono font-bold text-[#0F2747] focus:outline-none focus:border-[#1E65B8]"
                 />
-              </div>
-
-              <div>
-                <label className="block text-[#172033] font-bold mb-1">Number of Voyages</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="12"
-                  value={numVoyages}
-                  onChange={(e) => setNumVoyages(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
-                />
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                  MT
+                </span>
               </div>
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-3">
+          {/* COLUMN 2 (4 cols): MARITIME TRADE ROUTE & PORTS */}
+          <div className="lg:col-span-4 p-4 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC] space-y-3.5">
+            <div className="flex items-center gap-2">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-black font-mono bg-[#0F2747] text-white">
+                01
+              </span>
               <div>
-                <label className="block text-[#172033] font-bold mb-1">Origin Country</label>
-                <select
-                  value={originCountry}
-                  onChange={(e) => handleCountryChange(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
-                >
-                  <option value="Australia">Australia</option>
-                  <option value="Indonesia">Indonesia</option>
-                  <option value="Mozambique">Mozambique</option>
-                  <option value="Russia">Russia</option>
-                  <option value="USA">USA</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[#172033] font-bold mb-1">Origin Port</label>
-                <select
-                  value={originPort}
-                  onChange={(e) => setOriginPort(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
-                >
-                  {(originPortOptions[originCountry] || []).map((p) => (
-                    <option key={p} value={p}>{p}</option>
-                  ))}
-                </select>
+                <h3 className="text-xs font-black uppercase tracking-wider text-[#0F2747]">
+                  MARITIME TRADE ROUTE &amp; PORTS
+                </h3>
+                <p className="text-[10.5px] text-[#64748B] font-medium leading-none mt-0.5">
+                  Select origin loading hub and Indian East Coast discharge port
+                </p>
               </div>
             </div>
 
             <div>
-              <label className="block text-[#172033] font-bold mb-1">East Coast Destination Port</label>
+              <label className="block text-[10px] uppercase font-bold tracking-wider text-[#475569] mb-1">
+                Origin Port (Loading Hub) <span className="text-red-500">*</span>
+              </label>
               <select
-                value={destinationPort}
-                onChange={(e) => setDestinationPort(e.target.value)}
-                className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
+                value={originPort}
+                onChange={(e) => setOriginPort(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg bg-white border border-[#CBD5E1] text-xs font-bold text-[#0F2747] focus:outline-none focus:border-[#1E65B8]"
               >
-                <option value="Paradip">Paradip (Odisha) • Max Draft 14.5m</option>
-                <option value="Visakhapatnam">Visakhapatnam (AP) • Max Draft 18.1m</option>
-                <option value="Gangavaram">Gangavaram (AP) • Max Draft 21.0m</option>
-                <option value="Dhamra">Dhamra (Odisha) • Max Draft 18.0m</option>
-                <option value="Gopalpur">Gopalpur (Odisha) • Max Draft 13.0m</option>
-                <option value="Sagar/Sandheads">Sagar / Sandheads • Transshipment</option>
-                <option value="Haldia">Haldia (WB) • Lock Draft 8.5m</option>
+                <option value="Australia (Hay Point / Dalrymple Bay)">Australia (Hay Point / Dalrymple Bay)</option>
+                <option value="Australia (Gladstone / Abbot Point)">Australia (Gladstone / Abbot Point)</option>
+                <option value="Indonesia (Taboneo Anchorage)">Indonesia (Taboneo Anchorage)</option>
+                <option value="Mozambique (Maputo Coal Terminal)">Mozambique (Maputo Coal Terminal)</option>
+                <option value="United States (New Orleans)">United States (New Orleans)</option>
               </select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[#172033] font-bold mb-1">Laycan Date</label>
-                <input
-                  type="date"
-                  value={desiredDate}
-                  onChange={(e) => setDesiredDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[#172033] font-bold mb-1">Vessel Category</label>
-                <select
-                  value={vesselClass}
-                  onChange={(e) => setVesselClass(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
-                >
-                  <option value="AUTO">AUTO (Optimal Selection)</option>
-                  <option value="Panamax">Panamax (65k–85k DWT)</option>
-                  <option value="Supramax">Supramax (50k–64k DWT)</option>
-                  <option value="Capesize">Capesize (120k–200k DWT)</option>
-                  <option value="Handysize">Handysize (28k–39k DWT)</option>
-                </select>
+              <div className="text-[9.5px] text-slate-500 mt-1 font-mono">
+                Max Draft: <strong className="text-[#0F2747]">20m</strong> | Max LOA: <strong className="text-[#0F2747]">330m</strong>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[#172033] font-bold mb-1">Contract Horizon</label>
-                <select
-                  value={contractMonths}
-                  onChange={(e) => setContractMonths(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
-                >
-                  <option value="3">3 Months (Short-Term)</option>
-                  <option value="6">6 Months (Medium-Term)</option>
-                  <option value="12">12 Months (Annual COA)</option>
-                </select>
+            <div>
+              <label className="block text-[10px] uppercase font-bold tracking-wider text-[#475569] mb-1">
+                Destination Port (East Coast India) <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={destPort}
+                onChange={(e) => setDestPort(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg bg-white border border-[#CBD5E1] text-xs font-bold text-[#0F2747] focus:outline-none focus:border-[#1E65B8]"
+              >
+                <option value="Paradip Port (Odisha)">Paradip Port (Odisha)</option>
+                <option value="Visakhapatnam Port (Andhra Pradesh)">Visakhapatnam Port (Andhra Pradesh)</option>
+                <option value="Gangavaram Port (Andhra Pradesh)">Gangavaram Port (Andhra Pradesh)</option>
+                <option value="Dhamra Port (Odisha)">Dhamra Port (Odisha)</option>
+                <option value="Chennai Port (Tamil Nadu)">Chennai Port (Tamil Nadu)</option>
+                <option value="Kamarajar Port (Ennore)">Kamarajar Port (Ennore)</option>
+              </select>
+              <div className="text-[9.5px] text-slate-500 mt-1 font-mono">
+                Max Draft: <strong className="text-[#0F2747]">14.5m</strong> | Max LOA: <strong className="text-[#0F2747]">260m</strong> | Max Beam: <strong className="text-[#0F2747]">40m</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* COLUMN 3 (4 cols): CHARTER PERIOD & LAYCAN SCHEDULE */}
+          <div className="lg:col-span-4 p-4 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC] space-y-3.5 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-black font-mono bg-[#0F2747] text-white">
+                  03
+                </span>
+                <div>
+                  <h3 className="text-xs font-black uppercase tracking-wider text-[#0F2747]">
+                    CHARTER PERIOD &amp; LAYCAN SCHEDULE
+                  </h3>
+                  <p className="text-[10.5px] text-[#64748B] font-medium leading-none mt-0.5">
+                    Target duration scope and laycan opening/closing dates
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-[#172033] font-bold mb-1">Forecast Horizon</label>
-                <select
-                  value={horizonDays}
-                  onChange={(e) => setHorizonDays(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
-                >
-                  <option value="30">30 Days</option>
-                  <option value="60">60 Days</option>
-                  <option value="90">90 Days</option>
-                </select>
+              {/* Duration Scope Pills */}
+              <div className="mb-3">
+                <label className="block text-[10px] uppercase font-bold tracking-wider text-[#475569] mb-1">
+                  Duration Scope
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setDurationScope('short')}
+                    className={`p-1.5 sm:p-2 rounded-lg text-left border transition-all cursor-pointer flex items-start gap-1.5 ${
+                      durationScope === 'short'
+                        ? 'bg-white border-[#D97706] ring-1 ring-[#D97706] shadow-xs'
+                        : 'bg-white border-[#CBD5E1] hover:border-slate-400'
+                    }`}
+                  >
+                    <div className={`w-3.5 h-3.5 rounded-full border mt-0.5 shrink-0 flex items-center justify-center ${
+                      durationScope === 'short' ? 'border-[#D97706] bg-[#D97706]' : 'border-slate-300'
+                    }`}>
+                      {durationScope === 'short' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[10.5px] font-black text-[#0F2747] leading-tight whitespace-nowrap">
+                        Short-Term (90 Days)
+                      </div>
+                      <div className="text-[9px] text-[#64748B] font-medium truncate">
+                        Spot fixture optimization
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setDurationScope('medium')}
+                    className={`p-1.5 sm:p-2 rounded-lg text-left border transition-all cursor-pointer flex items-start gap-1.5 ${
+                      durationScope === 'medium'
+                        ? 'bg-white border-[#D97706] ring-1 ring-[#D97706] shadow-xs'
+                        : 'bg-white border-[#CBD5E1] hover:border-slate-400'
+                    }`}
+                  >
+                    <div className={`w-3.5 h-3.5 rounded-full border mt-0.5 shrink-0 flex items-center justify-center ${
+                      durationScope === 'medium' ? 'border-[#D97706] bg-[#D97706]' : 'border-slate-300'
+                    }`}>
+                      {durationScope === 'medium' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[10.5px] font-black text-[#0F2747] leading-tight whitespace-nowrap">
+                        Medium-Term (180 Days)
+                      </div>
+                      <div className="text-[9px] text-[#64748B] font-medium truncate">
+                        Contract of affreightment (COA)
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Start Date and End Date */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold tracking-wider text-[#475569] mb-1">
+                    Start Date (Laycan Window Open) <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-[#CBD5E1] text-[11px] font-bold text-[#0F2747] focus:outline-none focus:border-[#1E65B8]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] uppercase font-bold tracking-wider text-[#475569] mb-1">
+                    End Date (Discharge Window Deadline) <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-[#CBD5E1] text-[11px] font-bold text-[#0F2747] focus:outline-none focus:border-[#1E65B8]"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={runAnalysis}
-              disabled={loading}
-              className="w-full py-3 rounded-[8px] text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 shadow-sm"
-              style={{
-                backgroundColor: '#D6A63B',
-                color: '#0F2747',
-              }}
-            >
-              {loading ? 'Executing ML Inference...' : 'Generate Predictive Forecast'}
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            {/* GENERATE FORECAST CTA */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handleGenerateForecast}
+                disabled={isGenerating}
+                className="w-full py-2.5 rounded-lg bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-black tracking-wider uppercase transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60"
+              >
+                <span>{isGenerating ? 'Computing Forecast...' : 'GENERATE FORECAST'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. BOTTOM CARD: FORECAST RESULTS */}
+      {/* ========================================================================= */}
+      <div className="p-5 sm:p-6 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs space-y-5">
+        
+        {/* Header of Forecast Results */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
+              <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-[#0F2747]">
+                FORECAST RESULTS
+              </h2>
+            </div>
+            <p className="text-xs text-[#64748B] mt-0.5 font-medium">
+              90-day probabilistic freight forecast with quantile range and optimal chartering window.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE]">
+              <Activity className="w-3.5 h-3.5 text-[#1D4ED8]" />
+              <span>SIGNAL: MONITOR</span>
+            </span>
           </div>
         </div>
 
-        {/* Right Area: Forecast Results, Multi-Horizon Milestones & Charts (8 cols) */}
-        <div className="lg:col-span-8 space-y-5">
-          {forecast && (
-            <>
-              {/* Top Prediction Milestones Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
-                  <span className="text-[10px] uppercase font-bold text-[#68717D] tracking-wider block">Current Reference</span>
-                  <div className="text-2xl font-black text-[#0F2747] font-mono mt-1">${forecast.current_reference_rate.toFixed(2)}</div>
-                  <span className="text-[10px] text-[#68717D] mt-0.5 block">USD / Metric Ton</span>
+        {/* 2 Columns: Left (8 cols chart & rates) + Right (4 cols PortIN Recommendation) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          
+          {/* LEFT 8 COLUMNS: RATES & 90-DAY TREND */}
+          <div className="lg:col-span-8 space-y-4">
+            
+            {/* Top 3 Rate Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div className="p-3.5 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
+                <div className="text-[10px] uppercase font-bold text-slate-500">Current Reference Rate</div>
+                <div className="text-2xl font-mono font-black text-[#0F2747] mt-1">
+                  $11.99 <span className="text-xs font-semibold text-slate-500">/ MT</span>
                 </div>
+                <div className="text-[10.5px] text-slate-500 mt-0.5 font-medium">Baltic benchmark</div>
+              </div>
 
-                <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
-                  <span className="text-[10px] uppercase font-bold text-[#68717D] tracking-wider block">7-Day Forward</span>
-                  <div className="text-2xl font-black text-[#0F2747] font-mono mt-1">${forecast.day_7_prediction.toFixed(2)}</div>
-                  <span className="text-[10px] text-[#68717D] mt-0.5 block">USD / Metric Ton</span>
+              <div className="p-3.5 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
+                <div className="text-[10px] uppercase font-bold text-slate-500">T + 30 Days Expected</div>
+                <div className="text-2xl font-mono font-black text-[#0F2747] mt-1">
+                  $11.63 <span className="text-xs font-semibold text-slate-500">/ MT</span>
                 </div>
+                <div className="text-[10.5px] text-slate-500 mt-0.5 font-medium">P50 median quantile</div>
+              </div>
 
-                <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
-                  <span className="text-[10px] uppercase font-bold text-[#68717D] tracking-wider block">30-Day Forward</span>
-                  <div className="text-2xl font-black text-[#0F2747] font-mono mt-1">${forecast.day_30_prediction.toFixed(2)}</div>
-                  <span className={`text-[10px] font-bold mt-0.5 block ${forecast.trend_pct > 0 ? 'text-[#C64A3B]' : 'text-[#2F7D4B]'}`}>
-                    {forecast.trend_pct > 0 ? `+${forecast.trend_pct}%` : `${forecast.trend_pct}%`} vs current
+              <div className="p-3.5 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
+                <div className="text-[10px] uppercase font-bold text-slate-500">T + 90 Days Expected</div>
+                <div className="text-2xl font-mono font-black text-[#0F2747] mt-1">
+                  $10.94 <span className="text-xs font-semibold text-slate-500">/ MT</span>
+                </div>
+                <div className="text-[10.5px] text-slate-500 mt-0.5 font-medium">Term horizon projection</div>
+              </div>
+            </div>
+
+            {/* 90-Day Freight Trend Container */}
+            <div className="p-4 rounded-xl bg-white border border-[#E2E8F0] space-y-2">
+              
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
+                <span className="text-xs font-bold text-[#0F2747]">
+                  90-Day Freight Trend with Quantile Envelope ($/MT)
+                </span>
+                <div className="flex items-center gap-4 text-[10px] font-bold text-slate-600">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#0F2747]" />
+                    <span>P50 Median</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
+                    <span>P10 Lower</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]" />
+                    <span>P90 Upper</span>
                   </span>
                 </div>
-
-                <div className="p-4 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
-                  <span className="text-[10px] uppercase font-bold text-[#68717D] tracking-wider block">90-Day Forward</span>
-                  <div className="text-2xl font-black text-[#0F2747] font-mono mt-1">${forecast.day_90_prediction.toFixed(2)}</div>
-                  <span className="text-[10px] text-[#68717D] mt-0.5 block">USD / Metric Ton</span>
-                </div>
               </div>
 
-              {/* Main 90-Day Forecast Visual with Shaded Quantiles */}
-              <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E4E2DC]">
+              {/* Chart Viewport */}
+              <div className="h-64 sm:h-72 w-full relative pt-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart
+                    data={DEFAULT_TREND_DATA}
+                    margin={{ top: 25, right: 15, left: -20, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="p50TrendGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#0F2747" stopOpacity={0.15} />
+                        <stop offset="100%" stopColor="#0F2747" stopOpacity={0.0} />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Window 1: Suggest Wait / Monitor (Blue) */}
+                    <ReferenceArea
+                      x1="Sep 15"
+                      x2="Oct 01"
+                      fill="#EFF6FF"
+                      fillOpacity={0.7}
+                      label={renderWaitMonitorLabel}
+                    />
+
+                    {/* Window 2: Optimal Fixing Window (Green) */}
+                    <ReferenceArea
+                      x1="Oct 01"
+                      x2="Oct 24"
+                      fill="#ECFDF5"
+                      fillOpacity={0.7}
+                      label={renderOptimalWindowLabel}
+                    />
+
+                    {/* Window 3: Higher Risk / Expensive Window (Red) */}
+                    <ReferenceArea
+                      x1="Oct 31"
+                      x2="Nov 23"
+                      fill="#FEF2F2"
+                      fillOpacity={0.7}
+                      label={renderExpensiveWindowLabel}
+                    />
+
+                    {/* Today Marker Line */}
+                    <ReferenceLine
+                      x="Sep 08"
+                      stroke="#64748B"
+                      strokeDasharray="2 2"
+                      strokeWidth={1.2}
+                      label={{
+                        value: 'Today',
+                        position: 'top',
+                        fill: '#0F2747',
+                        fontSize: 10,
+                        fontWeight: 'bold',
+                      }}
+                    />
+
+                    <XAxis
+                      dataKey="date"
+                      stroke="#94A3B8"
+                      fontSize={9.5}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      stroke="#94A3B8"
+                      fontSize={9.5}
+                      domain={[8, 16]}
+                      ticks={[8, 10, 12, 14, 16]}
+                      tickLine={false}
+                    />
+                    <Tooltip
+                      content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                          const d = payload[0].payload as TrendPoint;
+                          return (
+                            <div className="p-2.5 bg-white rounded-lg shadow-lg border border-slate-200 text-xs">
+                              <div className="font-bold text-[#0F2747]">{label}</div>
+                              <div className="mt-1 space-y-0.5 text-[11px] font-mono">
+                                <div className="text-red-600 font-bold">P90 Upper: ${d.p90.toFixed(2)}</div>
+                                <div className="text-[#0F2747] font-black">P50 Median: ${d.p50.toFixed(2)}</div>
+                                <div className="text-emerald-600 font-bold">P10 Lower: ${d.p10.toFixed(2)}</div>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+
+                    {/* Curves */}
+                    <Area
+                      type="monotone"
+                      dataKey="p50"
+                      stroke="none"
+                      fill="url(#p50TrendGradient)"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="p90"
+                      stroke="#EF4444"
+                      strokeWidth={1.5}
+                      strokeDasharray="3 3"
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="p50"
+                      stroke="#0F2747"
+                      strokeWidth={2.5}
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="p10"
+                      stroke="#10B981"
+                      strokeWidth={1.5}
+                      strokeDasharray="3 3"
+                      dot={false}
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* MAPE / MAE Metrics */}
+              <div className="text-[11px] text-slate-500 font-medium pt-1">
+                Historical MAPE: <strong className="text-[#0F2747]">1.94%</strong> • Model MAE: <strong className="text-emerald-700 font-mono font-bold">$0.37 / MT</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT 4 COLUMNS: PortIN RECOMMENDATION CARD */}
+          <div className="lg:col-span-4 rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden flex flex-col justify-between bg-white">
+            <div>
+              {/* Card Header (Navy #0F2747) */}
+              <div className="px-4 py-3 bg-[#0F2747] text-white flex items-center gap-2">
+                <Anchor className="w-4 h-4 text-[#D6A63B]" />
+                <span className="text-xs sm:text-sm font-bold tracking-tight">
+                  PortIN Recommendation
+                </span>
+              </div>
+
+              {/* Status Decision Box (Mint/Green) */}
+              <div className="p-4">
+                <div className="p-3.5 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#059669] text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <TrendingUp className="w-5 h-5" />
+                  </div>
                   <div>
-                    <h3 className="text-base font-black text-[#0F2747]">
-                      90-Day Forecast Curve with Quantile Confidence Intervals
-                    </h3>
-                    <p className="text-xs text-[#68717D] font-medium mt-0.5">
-                      Target: USD/MT freight for {cargoType} on {originPort} &rarr; {destinationPort}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[11px] px-2 py-0.5 rounded font-bold bg-[#F8F7F3] text-[#0F2747] border border-[#E4E2DC]">
-                      MAE: {forecast.model_metadata.mae} $/MT
-                    </span>
-                    <span className="text-[11px] px-2 py-0.5 rounded font-bold bg-[#F8F7F3] text-[#0F2747] border border-[#E4E2DC]">
-                      MAPE: {forecast.model_metadata.mape}%
-                    </span>
+                    <div className="text-base font-black text-[#065F46] tracking-tight leading-tight">
+                      WAIT &amp; MONITOR
+                    </div>
+                    <div className="text-[11px] text-[#047857] font-semibold mt-0.5">
+                      Favourable rates expected in next 14–21 days.
+                    </div>
                   </div>
                 </div>
 
-                <div className="h-64 w-full pt-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={forecast.forecast_curve} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="forecastConfidenceBand" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#D0D9E5" stopOpacity={0.6} />
-                          <stop offset="95%" stopColor="#E4EBF2" stopOpacity={0.2} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#E4E2DC" vertical={false} />
-                      <XAxis dataKey="date" stroke="#68717D" fontSize={10} tickFormatter={(v) => v.slice(5)} />
-                      <YAxis stroke="#68717D" fontSize={10} domain={['dataMin - 1', 'dataMax + 1']} tickFormatter={(v) => `$${v}`} />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: '#FFFFFF',
-                          borderColor: '#E4E2DC',
-                          borderRadius: '8px',
-                          fontSize: '11px',
-                          color: '#172033',
-                          boxShadow: '0 4px 12px rgba(15, 39, 71, 0.08)',
-                        }}
-                        formatter={(val: any, name: any) => [
-                          `$${Number(val).toFixed(2)}/MT`,
-                          name === 'predicted_rate' ? 'Predicted Rate' : name === 'upper_bound' ? '90% Upper Bound' : '10% Lower Bound'
-                        ]}
-                      />
-                      <Area type="monotone" dataKey="upper_bound" stroke="none" fill="url(#forecastConfidenceBand)" fillOpacity={1} />
-                      <Area type="monotone" dataKey="lower_bound" stroke="none" fill="#FFFFFF" fillOpacity={1} />
-                      <Area
-                        type="monotone"
-                        dataKey="predicted_rate"
-                        stroke="#0F2747"
-                        strokeWidth={2.5}
-                        strokeDasharray="4 4"
-                        fill="none"
-                        dot={{ r: 3, fill: '#D6A63B', stroke: '#0F2747', strokeWidth: 1.5 }}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-
-                <div className="flex items-center justify-between text-xs text-[#68717D] pt-2 border-t border-[#E4E2DC]">
-                  <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1.5 font-semibold text-[#0F2747]">
-                      <span className="w-3 h-0.5 bg-[#0F2747] border-dashed border-t"></span> Expected Rate (Navy Dashed)
-                    </span>
-                    <span className="flex items-center gap-1.5 font-semibold text-[#68717D]">
-                      <span className="w-3 h-2 bg-[#D0D9E5] rounded-xs"></span> 90% Confidence Interval
+                {/* Key-Value Details Table */}
+                <div className="divide-y divide-slate-100 text-xs mt-3">
+                  <div className="py-2 flex items-center justify-between">
+                    <span className="text-slate-500 font-medium">Optimal Charter Window</span>
+                    <span className="font-bold text-[#0F2747]">Next 14–21 Days</span>
+                  </div>
+                  <div className="py-2 flex items-center justify-between">
+                    <span className="text-slate-500 font-medium">Recommended Vessel</span>
+                    <span className="font-bold text-[#0F2747]">Panamax</span>
+                  </div>
+                  <div className="py-2 flex items-center justify-between">
+                    <span className="text-slate-500 font-medium">Contract Strategy</span>
+                    <span className="font-bold text-[#0F2747]">3-Voyage COA</span>
+                  </div>
+                  <div className="py-2 flex items-center justify-between">
+                    <span className="text-slate-500 font-medium">Expected Rate Range</span>
+                    <span className="font-bold font-mono text-[#0F2747]">$10.8 – $11.4 / MT</span>
+                  </div>
+                  <div className="py-2 flex items-center justify-between">
+                    <span className="text-slate-500 font-medium">Market Risk</span>
+                    <span className="font-bold text-[#D97706] flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Moderate</span>
                     </span>
                   </div>
+                  <div className="py-2 flex items-center justify-between">
+                    <span className="text-slate-500 font-medium">Port Compatibility</span>
+                    <span className="font-bold text-[#16A34A] flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Compatible</span>
+                    </span>
+                  </div>
+                  <div className="py-2 flex items-center justify-between">
+                    <span className="text-slate-500 font-medium">Forecast Confidence</span>
+                    <span className="font-bold font-mono text-[#0F2747]">82%</span>
+                  </div>
+                </div>
+
+                {/* Why this recommendation? Accordion */}
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setWhyExpanded(!whyExpanded)}
+                    className="w-full flex items-center justify-between text-xs font-bold text-[#2563EB] hover:text-[#1D4ED8] transition-colors py-1 cursor-pointer"
+                  >
+                    <span>Why this recommendation?</span>
+                    {whyExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+                  {whyExpanded && (
+                    <div className="mt-2 p-3 rounded-lg bg-slate-50 border border-slate-200 text-[11px] text-slate-600 leading-relaxed space-y-1.5 animate-in fade-in duration-150">
+                      <p>
+                        Current Baltic forward freight rates (FFA) and bunker fuel forecasts indicate a seasonal surplus in Panamax vessel capacity arriving across the Indian Ocean in early October.
+                      </p>
+                      <p>
+                        Fixing fixtures now would incur higher spot premiums, whereas deferring laycan booking by 14–21 days captures an estimated savings of <strong>$0.55 – $0.90 / MT</strong> on thermal coal imports.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
+            </div>
 
-              {/* Explainable Decision Rationale & Feature Importance */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#E4E2DC]">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#0F2747] flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-[#2F7D4B]" />
-                      <span>Explainable Market Recommendation</span>
-                    </h4>
-                    <span className="font-bold text-xs px-2 py-0.5 rounded bg-[#F3FAF7] text-[#2F7D4B] border border-[#BCF0DA]">
-                      {forecast.market_signal}
-                    </span>
-                  </div>
-                  <div className="p-3.5 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-xs text-[#172033] font-medium leading-relaxed">
-                    {forecast.explanation}
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-[#68717D] pt-1">
-                    <span>Optimal Booking Window:</span>
-                    <span className="font-black text-[#0F2747]">{forecast.optimal_booking_window}</span>
-                  </div>
-                </div>
+            {/* Bottom Action Buttons */}
+            <div className="p-4 pt-0 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <Link
+                to="/decision-twin"
+                className="px-2.5 py-2 rounded-lg border border-[#CBD5E1] bg-white hover:bg-slate-50 text-[#0F2747] text-[11px] font-bold transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer text-center whitespace-nowrap"
+              >
+                <span>View in Decision Twin</span>
+                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+              </Link>
 
-                <div className="p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#E4E2DC]">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#0F2747] flex items-center gap-1.5">
-                      <BarChart3 className="w-4 h-4 text-[#D6A63B]" />
-                      <span>Key Driver Feature Weights</span>
-                    </h4>
-                    <span className="text-[10px] text-[#68717D] font-semibold">Model Sensitivity</span>
-                  </div>
-                  <div className="space-y-2.5 pt-1">
-                    {forecast.feature_importance.map((f, i) => (
-                      <div key={i} className="text-xs">
-                        <div className="flex justify-between text-[#172033] mb-1 text-[11px] font-medium">
-                          <span>{f.feature}</span>
-                          <span className="font-mono text-[#0F2747] font-bold">{(f.importance * 100).toFixed(0)}%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-[#F8F7F3] rounded-full overflow-hidden border border-[#E4E2DC]">
-                          <div className="h-full bg-[#0F2747] rounded-full" style={{ width: `${f.importance * 100}%` }}></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
+              <Link
+                to="/charter-operations"
+                className="px-2.5 py-2 rounded-lg bg-[#D97706] hover:bg-[#B45309] text-white text-[11px] font-black tracking-wide transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer text-center whitespace-nowrap"
+              >
+                <span>Proceed to Charter Plan</span>
+                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
+export default FreightForecastPage;

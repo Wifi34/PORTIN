@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   History, Eye, Copy, Trash2, ArrowRight, RefreshCw,
-  Ship, MapPin, Calendar, CheckCircle2, ShieldAlert, X
+  Ship, MapPin, Calendar, CheckCircle2, ShieldAlert, X, Sparkles
 } from 'lucide-react';
 import { apiClient } from '../api/client';
 import { DataProvenanceBadge } from '../components/common/DataProvenanceBadge';
@@ -68,38 +68,39 @@ export const DecisionHistoryPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-full bg-[#F8F7F3] text-[#172033] p-4 sm:p-6 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E4E2DC]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-sm border-t-4 border-t-[#D6A63B]">
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1.5">
             <span className="text-[11px] font-black uppercase tracking-widest text-[#D6A63B]">
               Audit Trail & Record Storage
             </span>
             <DataProvenanceBadge sourceType="USER IMPORTED & SAVED" />
           </div>
-          <h1 className="text-2xl font-black text-[#0F2747] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#0F2747] tracking-tight">
             Chartering Decision History
           </h1>
-          <p className="text-xs text-[#68717D] mt-1">
+          <p className="text-xs sm:text-sm text-[#68717D] mt-1 font-medium">
             Complete historical registry of saved procurement decisions, vessel selections, and contract evaluations.
           </p>
         </div>
 
         <button
           onClick={loadDecisions}
-          className="p-2.5 rounded-[8px] bg-white hover:bg-[#F8F7F3] border border-[#E4E2DC] text-[#0F2747] shadow-sm transition-colors self-start sm:self-center"
+          className="px-4 py-2 rounded-xl bg-[#FAF9F5] hover:bg-[#F3E3B7]/50 border border-[#E4E2DC] text-[#0F2747] text-xs font-bold shadow-xs transition-colors flex items-center gap-2 cursor-pointer self-start sm:self-center"
           title="Refresh Decision Log"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#D6A63B]' : ''}`} />
+          <span>Refresh</span>
         </button>
       </div>
 
-      {/* Decisions List Table */}
-      <div className="bg-white border border-[#E4E2DC] rounded-[10px] overflow-hidden shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+      {/* Decisions List Table (With Executive Navy Header & High Contrast) */}
+      <div className="bg-white border border-[#E4E2DC] rounded-[16px] overflow-hidden shadow-sm border-t-4 border-t-[#D6A63B]">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-[#F8F7F3] text-[#0F2747] uppercase tracking-wider text-[11px] font-black border-b border-[#E4E2DC]">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead className="bg-[#0F2747] text-[#F3E3B7] uppercase tracking-wider text-[10px] font-black">
               <tr>
                 <th className="py-3 px-4">Decision ID / Title</th>
                 <th className="py-3 px-4">Cargo Parcel</th>
@@ -108,65 +109,72 @@ export const DecisionHistoryPage: React.FC = () => {
                 <th className="py-3 px-4">Contract Strategy</th>
                 <th className="py-3 px-4">Signal</th>
                 <th className="py-3 px-4">Est. Cost</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th className="py-3 px-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E4E2DC]">
               {decisions.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-12 text-[#68717D]">
+                  <td colSpan={8} className="text-center py-12 text-[#68717D] font-medium">
                     No decisions recorded yet. Run an analysis from the Forecast or Decision Twin page and click Save.
                   </td>
                 </tr>
               ) : (
-                decisions.map((d) => (
-                  <tr key={d.id} className="hover:bg-[#F8F7F3]/60 transition-colors">
+                decisions.map((d, idx) => (
+                  <tr
+                    key={d.id}
+                    className={`transition-colors ${idx % 2 === 1 ? 'bg-[#FAF9F5]' : 'bg-white'} hover:bg-[#F3E3B7]/20`}
+                  >
                     <td className="py-3.5 px-4">
                       <div className="font-bold text-[#0F2747] text-xs">{d.title}</div>
                       <div className="text-[10px] text-[#68717D] font-mono mt-0.5">
                         #{d.id} • {new Date(d.created_at).toLocaleDateString()}
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 text-[#172033] font-medium">
-                      {d.cargo_mt.toLocaleString()} MT {d.cargo_type}
-                    </td>
-                    <td className="py-3.5 px-4 text-[#172033] font-medium">
-                      {d.origin_port} &rarr; {d.destination_port}
-                    </td>
-                    <td className="py-3.5 px-4 font-bold text-[#0F2747]">
-                      {d.recommended_vessel}
+                    <td className="py-3.5 px-4 text-[#172033] font-bold">
+                      {d.cargo_mt.toLocaleString()} MT <span className="text-[#0F2747]">{d.cargo_type}</span>
                     </td>
                     <td className="py-3.5 px-4 text-[#172033] font-semibold">
+                      {d.origin_port} &rarr; {d.destination_port}
+                    </td>
+                    <td className="py-3.5 px-4 font-black text-[#0F2747]">
+                      {d.recommended_vessel}
+                    </td>
+                    <td className="py-3.5 px-4 text-[#172033] font-medium">
                       {d.contract_type}
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-black uppercase bg-[#F3FAF7] text-[#2F7D4B] border border-[#BCF0DA]">
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                        d.market_signal === 'BOOK NOW'
+                          ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                          : 'bg-amber-100 text-amber-900 border border-amber-300'
+                      }`}>
                         {d.market_signal}
                       </span>
                     </td>
                     <td className="py-3.5 px-4 font-mono font-black text-[#0F2747]">
                       ${d.estimated_total_cost_usd.toLocaleString()}
                     </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
+                    <td className="py-3.5 px-4 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
                         <button
                           onClick={() => setActiveModalDecision(d)}
-                          title="Open Details"
-                          className="p-1.5 rounded-[6px] bg-[#F8F7F3] hover:bg-[#E4E2DC] border border-[#E4E2DC] text-[#0F2747] transition-colors"
+                          className="p-1.5 rounded-lg text-[#0F2747] hover:bg-[#FAF9F5] border border-[#E4E2DC] transition-colors cursor-pointer"
+                          title="View Details"
                         >
                           <Eye className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDuplicate(d)}
-                          title="Duplicate"
-                          className="p-1.5 rounded-[6px] bg-[#F8F7F3] hover:bg-[#E4E2DC] border border-[#E4E2DC] text-[#0F2747] transition-colors"
+                          className="p-1.5 rounded-lg text-[#0F2747] hover:bg-[#FAF9F5] border border-[#E4E2DC] transition-colors cursor-pointer"
+                          title="Duplicate Scenario"
                         >
                           <Copy className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDelete(d.id)}
-                          title="Delete"
-                          className="p-1.5 rounded-[6px] bg-[#FDF2F2] hover:bg-[#FDE8E8] border border-[#F8B4B4] text-[#C64A3B] transition-colors"
+                          className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 border border-rose-200 transition-colors cursor-pointer"
+                          title="Delete Decision"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -180,60 +188,89 @@ export const DecisionHistoryPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Detail Modal View */}
+      {/* Decision Detail Modal */}
       {activeModalDecision && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-6">
-          <div className="w-full max-w-2xl bg-white border border-[#E4E2DC] rounded-[10px] p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#E4E2DC]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="w-full max-w-2xl rounded-[16px] bg-white border border-[#E4E2DC] shadow-2xl p-6 text-[#172033] relative border-t-4 border-t-[#D6A63B]">
+            <div className="flex items-start justify-between pb-4 border-b border-[#E4E2DC]">
               <div>
-                <span className="text-[10px] uppercase font-bold text-[#D6A63B]">Archived Analysis Snapshot</span>
-                <h3 className="text-lg font-black text-[#0F2747] mt-0.5">{activeModalDecision.title}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-black uppercase tracking-wider text-[#0F2747]">
+                    Decision #{activeModalDecision.id}
+                  </h3>
+                  <span className="px-2 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-900 border border-emerald-300">
+                    {activeModalDecision.market_signal}
+                  </span>
+                </div>
+                <div className="text-xs text-[#68717D] mt-0.5 font-medium">
+                  {activeModalDecision.title}
+                </div>
               </div>
+
               <button
                 onClick={() => setActiveModalDecision(null)}
-                className="text-[#68717D] hover:text-[#0F2747] p-1 transition-colors"
+                className="p-1 rounded-md text-[#68717D] hover:text-[#0F2747] hover:bg-[#FAF9F5] transition-colors cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 text-xs text-[#172033]">
-              <div>
-                <span className="text-[#68717D] block text-[11px]">Trade Lane:</span>
-                <span className="font-bold text-[#0F2747]">{activeModalDecision.origin_country} ({activeModalDecision.origin_port}) &rarr; {activeModalDecision.destination_port}</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
+              <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
+                <div className="text-[10px] uppercase font-bold text-[#68717D]">Cargo Parcel</div>
+                <div className="text-sm font-black text-[#0F2747] mt-0.5">
+                  {activeModalDecision.cargo_mt.toLocaleString()} MT
+                </div>
+                <div className="text-[10px] text-[#68717D] truncate">{activeModalDecision.cargo_type}</div>
               </div>
-              <div>
-                <span className="text-[#68717D] block text-[11px]">Parcel Specification:</span>
-                <span className="font-bold text-[#0F2747]">{activeModalDecision.cargo_mt.toLocaleString()} MT {activeModalDecision.cargo_type}</span>
+
+              <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
+                <div className="text-[10px] uppercase font-bold text-[#68717D]">Vessel Class</div>
+                <div className="text-sm font-black text-[#0F2747] mt-0.5">
+                  {activeModalDecision.recommended_vessel}
+                </div>
+                <div className="text-[10px] text-[#68717D]">Recommended</div>
               </div>
-              <div>
-                <span className="text-[#68717D] block text-[11px]">Recommended Vessel:</span>
-                <span className="font-bold text-[#0F2747]">{activeModalDecision.recommended_vessel}</span>
+
+              <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
+                <div className="text-[10px] uppercase font-bold text-[#68717D]">Risk Score</div>
+                <div className="text-sm font-black text-emerald-700 mt-0.5">
+                  {activeModalDecision.risk_score} / 100
+                </div>
+                <div className="text-[10px] text-[#68717D]">Low Risk</div>
               </div>
-              <div>
-                <span className="text-[#68717D] block text-[11px]">Contract Strategy:</span>
-                <span className="font-bold text-[#0F2747]">{activeModalDecision.contract_type}</span>
-              </div>
-              <div>
-                <span className="text-[#68717D] block text-[11px]">Optimal Window:</span>
-                <span className="font-bold text-[#2F7D4B]">{activeModalDecision.optimal_window}</span>
-              </div>
-              <div>
-                <span className="text-[#68717D] block text-[11px]">Operational Risk:</span>
-                <span className="font-bold text-[#2F7D4B]">{activeModalDecision.risk_score} / 100</span>
+
+              <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
+                <div className="text-[10px] uppercase font-bold text-[#68717D]">Estimated Cost</div>
+                <div className="text-sm font-black font-mono text-[#0F2747] mt-0.5">
+                  ${activeModalDecision.estimated_total_cost_usd.toLocaleString()}
+                </div>
+                <div className="text-[10px] text-[#68717D]">USD Total</div>
               </div>
             </div>
 
-            <div className="p-3 bg-[#F8F7F3] rounded-[8px] border border-[#E4E2DC] text-xs text-[#68717D]">
-              Created on: {new Date(activeModalDecision.created_at).toLocaleString()}
+            <div className="p-4 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC] space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-[#68717D] font-bold">Trade Corridor:</span>
+                <strong className="text-[#0F2747]">{activeModalDecision.origin_port} ({activeModalDecision.origin_country}) &rarr; {activeModalDecision.destination_port} (India)</strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#68717D] font-bold">Contract Strategy:</span>
+                <strong className="text-[#0F2747]">{activeModalDecision.contract_type} ({activeModalDecision.num_voyages} Voyages)</strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#68717D] font-bold">Target Laycan Window:</span>
+                <strong className="text-[#0F2747]">{activeModalDecision.optimal_window}</strong>
+              </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex items-center justify-end gap-3 mt-6 pt-3 border-t border-[#E4E2DC]">
               <button
+                type="button"
                 onClick={() => setActiveModalDecision(null)}
-                className="px-5 py-2.5 bg-[#0F2747] hover:bg-[#16365f] text-white text-xs font-bold rounded-[8px] transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#68717D] hover:bg-[#FAF9F5] transition-colors cursor-pointer"
               >
-                Close Snapshot
+                Close
               </button>
             </div>
           </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronDown, Menu, X, ArrowRight } from 'lucide-react';
 import { PortINLogo } from '../common/PortINLogo';
+import { IndiaEmblemSvg, SailLogoSvg } from '../common/GovtLogos';
 import { useAuth } from '../../context/AuthContext';
 
 export const Navbar: React.FC = () => {
@@ -25,179 +26,223 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'py-3 shadow-xl backdrop-blur-md'
-          : 'py-5 bg-transparent'
-      }`}
-      style={{
-        backgroundColor: scrolled ? 'rgba(11, 31, 56, 0.95)' : 'transparent',
-        borderBottom: scrolled ? '1px solid rgba(214, 166, 59, 0.2)' : 'none',
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        {/* LEFT: Master PortIN Logo */}
-        <PortINLogo size="md" variant="light" showTagline={true} linkTo="/" />
+    <header className="fixed top-0 left-0 right-0 z-50 select-none">
+      {/* 1. Indian National Tricolor Top Accent Line */}
+      <div className="w-full h-[3px] flex">
+        <div className="h-full flex-1 bg-[#FF9933]" />
+        <div className="h-full flex-1 bg-[#FFFFFF]" />
+        <div className="h-full flex-1 bg-[#138808]" />
+      </div>
 
-        {/* CENTER: Enterprise Navigation with Subtle Dropdowns */}
-        <div className="hidden lg:flex items-center gap-7 text-xs font-semibold tracking-wide text-white/90">
-          <Link to="/" className="hover:text-[#D6A63B] transition-colors">
-            Home
-          </Link>
+      {/* 2. Unified Master Navigation Bar */}
+      <nav
+        className={`w-full transition-all duration-300 ${
+          scrolled
+            ? 'py-2.5 shadow-xl backdrop-blur-md'
+            : 'py-3.5 bg-[#0B1F38]/95 backdrop-blur-sm'
+        }`}
+        style={{
+          backgroundColor: scrolled ? 'rgba(11, 31, 56, 0.98)' : 'rgba(11, 31, 56, 0.92)',
+          borderBottom: '1px solid rgba(214, 166, 59, 0.25)',
+        }}
+      >
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
+          {/* LEFT: PortIN Logo + Govt of India & SAIL Official Co-branding */}
+          <div className="flex items-center gap-2.5 sm:gap-3 xl:gap-4 shrink-0">
+            <PortINLogo size="sm" variant="light" showTagline={true} taglineClassName="hidden 2xl:block" linkTo="/" />
 
-          {/* Platform Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => setActiveDropdown('platform')}
-            onMouseLeave={() => setActiveDropdown(null)}
-          >
-            <button
-              type="button"
-              className="flex items-center gap-1 hover:text-[#D6A63B] transition-colors focus:outline-none"
-            >
-              <span>Platform</span>
-              <ChevronDown className="w-3.5 h-3.5 text-[#D6A63B]" />
-            </button>
-            {activeDropdown === 'platform' && (
-              <div
-                className="absolute top-full left-0 mt-2 w-56 rounded-xl shadow-2xl p-2 border animate-in fade-in duration-150"
-                style={{
-                  backgroundColor: '#0F2747',
-                  borderColor: 'rgba(214, 166, 59, 0.25)',
-                }}
-              >
-                <a href="#platform" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
-                  <div className="font-bold text-xs">Overview & Architecture</div>
-                  <div className="text-[10px] text-slate-400">Integrated decision framework</div>
-                </a>
-                <a href="#features" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
-                  <div className="font-bold text-xs">Core Capabilities</div>
-                  <div className="text-[10px] text-slate-400">Forecasting, vessel & ports</div>
-                </a>
-                <a href="#workflow" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
-                  <div className="font-bold text-xs">Decision Workflow</div>
-                  <div className="text-[10px] text-slate-400">Signal to contract execution</div>
-                </a>
+            {/* Vertical Divider */}
+            <div className="h-7 w-px bg-white/20 hidden sm:block" />
+
+            {/* Ministry of Steel, Government of India */}
+            <div className="hidden sm:flex items-center gap-2 select-none shrink-0">
+              <IndiaEmblemSvg size={24} color="#F3E3B7" />
+              <div className="flex flex-col justify-center leading-tight">
+                <span className="text-[11px] font-black text-white tracking-wide font-serif whitespace-nowrap">
+                  भारत सरकार
+                </span>
+                <span className="text-[8.5px] font-bold text-[#D6A63B] uppercase tracking-wider whitespace-nowrap">
+                  Ministry of Steel
+                </span>
               </div>
-            )}
+            </div>
+
+            {/* Vertical Divider */}
+            <div className="h-7 w-px bg-white/20 hidden md:block" />
+
+            {/* SAIL (Steel Authority of India Limited) */}
+            <div className="hidden md:flex items-center gap-2 select-none shrink-0">
+              <SailLogoSvg size={22} showText={false} variant="light" />
+              <div className="flex flex-col justify-center leading-tight">
+                <span className="text-[11px] font-black text-white tracking-tight whitespace-nowrap">
+                  सेल <span style={{ color: '#F26522' }}>SAIL</span>
+                </span>
+                <span className="text-[7.5px] font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">
+                  Maharatna
+                </span>
+              </div>
+            </div>
           </div>
 
-          {/* Solutions Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => setActiveDropdown('solutions')}
-            onMouseLeave={() => setActiveDropdown(null)}
-          >
-            <button
-              type="button"
-              className="flex items-center gap-1 hover:text-[#D6A63B] transition-colors focus:outline-none"
+          {/* CENTER-RIGHT: Navigation Menu with Generous Breathing Room */}
+          <div className="hidden lg:flex items-center gap-4 xl:gap-6 text-[13px] font-semibold tracking-normal text-slate-200 ml-auto mr-4 xl:mr-8 whitespace-nowrap shrink-0">
+            <Link to="/" className="hover:text-[#D6A63B] transition-colors py-1 whitespace-nowrap">
+              Home
+            </Link>
+
+            {/* Platform Dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setActiveDropdown('platform')}
+              onMouseLeave={() => setActiveDropdown(null)}
             >
-              <span>Solutions</span>
-              <ChevronDown className="w-3.5 h-3.5 text-[#D6A63B]" />
-            </button>
-            {activeDropdown === 'solutions' && (
-              <div
-                className="absolute top-full left-0 mt-2 w-64 rounded-xl shadow-2xl p-2 border animate-in fade-in duration-150"
-                style={{
-                  backgroundColor: '#0F2747',
-                  borderColor: 'rgba(214, 166, 59, 0.25)',
-                }}
+              <button
+                type="button"
+                className="flex items-center gap-1 hover:text-[#D6A63B] transition-colors focus:outline-none py-1 whitespace-nowrap"
               >
-                <a href="#value" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
-                  <div className="font-bold text-xs">Chartering Managers</div>
-                  <div className="text-[10px] text-slate-400">Multi-voyage COA vs spot savings</div>
-                </a>
-                <a href="#value" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
-                  <div className="font-bold text-xs">Procurement Teams</div>
-                  <div className="text-[10px] text-slate-400">Total landed cost minimization</div>
-                </a>
-                <a href="#value" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
-                  <div className="font-bold text-xs">Freight Analysts</div>
-                  <div className="text-[10px] text-slate-400">90-day probabilistic quantile bands</div>
-                </a>
-              </div>
-            )}
+                <span>Platform</span>
+                <ChevronDown className="w-3.5 h-3.5 text-[#D6A63B] shrink-0" />
+              </button>
+              {activeDropdown === 'platform' && (
+                <div
+                  className="absolute top-full left-0 mt-2 w-56 rounded-xl shadow-2xl p-2 border animate-in fade-in duration-150"
+                  style={{
+                    backgroundColor: '#0F2747',
+                    borderColor: 'rgba(214, 166, 59, 0.25)',
+                  }}
+                >
+                  <a href="#platform" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
+                    <div className="font-bold text-xs">Overview & Architecture</div>
+                    <div className="text-[10px] text-slate-400">Integrated decision framework</div>
+                  </a>
+                  <a href="#features" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
+                    <div className="font-bold text-xs">Core Capabilities</div>
+                    <div className="text-[10px] text-slate-400">Forecasting, vessel & ports</div>
+                  </a>
+                  <a href="#workflow" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
+                    <div className="font-bold text-xs">Decision Workflow</div>
+                    <div className="text-[10px] text-slate-400">Signal to contract execution</div>
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {/* Solutions Dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setActiveDropdown('solutions')}
+              onMouseLeave={() => setActiveDropdown(null)}
+            >
+              <button
+                type="button"
+                className="flex items-center gap-1 hover:text-[#D6A63B] transition-colors focus:outline-none py-1 whitespace-nowrap"
+              >
+                <span>Solutions</span>
+                <ChevronDown className="w-3.5 h-3.5 text-[#D6A63B] shrink-0" />
+              </button>
+              {activeDropdown === 'solutions' && (
+                <div
+                  className="absolute top-full left-0 mt-2 w-64 rounded-xl shadow-2xl p-2 border animate-in fade-in duration-150"
+                  style={{
+                    backgroundColor: '#0F2747',
+                    borderColor: 'rgba(214, 166, 59, 0.25)',
+                  }}
+                >
+                  <a href="#value" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
+                    <div className="font-bold text-xs">Chartering Managers</div>
+                    <div className="text-[10px] text-slate-400">Multi-voyage COA vs spot savings</div>
+                  </a>
+                  <a href="#value" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
+                    <div className="font-bold text-xs">Procurement Teams</div>
+                    <div className="text-[10px] text-slate-400">Total landed cost minimization</div>
+                  </a>
+                  <a href="#value" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
+                    <div className="font-bold text-xs">Freight Analysts</div>
+                    <div className="text-[10px] text-slate-400">90-day probabilistic quantile bands</div>
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {/* Market Intelligence Dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setActiveDropdown('market')}
+              onMouseLeave={() => setActiveDropdown(null)}
+            >
+              <button
+                type="button"
+                className="flex items-center gap-1 hover:text-[#D6A63B] transition-colors focus:outline-none py-1 whitespace-nowrap"
+              >
+                <span className="hidden xl:inline">Market Intelligence</span>
+                <span className="xl:hidden">Market Intel</span>
+                <ChevronDown className="w-3.5 h-3.5 text-[#D6A63B] shrink-0" />
+              </button>
+              {activeDropdown === 'market' && (
+                <div
+                  className="absolute top-full left-0 mt-2 w-64 rounded-xl shadow-2xl p-2 border animate-in fade-in duration-150"
+                  style={{
+                    backgroundColor: '#0F2747',
+                    borderColor: 'rgba(214, 166, 59, 0.25)',
+                  }}
+                >
+                  <a href="#intelligence-strip" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
+                    <div className="font-bold text-xs">Live Freight Signals</div>
+                    <div className="text-[10px] text-slate-400">Pacific & Indian Ocean bulk rates</div>
+                  </a>
+                  <a href="#advisor" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
+                    <div className="font-bold text-xs">PortIN Decision Advisor</div>
+                    <div className="text-[10px] text-slate-400">Quantitative AI decision reasoning</div>
+                  </a>
+                </div>
+              )}
+            </div>
+
+            <a href="#trusted-data" className="hover:text-[#D6A63B] transition-colors py-1 whitespace-nowrap">
+              Technology
+            </a>
+
+            <a href="#footer" className="hover:text-[#D6A63B] transition-colors py-1 whitespace-nowrap">
+              About
+            </a>
           </div>
 
-          {/* Market Intelligence Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => setActiveDropdown('market')}
-            onMouseLeave={() => setActiveDropdown(null)}
-          >
-            <button
-              type="button"
-              className="flex items-center gap-1 hover:text-[#D6A63B] transition-colors focus:outline-none"
+          {/* RIGHT: Sign In & Request Demo CTAs */}
+          <div className="hidden sm:flex items-center gap-2.5 shrink-0 whitespace-nowrap">
+            <Link
+              to={isAuthenticated ? "/dashboard" : "/login"}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border whitespace-nowrap"
+              style={{
+                backgroundColor: 'transparent',
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+                color: '#FFFFFF',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#D6A63B';
+                e.currentTarget.style.color = '#D6A63B';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                e.currentTarget.style.color = '#FFFFFF';
+              }}
             >
-              <span>Market Intelligence</span>
-              <ChevronDown className="w-3.5 h-3.5 text-[#D6A63B]" />
-            </button>
-            {activeDropdown === 'market' && (
-              <div
-                className="absolute top-full left-0 mt-2 w-64 rounded-xl shadow-2xl p-2 border animate-in fade-in duration-150"
-                style={{
-                  backgroundColor: '#0F2747',
-                  borderColor: 'rgba(214, 166, 59, 0.25)',
-                }}
-              >
-                <a href="#intelligence-strip" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
-                  <div className="font-bold text-xs">Live Freight Signals</div>
-                  <div className="text-[10px] text-slate-400">Pacific & Indian Ocean bulk rates</div>
-                </a>
-                <a href="#advisor" className="block px-3 py-2 rounded-lg hover:bg-[#17355B] text-slate-200 hover:text-white transition-colors">
-                  <div className="font-bold text-xs">PortIN Decision Advisor</div>
-                  <div className="text-[10px] text-slate-400">Quantitative AI decision reasoning</div>
-                </a>
-              </div>
-            )}
+              {isAuthenticated ? 'Console' : 'Sign In'}
+            </Link>
+
+            <Link
+              to="/signup"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black tracking-wider uppercase transition-all shadow-md cursor-pointer whitespace-nowrap"
+              style={{
+                backgroundColor: '#D6A63B',
+                color: '#0F2747',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#C7962F')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#D6A63B')}
+            >
+              <span>Get Started</span>
+              <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+            </Link>
           </div>
-
-          <a href="#trusted-data" className="hover:text-[#D6A63B] transition-colors">
-            Technology
-          </a>
-
-          <a href="#footer" className="hover:text-[#D6A63B] transition-colors">
-            About
-          </a>
-        </div>
-
-        {/* RIGHT: Sign In & Request Demo CTAs */}
-        <div className="hidden sm:flex items-center gap-3">
-          <Link
-            to={isAuthenticated ? "/dashboard" : "/login"}
-            className="px-4 py-2 rounded-xl text-xs font-bold transition-all border"
-            style={{
-              backgroundColor: 'transparent',
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-              color: '#FFFFFF',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#D6A63B';
-              e.currentTarget.style.color = '#D6A63B';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-              e.currentTarget.style.color = '#FFFFFF';
-            }}
-          >
-            {isAuthenticated ? 'Console' : 'Sign In'}
-          </Link>
-
-          <Link
-            to="/signup"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black tracking-wider uppercase transition-all shadow-md cursor-pointer"
-            style={{
-              backgroundColor: '#D6A63B',
-              color: '#0F2747',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#C7962F')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#D6A63B')}
-          >
-            <span>Request Demo</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
 
         {/* Mobile Hamburger Toggle */}
         <div className="lg:hidden flex items-center gap-2">
@@ -277,12 +322,13 @@ export const Navbar: React.FC = () => {
                 className="w-full py-2.5 rounded-xl text-center font-black text-xs uppercase tracking-wider text-[#0F2747]"
                 style={{ backgroundColor: '#D6A63B' }}
               >
-                Request Demo
+                Get Started
               </Link>
             </div>
           </div>
         </div>
       )}
     </nav>
+    </header>
   );
 };

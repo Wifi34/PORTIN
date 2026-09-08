@@ -1,8 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, ShieldCheck, Sparkles, Check, Copy, Shield, UserCheck } from 'lucide-react';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { useAuth } from '../context/AuthContext';
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
+const DEMO_ACCOUNTS = [
+  {
+    id: 'admin',
+    title: 'Executive Admin',
+    email: 'admin@portin.sail.gov.in',
+    password: 'Admin@PortIN2026',
+  },
+  {
+    id: 'analyst',
+    title: 'Chartering Analyst',
+    email: 'analyst@sail.gov.in',
+    password: 'Analyst@PortIN2026',
+  },
+  {
+    id: 'manager',
+    title: 'Procurement Head',
+    email: 'manager@sail.gov.in',
+    password: 'Manager@PortIN2026',
+  },
+  {
+    id: 'logistics',
+    title: 'Logistics Officer',
+    email: 'logistics@sail.gov.in',
+    password: 'Logistics@PortIN2026',
+  },
+];
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -11,8 +40,9 @@ export const LoginPage: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [selectedDemoId, setSelectedDemoId] = useState<string | null>(null);
 
-  const { login, isAuthenticated } = useAuth();
+  const { login, loginWithGoogle, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -23,13 +53,39 @@ export const LoginPage: React.FC = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Handle ?demo=true or role fill
+  // Initialize Google Identity Services
   useEffect(() => {
-    if (searchParams.get('demo') === 'true') {
-      setEmail('analyst@sail.gov.in');
-      setPassword('Analyst@PortIN2026');
+    if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
+      try {
+        (window as any).google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: async (response: any) => {
+            if (response?.credential) {
+              setLoading(true);
+              setError(null);
+              try {
+                await loginWithGoogle({ credential: response.credential });
+                navigate('/dashboard');
+              } catch (err: any) {
+                setError(err.response?.data?.detail || 'Google sign-in failed. Please try again.');
+              } finally {
+                setLoading(false);
+              }
+            }
+          },
+        });
+      } catch (e) {
+        console.warn('Google Identity initialization error:', e);
+      }
     }
-  }, [searchParams]);
+  }, [loginWithGoogle, navigate]);
+
+  const handleSelectDemo = (account: typeof DEMO_ACCOUNTS[0]) => {
+    setEmail(account.email);
+    setPassword(account.password);
+    setSelectedDemoId(account.id);
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,62 +115,61 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleDemoFill = (role: 'analyst' | 'manager' | 'admin') => {
-    if (role === 'analyst') {
-      setEmail('analyst@sail.gov.in');
-      setPassword('Analyst@PortIN2026');
-    } else if (role === 'manager') {
-      setEmail('manager@sail.gov.in');
-      setPassword('Manager@PortIN2026');
-    } else if (role === 'admin') {
-      setEmail('admin@portin.sail.gov.in');
-      setPassword('Admin@PortIN2026');
-    }
-    setError(null);
-  };
-
   const handleGoogleSignIn = () => {
-    // Standard OAuth initiation point
-    setError('Google Single Sign-On requires organization domain authorization. Please use work credentials or enterprise SSO.');
+    setError(null);
+
+    // Modern Google OAuth2 Token Client (popup flow)
+    if (typeof window !== 'undefined' && (window as any).google?.accounts?.oauth2) {
+      try {
+        const client = (window as any).google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID,
+          scope: 'email profile openid',
+          callback: async (tokenResponse: any) => {
+            if (tokenResponse?.access_token) {
+              setLoading(true);
+              try {
+                await loginWithGoogle({ access_token: tokenResponse.access_token });
+                navigate('/dashboard');
+              } catch (err: any) {
+                setError(err.response?.data?.detail || 'Google authentication failed.');
+              } finally {
+                setLoading(false);
+              }
+            } else if (tokenResponse?.error) {
+              setError(`Google Sign-In: ${tokenResponse.error_description || tokenResponse.error}`);
+            }
+          },
+          error_callback: (err: any) => {
+            setError(`Google Sign-In: ${err?.message || 'Dialog closed'}`);
+          }
+        });
+        client.requestAccessToken();
+        return;
+      } catch (err) {
+        console.warn('initTokenClient failed, falling back to One Tap prompt:', err);
+      }
+    }
+
+    // Fallback to Google One Tap prompt
+    if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
+      (window as any).google.accounts.id.prompt((notification: any) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          setError('Google sign-in popup was blocked or skipped. Please allow popups or try again.');
+        }
+      });
+    } else {
+      setError('Google Sign-In is initializing. Please wait a moment and try again.');
+    }
   };
 
   return (
     <AuthLayout
       title="Welcome Back!"
       subtitle="Sign in to access your PortIN maritime intelligence dashboard."
-      heroHeadline="Smarter Freight Forecasting for"
-      heroHighlight="Maritime Decisions"
+      heroHeadline="Next-Gen Freight Intelligence &"
+      heroHighlight="Strategic Chartering Cockpit"
     >
-      {/* Quick Fill Demo Ribbon for SIH Evaluators */}
-      <div className="mb-5 p-2.5 rounded-xl bg-[#F8F7F3] border border-[#E4E2DC] flex items-center justify-between text-[11px]">
-        <div className="flex items-center gap-1.5 text-[#0F2747] font-semibold">
-          <ShieldCheck className="w-3.5 h-3.5 text-[#D6A63B]" />
-          <span>Demo Quick-Fill:</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => handleDemoFill('analyst')}
-            className="px-2 py-1 rounded bg-white hover:bg-[#F3E3B7] border border-[#E4E2DC] text-[#0F2747] font-bold text-[10px] transition-colors"
-          >
-            Analyst
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDemoFill('manager')}
-            className="px-2 py-1 rounded bg-white hover:bg-[#F3E3B7] border border-[#E4E2DC] text-[#0F2747] font-bold text-[10px] transition-colors"
-          >
-            Manager
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDemoFill('admin')}
-            className="px-2 py-1 rounded bg-white hover:bg-[#F3E3B7] border border-[#E4E2DC] text-[#0F2747] font-bold text-[10px] transition-colors"
-          >
-            Admin
-          </button>
-        </div>
-      </div>
+
 
       {/* Error Alert Box */}
       {error && (
@@ -131,6 +186,39 @@ export const LoginPage: React.FC = () => {
           <span className="font-medium leading-relaxed">{error}</span>
         </div>
       )}
+
+      {/* 1-Click Demo Login (Role Name Only) */}
+      <div className="mb-5 p-3 rounded-xl border border-[#E4E2DC] bg-[#FBFBFA]">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[11px] font-bold text-[#68717D] uppercase tracking-wider">
+            Quick Demo Access
+          </span>
+          <span className="text-[10px] text-[#8C95A3]">
+            Click role name to auto-fill
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          {DEMO_ACCOUNTS.map((account) => {
+            const isSelected = selectedDemoId === account.id;
+            return (
+              <button
+                key={account.id}
+                type="button"
+                onClick={() => handleSelectDemo(account)}
+                className={`py-2.5 px-3 rounded-lg border text-left font-semibold text-xs transition-all flex items-center justify-between cursor-pointer ${
+                  isSelected
+                    ? 'border-[#D6A63B] bg-[#FFFDF8] text-[#0F2747] ring-1 ring-[#D6A63B]/50 shadow-xs'
+                    : 'border-[#E4E2DC] bg-white text-[#333E4F] hover:border-[#D6A63B] hover:text-[#0F2747] hover:bg-[#FAF9F5]'
+                }`}
+              >
+                <span className="truncate">{account.title}</span>
+                {isSelected && <Check className="w-3.5 h-3.5 text-[#D6A63B] shrink-0 ml-1" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Sign In Form */}
       <form onSubmit={handleSubmit} className="space-y-4">

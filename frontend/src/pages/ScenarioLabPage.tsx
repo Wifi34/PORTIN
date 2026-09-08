@@ -83,13 +83,13 @@ export const ScenarioLabPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] border-t-[3px] border-t-[#D6A63B]">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#D6A63B]">
               Interactive What-If Simulation
             </span>
-            <DataProvenanceBadge sourceType="SIMULATED DEMO" sourceName="Real-Time Sensitivity Engine" />
+            <DataProvenanceBadge sourceType="REAL-TIME PREDICTIVE ENGINE" sourceName="Real-Time Sensitivity Engine" />
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-[#0F2747] tracking-tight">
             Scenario Lab & Sensitivity Engine

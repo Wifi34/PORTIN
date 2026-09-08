@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
+import { GovtHeroBadge, IndiaEmblemSvg, SailLogoSvg } from '../components/common/GovtLogos';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export const LandingPage: React.FC = () => {
       {/* ========================================================================= */}
       {/* 4 & 5. FULL-SCREEN CINEMATIC VIDEO HERO WITH PRESCRIBED NAVY OVERLAY */}
       {/* ========================================================================= */}
-      <section id="hero" className="relative w-full min-h-screen flex flex-col justify-center items-center overflow-hidden pt-24 pb-20">
+      <section id="hero" className="relative w-full min-h-screen flex flex-col justify-center items-center overflow-hidden pt-28 sm:pt-32 pb-20">
         {/* Cinematic Ocean Bulk Vessel Video with Poster Fallback */}
         <video
           ref={videoRef}
@@ -53,7 +54,7 @@ export const LandingPage: React.FC = () => {
           className="absolute inset-0 z-10 pointer-events-none"
           style={{
             background:
-              'linear-gradient(90deg, rgba(7, 27, 50, 0.92) 0%, rgba(7, 27, 50, 0.72) 42%, rgba(7, 27, 50, 0.22) 100%)',
+              'linear-gradient(90deg, rgba(7, 27, 50, 0.94) 0%, rgba(7, 27, 50, 0.78) 45%, rgba(7, 27, 50, 0.28) 100%)',
           }}
         />
 
@@ -69,14 +70,9 @@ export const LandingPage: React.FC = () => {
 
         {/* 7. Hero Content: Positioned Primarily on the LEFT */}
         <div className="relative z-20 max-w-7xl mx-auto px-6 w-full my-auto">
-          <div className="max-w-2xl text-left space-y-6">
-            {/* Small Gold Eyebrow */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-[#D6A63B]/40 bg-[#0F2747]/80 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#D6A63B] animate-pulse" />
-              <span className="text-[11px] uppercase tracking-widest font-bold text-[#F3E3B7]">
-                DATA. INTELLIGENCE. CONFIDENCE.
-              </span>
-            </div>
+          <div className="max-w-3xl text-left space-y-6">
+            {/* Government & Ministry of Steel Official Badge */}
+            <GovtHeroBadge />
 
             {/* Main Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
@@ -85,17 +81,17 @@ export const LandingPage: React.FC = () => {
             </h1>
 
             {/* Supporting Brand Statement */}
-            <div className="text-sm sm:text-base font-bold uppercase tracking-widest text-[#F3E3B7]">
-              Predict Freight. Optimize Chartering. Procure Smarter.
+            <div className="text-sm sm:text-base font-bold uppercase tracking-widest text-[#F3E3B7] flex items-center gap-2">
+              <span>Predict Freight. Optimize Chartering. Procure Smarter.</span>
             </div>
 
             {/* Supporting Paragraph */}
-            <p className="text-base sm:text-lg text-slate-200 font-medium leading-relaxed max-w-xl">
-              PortIN combines freight forecasting, vessel optimization, port intelligence, route analytics and AI-powered decision support to help chartering and procurement teams make confident bulk cargo decisions for India’s East Coast.
+            <p className="text-base sm:text-lg text-slate-200 font-medium leading-relaxed max-w-2xl">
+              PortIN is the dedicated maritime freight intelligence & decision support platform engineered for the Ministry of Steel and Steel Authority of India Limited (SAIL) to optimize bulk raw material chartering across India’s East Coast ports.
             </p>
 
             {/* 8. Hero CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            <div className="flex flex-wrap items-center gap-4 pt-1">
               <Link
                 to="/signup"
                 className="flex items-center gap-2 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-black tracking-wider uppercase transition-all shadow-xl cursor-pointer"
@@ -558,6 +554,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
+
       {/* ========================================================================= */}
       {/* 15. BUSINESS VALUE SECTION */}
       {/* ========================================================================= */}
@@ -689,8 +686,8 @@ export const LandingPage: React.FC = () => {
       <section className="w-full py-24 relative z-20 text-center" style={{ backgroundColor: '#071526', borderTop: '1px solid rgba(214, 166, 59, 0.2)' }}>
         <div className="max-w-4xl mx-auto px-6 space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F2747] border border-[#D6A63B]/30 text-xs font-bold text-[#F3E3B7]">
-            <Award className="w-3.5 h-3.5 text-[#D6A63B]" />
-            <span>Ministry of Steel • Smart India Hackathon 2026</span>
+            <IndiaEmblemSvg size={14} color="#D6A63B" />
+            <span>Ministry of Steel • Steel Authority of India Limited (SAIL)</span>
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
@@ -720,7 +717,7 @@ export const LandingPage: React.FC = () => {
               to="/signup"
               className="px-7 py-3.5 rounded-xl text-xs sm:text-sm font-bold text-white border border-white/40 hover:border-[#D6A63B] hover:text-[#D6A63B] transition-all"
             >
-              Request Demo
+              Request Access
             </Link>
           </div>
         </div>

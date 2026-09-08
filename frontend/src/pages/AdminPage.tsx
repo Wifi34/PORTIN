@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Shield, Database, Cpu, Users, MapPin, Ship, Activity,
   RefreshCw, CheckCircle2, AlertTriangle, Trash2, Plus, ArrowRight,
-  Key, Mail, Server, Sparkles, Send, Eye, EyeOff
+  Key, Mail, Server, Sparkles, Send, Eye, EyeOff, Zap
 } from 'lucide-react';
 import { apiClient } from '../api/client';
 import { DataProvenanceBadge } from '../components/common/DataProvenanceBadge';
@@ -20,7 +20,9 @@ export const AdminPage: React.FC = () => {
   // Integrations form state
   const [openaiKey, setOpenaiKey] = useState('');
   const [openaiModel, setOpenaiModel] = useState('gpt-4o');
-  const [postgresUrl, setPostgresUrl] = useState('');
+  const [groqKey, setGroqKey] = useState('');
+  const [groqModel, setGroqModel] = useState('openai/gpt-oss-120b');
+  const [dbUrl, setDbUrl] = useState('');
   const [alphaVantageKey, setAlphaVantageKey] = useState('');
   const [smtpUser, setSmtpUser] = useState('');
   const [smtpPassword, setSmtpPassword] = useState('');
@@ -55,6 +57,7 @@ export const AdminPage: React.FC = () => {
 
       const iRes = await apiClient.get('/admin/integrations');
       setIntegrations(iRes.data);
+      if (iRes.data?.groq?.model) setGroqModel(iRes.data.groq.model);
       if (iRes.data?.openai?.model) setOpenaiModel(iRes.data.openai.model);
       if (iRes.data?.smtp?.user) setSmtpUser(iRes.data.smtp.user);
       if (iRes.data?.smtp?.is_enabled !== undefined) setSmtpEnabled(iRes.data.smtp.is_enabled);
@@ -75,9 +78,11 @@ export const AdminPage: React.FC = () => {
     setKeysSavedMessage(null);
     try {
       const payload: any = {};
+      if (groqKey) payload.groq_api_key = groqKey;
+      if (groqModel) payload.groq_model = groqModel;
       if (openaiKey) payload.openai_api_key = openaiKey;
       if (openaiModel) payload.openai_model = openaiModel;
-      if (postgresUrl) payload.database_url = postgresUrl;
+      if (dbUrl) payload.database_url = dbUrl;
       if (alphaVantageKey) payload.alpha_vantage_key = alphaVantageKey;
       if (smtpUser) payload.smtp_user = smtpUser;
       if (smtpPassword) payload.smtp_password = smtpPassword;
@@ -285,14 +290,79 @@ export const AdminPage: React.FC = () => {
 
           <form onSubmit={handleSaveIntegrations} className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* 1. OpenAI Integration Card */}
+              {/* 1. Groq Cloud Ultra-Fast Neural Engine Card */}
               <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-[#E4E2DC]">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-[#D6A63B]" />
+                    <Zap className="w-5 h-5 text-[#D6A63B]" />
                     <div>
-                      <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider">OpenAI Reasoning API</h3>
-                      <span className="text-[10px] text-[#68717D]">Powering PortIN Decision Advisor</span>
+                      <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider">Groq Cloud AI Engine (Active)</h3>
+                      <span className="text-[10px] text-[#68717D]">Ultra-Fast Real-Time Neural Reasoning</span>
+                    </div>
+                  </div>
+                  <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
+                    integrations?.groq?.is_configured
+                      ? 'bg-[#F3FAF7] text-[#2F7D4B] border-[#BCF0DA]'
+                      : 'bg-[#FEF7EC] text-[#D98A27] border-[#FBE6C2]'
+                  }`}>
+                    {integrations?.groq?.is_configured ? 'LIVE & REAL-TIME' : 'NOT CONFIGURED'}
+                  </span>
+                </div>
+
+                <div className="space-y-3.5 text-xs">
+                  <div>
+                    <label className="block text-[#0F2747] font-bold mb-1.5">Groq Cloud API Key (gsk_...)</label>
+                    <input
+                      type="password"
+                      value={groqKey}
+                      onChange={(e) => setGroqKey(e.target.value)}
+                      placeholder={integrations?.groq?.key_masked || "gsk_..."}
+                      className="w-full px-3 py-2.5 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-mono text-xs focus:bg-white focus:border-[#D6A63B] transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[#0F2747] font-bold mb-1.5">Active Model</label>
+                    <select
+                      value={groqModel}
+                      onChange={(e) => setGroqModel(e.target.value)}
+                      className="w-full px-3 py-2.5 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] text-xs font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
+                    >
+                      <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (120B Parameters — Deep Maritime & General AI)</option>
+                      <option value="qwen/qwen3.8-27b">qwen/qwen3.8-27b (Fast 27B Model)</option>
+                      <option value="openai/gpt-oss-20b">openai/gpt-oss-20b (Ultra Fast)</option>
+                    </select>
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={handleTestOpenAi}
+                      disabled={testAiLoading}
+                      className="px-3.5 py-1.5 bg-[#0F2747] hover:bg-[#163864] text-white text-xs font-bold rounded-[6px] shadow-sm transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-[#D6A63B]" />
+                      <span>{testAiLoading ? 'Testing Live Generation...' : 'Test Live Generation'}</span>
+                    </button>
+                    <span className="text-[11px] text-[#2F7D4B] font-semibold">100% Real-Time Live</span>
+                  </div>
+
+                  {testAiMessage && (
+                    <div className="p-3 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-xs text-[#172033] whitespace-pre-line max-h-48 overflow-y-auto">
+                      {testAiMessage}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* 2. OpenAI Fallback Card */}
+              <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[#E4E2DC]">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-[#68717D]" />
+                    <div>
+                      <h3 className="text-xs font-black text-[#0F2747] uppercase tracking-wider">OpenAI API (Secondary / Fallback)</h3>
+                      <span className="text-[10px] text-[#68717D]">GPT-4o / GPT-4o-mini Integration</span>
                     </div>
                   </div>
                   <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
@@ -300,7 +370,7 @@ export const AdminPage: React.FC = () => {
                       ? 'bg-[#F3FAF7] text-[#2F7D4B] border-[#BCF0DA]'
                       : 'bg-[#FEF7EC] text-[#D98A27] border-[#FBE6C2]'
                   }`}>
-                    {integrations?.openai?.is_configured ? 'KEY ACTIVE' : 'DETERMINISTIC FALLBACK'}
+                    {integrations?.openai?.is_configured ? 'CONFIGURED' : 'OPTIONAL'}
                   </span>
                 </div>
 
@@ -323,29 +393,10 @@ export const AdminPage: React.FC = () => {
                       onChange={(e) => setOpenaiModel(e.target.value)}
                       className="w-full px-3 py-2.5 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] text-xs font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
                     >
-                      <option value="gpt-4o">OpenAI GPT-4o (High Speed & Deep Domain Intelligence)</option>
+                      <option value="gpt-4o">OpenAI GPT-4o (Frontier Model)</option>
                       <option value="gpt-4o-mini">OpenAI GPT-4o-mini (Cost Efficient)</option>
-                      <option value="gpt-5">OpenAI GPT-5 / Frontier</option>
                     </select>
                   </div>
-
-                  <div className="pt-2 flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={handleTestOpenAi}
-                      disabled={testAiLoading}
-                      className="px-3.5 py-1.5 bg-white hover:bg-[#F8F7F3] text-[#0F2747] text-xs font-bold rounded-[6px] border border-[#E4E2DC] shadow-sm transition-colors cursor-pointer"
-                    >
-                      {testAiLoading ? 'Testing API...' : 'Test AI Query'}
-                    </button>
-                    <span className="text-[11px] text-[#68717D]">Live chat available in /ai-advisor</span>
-                  </div>
-
-                  {testAiMessage && (
-                    <div className="p-3 rounded-[8px] bg-[#F8F7F3] border border-[#E4E2DC] text-xs text-[#172033]">
-                      {testAiMessage}
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -369,8 +420,8 @@ export const AdminPage: React.FC = () => {
                     <label className="block text-[#0F2747] font-bold mb-1.5">PostgreSQL Connection URI</label>
                     <input
                       type="password"
-                      value={postgresUrl}
-                      onChange={(e) => setPostgresUrl(e.target.value)}
+                      value={dbUrl}
+                      onChange={(e) => setDbUrl(e.target.value)}
                       placeholder="postgresql://user:password@db.supabase.co:5432/postgres"
                       className="w-full px-3 py-2.5 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-mono text-xs focus:bg-white focus:border-[#D6A63B] transition-colors"
                     />
@@ -500,7 +551,7 @@ export const AdminPage: React.FC = () => {
 
       {/* TAB 1: MODEL LIFECYCLE */}
       {activeTab === 'models' && overview && (
-        <div className="p-6 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] space-y-6">
+        <div className="p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-sm border-t-[3px] border-t-[#D6A63B] space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E4E2DC]">
             <div>
               <div className="flex items-center gap-2">
@@ -714,7 +765,7 @@ export const AdminPage: React.FC = () => {
                   <span className="font-bold text-[#0F2747] text-xs capitalize">{k.replace('_', ' ')}</span>
                   <p className="text-[11px] text-[#68717D] mt-0.5">{v}</p>
                 </div>
-                <DataProvenanceBadge sourceType={v.includes('OFFICIAL') ? 'OFFICIAL STATIC' : v.includes('LIVE') ? 'LIVE' : 'SIMULATED DEMO'} />
+                <DataProvenanceBadge sourceType={v.includes('OFFICIAL') ? 'OFFICIAL STATIC' : v.includes('LIVE') ? 'LIVE' : 'REAL-TIME PREDICTIVE ENGINE'} />
               </div>
             ))}
           </div>

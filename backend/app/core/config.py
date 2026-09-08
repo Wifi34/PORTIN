@@ -1,6 +1,14 @@
 from pydantic_settings import BaseSettings
 from typing import List
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Explicitly load .env from root and backend directories
+_root_dir = Path(__file__).resolve().parent.parent.parent.parent
+_backend_dir = Path(__file__).resolve().parent.parent.parent
+load_dotenv(_root_dir / ".env")
+load_dotenv(_backend_dir / ".env", override=True)
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "PortIN Maritime Freight Intelligence"
@@ -29,7 +37,9 @@ class Settings(BaseSettings):
     FREIGHT_PROVIDER: str = os.getenv("FREIGHT_PROVIDER", "demo")
     BALTIC_API_KEY: str = os.getenv("BALTIC_API_KEY", "")
     
-    # AI Advisor (OpenAI / LLM)
+    # AI Advisor (Groq Cloud / OpenAI / LLM)
+    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
+    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o")
     OPTIONAL_LLM_API_KEY: str = os.getenv("OPTIONAL_LLM_API_KEY", "")
@@ -44,6 +54,10 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
     SMTP_FROM: str = os.getenv("SMTP_FROM", "noreply-portin@sail.gov.in")
     SMTP_ENABLED: bool = os.getenv("SMTP_ENABLED", "false").lower() in ("true", "1", "yes")
+
+    # Google OAuth 2.0 Credentials
+    GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "")
+    GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
 
     class Config:
         case_sensitive = True

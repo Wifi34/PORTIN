@@ -4,6 +4,8 @@ import { Mail, Lock, User, Building, Briefcase, Eye, EyeOff, ArrowRight, AlertCi
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { useAuth } from '../context/AuthContext';
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
 export const RegisterPage: React.FC = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -17,7 +19,7 @@ export const RegisterPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const { register, isAuthenticated } = useAuth();
+  const { register, loginWithGoogle, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   // If already authenticated, redirect to dashboard
@@ -26,6 +28,33 @@ export const RegisterPage: React.FC = () => {
       navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, navigate]);
+
+  // Initialize Google Identity Services
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
+      try {
+        (window as any).google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: async (response: any) => {
+            if (response?.credential) {
+              setLoading(true);
+              setError(null);
+              try {
+                await loginWithGoogle({ credential: response.credential });
+                navigate('/dashboard');
+              } catch (err: any) {
+                setError(err.response?.data?.detail || 'Google sign-up failed. Please try again.');
+              } finally {
+                setLoading(false);
+              }
+            }
+          },
+        });
+      } catch (e) {
+        console.warn('Google Identity initialization error:', e);
+      }
+    }
+  }, [loginWithGoogle, navigate]);
 
   // Password strength calculation
   const getPasswordStrength = () => {
@@ -93,15 +122,58 @@ export const RegisterPage: React.FC = () => {
   };
 
   const handleGoogleSignUp = () => {
-    setError('Google OAuth registration requires corporate domain setup. Please use email registration.');
+    setError(null);
+
+    // Modern Google OAuth2 Token Client (popup flow)
+    if (typeof window !== 'undefined' && (window as any).google?.accounts?.oauth2) {
+      try {
+        const client = (window as any).google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID,
+          scope: 'email profile openid',
+          callback: async (tokenResponse: any) => {
+            if (tokenResponse?.access_token) {
+              setLoading(true);
+              try {
+                await loginWithGoogle({ access_token: tokenResponse.access_token });
+                navigate('/dashboard');
+              } catch (err: any) {
+                setError(err.response?.data?.detail || 'Google sign-up failed.');
+              } finally {
+                setLoading(false);
+              }
+            } else if (tokenResponse?.error) {
+              setError(`Google Sign-Up: ${tokenResponse.error_description || tokenResponse.error}`);
+            }
+          },
+          error_callback: (err: any) => {
+            setError(`Google Sign-Up: ${err?.message || 'Dialog closed'}`);
+          }
+        });
+        client.requestAccessToken();
+        return;
+      } catch (err) {
+        console.warn('initTokenClient failed, falling back to One Tap prompt:', err);
+      }
+    }
+
+    // Fallback to Google One Tap prompt
+    if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
+      (window as any).google.accounts.id.prompt((notification: any) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          setError('Google sign-up popup was blocked or skipped. Please allow popups or try again.');
+        }
+      });
+    } else {
+      setError('Google Sign-Up is initializing. Please wait a moment and try again.');
+    }
   };
 
   return (
     <AuthLayout
       title="Create Your Account"
       subtitle="Join PortIN and make smarter maritime decisions."
-      heroHeadline="Predict Freight. Optimize Chartering."
-      heroHighlight="Procure Smarter."
+      heroHeadline="Autonomous Maritime Procurement &"
+      heroHighlight="Global Fleet Optimization"
     >
       {/* Error Alert Box */}
       {error && (

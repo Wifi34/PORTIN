@@ -19,9 +19,8 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     description=(
-        "PortIN: Intelligent Freight Forecasting Model for Optimized Vessel Chartering "
-        "and Bulk Cargo Procurement from Overseas to East Coast of India. "
-        "Official SIH 2026 Problem Statement 26006 (Ministry of Steel / SAIL)."
+        "PortIN: Enterprise Maritime Freight Forecasting & Chartering Decision Support Platform "
+        "for Raw Material Logistics and Bulk Cargo Procurement."
     ),
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     docs_url=f"{settings.API_V1_STR}/docs",
@@ -33,10 +32,13 @@ app = FastAPI(
 Base.metadata.create_all(bind=engine)
 seed_database()
 
+from backend.app.api.v1.endpoints import auth
+
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
+    allow_origin_regex=r"https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -47,14 +49,15 @@ os.makedirs("reports", exist_ok=True)
 app.mount("/reports", StaticFiles(directory="reports"), name="reports")
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+# Direct auth route fallback to support requests with or without /api/v1 prefix
+app.include_router(auth.router, prefix="/auth", tags=["Authentication Direct"])
 
 @app.get("/")
 def root():
     return {
         "project": "PortIN",
-        "title": "Intelligent Freight Forecasting & Vessel Chartering Platform",
-        "organization": "Ministry of Steel / SAIL",
-        "sih_problem_id": "26006",
+        "title": "Enterprise Maritime Freight Forecasting & Vessel Chartering Platform",
+        "organization": "Steel Authority of India Limited (SAIL)",
         "version": settings.VERSION,
         "docs": f"{settings.API_V1_STR}/docs",
         "status": "OPERATIONAL"

@@ -39,3 +39,4 @@ Thumbs.db
 # Temporary test artifacts
 search_pixabay.py
 verify_carto_map.py
+scratch/

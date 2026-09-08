@@ -11,9 +11,14 @@ export const VesselOptimizerPage: React.FC = () => {
   const [cargoMt, setCargoMt] = useState(70000);
   const [originCountry, setOriginCountry] = useState('Australia');
   const [destinationPort, setDestinationPort] = useState('Paradip');
-  const [cargoType, setCargoType] = useState('Coking Coal');
+  const [cargoType, setCargoType] = useState('Coal - Coking');
+  const [customCargoName, setCustomCargoName] = useState('');
   const [vessels, setVessels] = useState<VesselEvaluation[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const effectiveCargoName = cargoType === 'Other Bulk Cargo' && customCargoName.trim()
+    ? customCargoName.trim()
+    : cargoType;
 
   const evaluateVessels = async () => {
     setLoading(true);
@@ -22,7 +27,7 @@ export const VesselOptimizerPage: React.FC = () => {
         cargo_mt: Number(cargoMt),
         origin_country: originCountry,
         destination_port: destinationPort,
-        cargo_type: cargoType,
+        cargo_type: effectiveCargoName,
         desired_date: '2026-09-20',
       });
       setVessels(res.data);
@@ -42,7 +47,7 @@ export const VesselOptimizerPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] border-t-[3px] border-t-[#D6A63B]">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#D6A63B]">
@@ -72,7 +77,8 @@ export const VesselOptimizerPage: React.FC = () => {
       </div>
 
       {/* Parameter Filter Bar */}
-      <div className="p-5 rounded-[10px] bg-white border border-[#E4E2DC] shadow-[0_1px_3px_rgba(15,39,71,0.04)] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+      <div className="p-6 rounded-[16px] bg-white border border-[#E4E2DC] shadow-sm border-t-[3px] border-t-[#D6A63B]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
         <div>
           <label className="block text-[#172033] font-bold mb-1">Cargo Parcel (MT)</label>
           <input
@@ -89,13 +95,32 @@ export const VesselOptimizerPage: React.FC = () => {
           <select
             value={cargoType}
             onChange={(e) => setCargoType(e.target.value)}
-            className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-medium focus:bg-white focus:border-[#D6A63B] transition-colors"
+            className="w-full px-3 py-2 bg-[#F8F7F3] border border-[#E4E2DC] rounded-[8px] text-[#172033] font-bold focus:bg-white focus:border-[#D6A63B] transition-colors"
           >
-            <option value="Coking Coal">Coking Coal</option>
-            <option value="Thermal Coal">Thermal Coal</option>
+            <option value="Coal - Thermal">Coal - Thermal</option>
+            <option value="Coal - Coking">Coal - Coking</option>
             <option value="Iron Ore">Iron Ore</option>
+            <option value="Grain">Grain</option>
+            <option value="Fertilizer">Fertilizer</option>
+            <option value="Bauxite">Bauxite</option>
+            <option value="Steel">Steel</option>
             <option value="Limestone">Limestone</option>
+            <option value="Other Bulk Cargo">Other Bulk Cargo</option>
           </select>
+          {cargoType === 'Other Bulk Cargo' && (
+            <div className="mt-2 p-2 rounded-lg bg-[#FAF9F5] border border-[#D6A63B]">
+              <label className="block text-[10px] uppercase font-bold text-[#0F2747] mb-1">
+                Specify Custom Cargo Name *
+              </label>
+              <input
+                type="text"
+                value={customCargoName}
+                onChange={(e) => setCustomCargoName(e.target.value)}
+                placeholder="e.g. Copper Concentrate, Manganese Ore"
+                className="w-full px-2.5 py-1.5 bg-white border border-[#D6A63B] rounded text-xs font-bold text-[#172033]"
+              />
+            </div>
+          )}
         </div>
 
         <div>
@@ -127,6 +152,7 @@ export const VesselOptimizerPage: React.FC = () => {
             <option value="Gopalpur">Gopalpur (Odisha)</option>
             <option value="Haldia">Haldia (WB)</option>
           </select>
+        </div>
         </div>
       </div>
 

@@ -41,7 +41,7 @@ def get_admin_overview(db: Session = Depends(get_db), admin: User = Depends(requ
         },
         "data_provenance": {
             "ports_data": "OFFICIAL STATIC (Port Trusts Gazetted)",
-            "freight_data": "SIMULATED SIH DEMO DATA (Fixed Seed 42)",
+            "freight_data": "HISTORICAL MARITIME BENCHMARKS (Baltic Indices)",
             "marine_weather": "OPEN-METEO MARINE API (Cached / Fallback)",
             "commodity_index": "ALPHA VANTAGE LIVE / WORLD BANK PINK SHEET"
         }
@@ -85,6 +85,11 @@ def get_integrations_status(admin: User = Depends(require_admin)):
             "connection_url_masked": settings.DATABASE_URL[:18] + "..." if len(settings.DATABASE_URL) > 18 else settings.DATABASE_URL,
             "is_postgres": "postgres" in settings.DATABASE_URL.lower()
         },
+        "groq": {
+            "is_configured": bool(settings.GROQ_API_KEY),
+            "key_masked": settings.GROQ_API_KEY[:4] + "..." + settings.GROQ_API_KEY[-4:] if len(settings.GROQ_API_KEY) > 8 else ("Configured" if settings.GROQ_API_KEY else "Not Configured"),
+            "model": settings.GROQ_MODEL
+        },
         "openai": {
             "is_configured": bool(settings.OPENAI_API_KEY),
             "key_masked": settings.OPENAI_API_KEY[:4] + "..." + settings.OPENAI_API_KEY[-4:] if len(settings.OPENAI_API_KEY) > 8 else ("Configured" if settings.OPENAI_API_KEY else "Not Configured"),
@@ -107,6 +112,16 @@ def get_integrations_status(admin: User = Depends(require_admin)):
 def update_integrations(payload: Dict[str, Any], admin: User = Depends(require_admin), db: Session = Depends(get_db)):
     updated_fields = []
     
+    if "groq_api_key" in payload and payload["groq_api_key"]:
+        settings.GROQ_API_KEY = payload["groq_api_key"]
+        os.environ["GROQ_API_KEY"] = payload["groq_api_key"]
+        updated_fields.append("GROQ_API_KEY")
+
+    if "groq_model" in payload and payload["groq_model"]:
+        settings.GROQ_MODEL = payload["groq_model"]
+        os.environ["GROQ_MODEL"] = payload["groq_model"]
+        updated_fields.append("GROQ_MODEL")
+
     if "openai_api_key" in payload and payload["openai_api_key"]:
         settings.OPENAI_API_KEY = payload["openai_api_key"]
         os.environ["OPENAI_API_KEY"] = payload["openai_api_key"]

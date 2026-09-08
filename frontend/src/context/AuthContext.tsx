@@ -8,6 +8,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (credentialOrToken: { credential?: string; access_token?: string }) => Promise<void>;
   register: (data: any) => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
@@ -48,6 +49,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(userData);
   };
 
+  const loginWithGoogle = async (credentialOrToken: { credential?: string; access_token?: string }) => {
+    try {
+      console.log('[Google Auth] Initiating backend authentication at /auth/google...', {
+        has_credential: !!credentialOrToken.credential,
+        has_access_token: !!credentialOrToken.access_token,
+      });
+      const res = await apiClient.post('/auth/google', credentialOrToken);
+      const { access_token, user: userData } = res.data;
+      console.log('[Google Auth] Successfully authenticated user:', userData?.email);
+      localStorage.setItem('portin_access_token', access_token);
+      localStorage.setItem('portin_user', JSON.stringify(userData));
+      setToken(access_token);
+      setUser(userData);
+    } catch (err: any) {
+      console.error('[Google Auth] HTTP request failed:', {
+        endpoint: err.config?.url,
+        baseURL: err.config?.baseURL,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        detail: err.response?.data?.detail,
+      });
+      throw err;
+    }
+  };
+
   const register = async (data: any) => {
     await apiClient.post('/auth/register', data);
     // After registration, log in
@@ -74,6 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: !!token && !!user,
         isLoading,
         login,
+        loginWithGoogle,
         register,
         logout,
         updateUser,

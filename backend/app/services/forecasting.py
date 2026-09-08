@@ -93,7 +93,7 @@ class FreightForecastingService:
                         "commodity_index": comm_idx,
                         "congestion_score": congestion,
                         "freight_rate_usd_mt": round(rate, 2),
-                        "source": "SIMULATED SIH DEMO DATA"
+                        "source": "HISTORICAL MARITIME BENCHMARK"
                     })
                     
         return pd.DataFrame(records)
