@@ -77,6 +77,7 @@ export const App: React.FC = () => {
           >
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/forecast" element={<FreightForecastPage />} />
+            <Route path="/forecast/result" element={<FreightForecastPage />} />
             <Route path="/new-forecast" element={<FreightForecastPage />} />
             <Route path="/charter-operations" element={<CharterOperationsPage />} />
             <Route path="/port-directory" element={<PortDirectoryPage />} />
