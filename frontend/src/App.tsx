@@ -83,6 +83,7 @@ export const App: React.FC = () => {
             <Route path="/decision-twin" element={<DecisionTwinPage />} />
             <Route path="/market" element={<MarketIntelligencePage />} />
             <Route path="/vessel-optimizer" element={<VesselOptimizerPage />} />
+            <Route path="/optimizer" element={<VesselOptimizerPage />} />
             <Route path="/port-intelligence" element={<PortIntelligencePage />} />
             <Route path="/route-analysis" element={<RouteAnalysisPage />} />
             <Route path="/contract-optimizer" element={<ContractIntelligencePage />} />
