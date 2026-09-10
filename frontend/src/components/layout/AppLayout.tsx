@@ -5,7 +5,7 @@ import {
   FileText, ShoppingCart, Sliders, ShieldAlert, Sparkles,
   PieChart, FileDown, History, Settings, ChevronLeft, ChevronRight,
   LogOut, Bell, Shield, Menu, X, CheckCircle2, AlertTriangle, Plus,
-  Layers, BarChart2, Anchor, Search, Lightbulb, Clock
+  Layers, BarChart2, Anchor, Search, Lightbulb, Clock, CloudSun, CalendarCheck
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { apiClient } from '../../api/client';
@@ -76,28 +76,25 @@ export const AppLayout: React.FC = () => {
       items: [
         { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
         { label: 'New Forecast', path: '/forecast', icon: TrendingUp },
-        { label: 'Charter Operations', path: '/charter-operations', icon: Ship, badge: 3 },
+        { label: 'Booking', path: '/booking', icon: CalendarCheck, badge: 3 },
       ],
     },
     {
       groupName: 'ANALYSIS',
       items: [
-        { label: 'Comparisons', path: '/decision-twin', icon: BarChart2 },
-        { label: 'Port Directory', path: '/port-directory', icon: MapPin },
+        { label: 'Comparison Plan', path: '/decision-twin', icon: BarChart2 },
         { label: 'Vessel Directory', path: '/vessel-optimizer', icon: Ship },
         { label: 'Route Analysis', path: '/route-analysis', icon: Compass },
+        { label: 'Reports', path: '/reports', icon: FileDown },
       ],
     },
     {
       groupName: 'MONITORING',
       items: [
-        { label: 'Alerts & Risks', path: '/risk-monitor', icon: ShieldAlert, badge: 3 },
-        { label: 'History', path: '/history', icon: History },
+        { label: 'Ship Congestion Forecast', path: '/risk-monitor', icon: ShieldAlert, badge: 3 },
+        { label: 'Weather Forecasting', path: '/weather-forecasting', icon: CloudSun },
         { label: 'AI Advisor', path: '/ai-advisor', icon: Sparkles },
-        { label: 'Contracts', path: '/contract-optimizer', icon: FileText },
-        { label: 'Scenario Lab', path: '/scenario-lab', icon: Sliders },
-        { label: 'Analytics', path: '/analytics', icon: PieChart },
-        { label: 'Reports', path: '/reports', icon: FileDown },
+        { label: 'History', path: '/history', icon: History },
       ],
     },
     {
@@ -255,12 +252,12 @@ export const AppLayout: React.FC = () => {
                 color: location.pathname === '/forecast' ? '#FFFFFF' : '#0F2747',
               }}
             >
-              {location.pathname === '/forecast' ? 'C' : location.pathname === '/risk-monitor' ? 'S' : (user?.full_name?.charAt(0) || 'C')}
+              {location.pathname === '/forecast' ? 'C' : location.pathname === '/risk-monitor' ? 'S' : (location.pathname === '/decision-twin' || location.pathname === '/weather-forecasting') ? 'H' : (user?.full_name?.charAt(0) || 'C')}
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-bold text-white truncate">
-                  {location.pathname === '/forecast' ? 'Chief Executive Admin...' : location.pathname === '/risk-monitor' ? 'Senior Chartering Analyst' : (user?.full_name || 'Capt. Samarth R.')}
+                  {location.pathname === '/forecast' ? 'Chief Executive Admin...' : location.pathname === '/risk-monitor' ? 'Senior Chartering Analyst' : (location.pathname === '/decision-twin' || location.pathname === '/weather-forecasting') ? 'Head of Bulk Cargo' : (user?.full_name || 'Capt. Samarth R.')}
                 </div>
                 <div className="text-[10px] text-slate-400 truncate">
                   Logistics &amp; Chartering
@@ -312,20 +309,32 @@ export const AppLayout: React.FC = () => {
                 {location.pathname === '/risk-monitor' ? (
                   <div className="text-sm font-black text-[#0F2747] flex items-center gap-1.5 leading-tight">
                     <span className="text-[#68717D] font-medium">Corridor:</span>
-                    <span>Hay Point – Paradip Port</span>
+                    <span>🇦🇺 Hay Point – 🇮🇳 Paradip Port</span>
                   </div>
                 ) : (
                   <>
                     <div className="text-[11px] font-semibold text-[#68717D] flex items-center gap-1 leading-none">
                       <span>PortIN</span>
                       <span className="text-slate-400">&gt;</span>
-                      <span className="text-[#0F2747] font-bold capitalize">
-                        {location.pathname === '/dashboard' ? 'Dashboard' : location.pathname.replace('/', '').replace('-', ' ')}
+                      <span className="text-[#0F2747] font-bold">
+                        {location.pathname === '/route-analysis'
+                          ? 'Route Analysis'
+                          : location.pathname === '/decision-twin'
+                          ? 'Comparison Plan'
+                          : location.pathname === '/weather-forecasting'
+                          ? 'Weather Forecasting'
+                          : location.pathname === '/booking' || location.pathname === '/charter-operations'
+                          ? 'Smart Booking'
+                          : location.pathname === '/dashboard'
+                          ? 'Dashboard'
+                          : location.pathname.replace('/', '').replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
                       </span>
                     </div>
-                    <h1 className="text-base sm:text-lg font-black text-[#0F2747] tracking-tight leading-tight mt-0.5">
-                      {location.pathname === '/dashboard' ? 'Maritime Logistics Intelligence' : 'PortIN Freight Cockpit'}
-                    </h1>
+                    {location.pathname !== '/decision-twin' && location.pathname !== '/weather-forecasting' && (
+                      <h1 className="text-base sm:text-lg font-black text-[#0F2747] tracking-tight leading-tight mt-0.5">
+                        {location.pathname === '/dashboard' ? 'Maritime Logistics Intelligence' : 'PortIN Freight Cockpit'}
+                      </h1>
+                    )}
                   </>
                 )}
               </div>
@@ -465,7 +474,7 @@ export const AppLayout: React.FC = () => {
                   >
                     <Bell className="w-4 h-4 text-[#68717D]" />
                     <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#E05252] text-white text-[9px] font-black flex items-center justify-center">
-                      3
+                      {location.pathname === '/weather-forecasting' ? 2 : 3}
                     </span>
                   </button>
 
@@ -504,13 +513,13 @@ export const AppLayout: React.FC = () => {
                 >
                   <div
                     className="w-7 h-7 rounded-md flex items-center justify-center text-xs font-black text-white shrink-0"
-                    style={{ backgroundColor: '#1E65B8' }}
+                    style={{ backgroundColor: '#0F2747' }}
                   >
-                    {user?.full_name?.charAt(0) || 'C'}
+                    {(location.pathname === '/decision-twin' || location.pathname === '/weather-forecasting') ? 'H' : (user?.full_name ? user.full_name.charAt(0) : 'E')}
                   </div>
                   <div className="hidden lg:block text-left leading-tight">
                     <div className="text-xs font-bold text-[#172033] truncate max-w-[130px]">
-                      {user?.full_name || 'Capt. Samarth R.'}
+                      {(location.pathname === '/decision-twin' || location.pathname === '/weather-forecasting') ? 'Head of Bulk Cargo' : (user?.full_name || 'East Coast Traffic & ...')}
                     </div>
                     <div className="text-[10px] text-[#68717D]">
                       Logistics Officer

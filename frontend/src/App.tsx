@@ -1,3 +1,4 @@
+import { BookingPage } from './pages/BookingPage';
 import { CharterOperationsPage } from './pages/CharterOperationsPage';
 import { PortDirectoryPage } from './pages/PortDirectoryPage';
 import React from 'react';
@@ -22,6 +23,7 @@ import { ProcurementIntelligencePage } from './pages/ProcurementIntelligencePage
 import { ScenarioLabPage } from './pages/ScenarioLabPage';
 import { RiskMonitorPage } from './pages/RiskMonitorPage';
 import { AIAdvisorPage } from './pages/AIAdvisorPage';
+import { WeatherForecastingPage } from './pages/WeatherForecastingPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { DecisionHistoryPage } from './pages/DecisionHistoryPage';
@@ -79,7 +81,8 @@ export const App: React.FC = () => {
             <Route path="/forecast" element={<FreightForecastPage />} />
             <Route path="/forecast/result" element={<FreightForecastPage />} />
             <Route path="/new-forecast" element={<FreightForecastPage />} />
-            <Route path="/charter-operations" element={<CharterOperationsPage />} />
+            <Route path="/booking" element={<BookingPage />} />
+            <Route path="/charter-operations" element={<BookingPage />} />
             <Route path="/port-directory" element={<PortDirectoryPage />} />
             <Route path="/decision-twin" element={<DecisionTwinPage />} />
             <Route path="/market" element={<MarketIntelligencePage />} />
@@ -92,6 +95,7 @@ export const App: React.FC = () => {
             <Route path="/scenario-lab" element={<ScenarioLabPage />} />
             <Route path="/risk-monitor" element={<RiskMonitorPage />} />
             <Route path="/ai-advisor" element={<AIAdvisorPage />} />
+            <Route path="/weather-forecasting" element={<WeatherForecastingPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/history" element={<DecisionHistoryPage />} />

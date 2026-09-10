@@ -12,6 +12,8 @@ def run_forecast(req: ForecastRequest):
         destination_port=req.destination_port,
         vessel_class=req.vessel_class,
         desired_date_str=req.desired_shipment_date,
-        horizon_days=req.planning_horizon_days
+        horizon_days=req.planning_horizon_days,
+        cargo_type=req.cargo_type,
+        cargo_mt=req.cargo_mt
     )
     return result

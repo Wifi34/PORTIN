@@ -166,13 +166,20 @@ class ForecastResponse(BaseModel):
     day_90_prediction: float
     trend: str  # INCREASING, STABLE, DECREASING
     trend_pct: float
-    market_signal: str  # BOOK NOW, WAIT, MONITOR
+    market_signal: str  # BOOK NOW, WAIT, MONITOR, WAIT & MONITOR
     optimal_booking_window: str
     explanation: str
     forecast_curve: List[ForecastPoint]
     historical_curve: List[Dict[str, Any]]
     model_metadata: Dict[str, Any]
     feature_importance: List[Dict[str, Any]]
+    action_headline: Optional[str] = None
+    recommended_vessel: Optional[str] = "Capesize / Panamax"
+    contract_strategy: Optional[str] = "Spot / Index-Linked"
+    expected_rate_range: Optional[str] = "$13.6 – $14.9 / MT"
+    market_risk: Optional[str] = "Moderate"
+    port_compatibility: Optional[str] = "Compatible"
+    forecast_confidence: Optional[int] = 82
 
 # --- Vessel & Port Compatibility ---
 class CompatibilityResult(BaseModel):

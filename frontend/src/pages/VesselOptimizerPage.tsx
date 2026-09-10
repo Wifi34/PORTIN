@@ -179,11 +179,11 @@ export const VesselOptimizerPage: React.FC = () => {
               onChange={(e) => setOriginCountry(e.target.value)}
               className="w-full px-3 py-2 bg-white border border-[#E4E2DC] rounded-[8px] text-[#0F2747] font-semibold text-xs focus:border-[#D6A63B] focus:outline-none focus:ring-1 focus:ring-[#D6A63B] transition-colors shadow-sm"
             >
-              <option value="Australia">Australia</option>
-              <option value="Indonesia">Indonesia</option>
-              <option value="Mozambique">Mozambique</option>
-              <option value="Russia">Russia</option>
-              <option value="USA">USA</option>
+              <option value="Australia">🇦🇺 Australia</option>
+              <option value="Indonesia">🇮🇩 Indonesia</option>
+              <option value="Mozambique">🇲🇿 Mozambique</option>
+              <option value="Russia">🇷🇺 Russia</option>
+              <option value="USA">🇺🇸 USA</option>
             </select>
           </div>
 
@@ -194,12 +194,12 @@ export const VesselOptimizerPage: React.FC = () => {
               onChange={(e) => setDestinationPort(e.target.value)}
               className="w-full px-3 py-2 bg-white border border-[#E4E2DC] rounded-[8px] text-[#0F2747] font-semibold text-xs focus:border-[#D6A63B] focus:outline-none focus:ring-1 focus:ring-[#D6A63B] transition-colors shadow-sm"
             >
-              <option value="Paradip">Paradip (Odisha)</option>
-              <option value="Visakhapatnam">Visakhapatnam (AP)</option>
-              <option value="Gangavaram">Gangavaram (AP)</option>
-              <option value="Dhamra">Dhamra (Odisha)</option>
-              <option value="Gopalpur">Gopalpur (Odisha)</option>
-              <option value="Haldia">Haldia (WB)</option>
+              <option value="Paradip">🇮🇳 Paradip (Odisha)</option>
+              <option value="Visakhapatnam">🇮🇳 Visakhapatnam (AP)</option>
+              <option value="Gangavaram">🇮🇳 Gangavaram (AP)</option>
+              <option value="Dhamra">🇮🇳 Dhamra (Odisha)</option>
+              <option value="Gopalpur">🇮🇳 Gopalpur (Odisha)</option>
+              <option value="Haldia">🇮🇳 Haldia (WB)</option>
             </select>
           </div>
         </div>

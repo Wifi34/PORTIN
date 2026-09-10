@@ -12,11 +12,11 @@ import { DataProvenanceBadge } from '../components/common/DataProvenanceBadge';
 export const MarketIntelligencePage: React.FC = () => {
   // Trade lane freight benchmarks
   const lanes = [
-    { route: 'Australia -> Paradip (Panamax)', rate: 14.80, change: '+4.2%', signal: 'BOOK NOW', status: 'Rising' },
-    { route: 'Indonesia -> Dhamra (Supramax)', rate: 13.80, change: '-1.1%', signal: 'WAIT', status: 'Softening' },
-    { route: 'Mozambique -> Gangavaram (Panamax)', rate: 16.20, change: '+2.5%', signal: 'MONITOR', status: 'Steady' },
-    { route: 'Russia -> Paradip (Panamax)', rate: 29.80, change: '+0.5%', signal: 'MONITOR', status: 'Stable' },
-    { route: 'USA -> Paradip (Panamax)', rate: 34.50, change: '-0.8%', signal: 'WAIT', status: 'Easing' },
+    { route: '🇦🇺 Australia -> 🇮🇳 Paradip (Panamax)', rate: 14.80, change: '+4.2%', signal: 'BOOK NOW', status: 'Rising' },
+    { route: '🇮🇩 Indonesia -> 🇮🇳 Dhamra (Supramax)', rate: 13.80, change: '-1.1%', signal: 'WAIT', status: 'Softening' },
+    { route: '🇲🇿 Mozambique -> 🇮🇳 Gangavaram (Panamax)', rate: 16.20, change: '+2.5%', signal: 'MONITOR', status: 'Steady' },
+    { route: '🇷🇺 Russia -> 🇮🇳 Paradip (Panamax)', rate: 29.80, change: '+0.5%', signal: 'MONITOR', status: 'Stable' },
+    { route: '🇺🇸 USA -> 🇮🇳 Paradip (Panamax)', rate: 34.50, change: '-0.8%', signal: 'WAIT', status: 'Easing' },
   ];
 
   // 12-Month Historical Freight Indices (USD/MT)
@@ -131,8 +131,8 @@ export const MarketIntelligencePage: React.FC = () => {
                 formatter={(val: any) => [`$${Number(val).toFixed(2)}/MT`]}
               />
               <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-              <Line type="monotone" dataKey="Australia" stroke="#0F2747" strokeWidth={2.5} dot={{ r: 3, fill: '#D6A63B' }} />
-              <Line type="monotone" dataKey="Indonesia" stroke="#2F7D4B" strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" name="🇦🇺 Australia" dataKey="Australia" stroke="#0F2747" strokeWidth={2.5} dot={{ r: 3, fill: '#D6A63B' }} />
+              <Line type="monotone" name="🇮🇩 Indonesia" dataKey="Indonesia" stroke="#2F7D4B" strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>

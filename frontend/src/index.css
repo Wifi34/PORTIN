@@ -84,3 +84,21 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Custom PortIN Leaflet Map Callout Tooltips */
+.leaflet-tooltip.custom-map-tooltip {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.leaflet-tooltip.custom-map-tooltip::before {
+  display: none !important;
+}
+
+.custom-port-marker-div,
+.custom-weather-waypoint-div {
+  background: transparent !important;
+  border: none !important;
+}

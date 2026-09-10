@@ -7,6 +7,7 @@ import {
 import { apiClient } from '../api/client';
 import { DataProvenanceBadge } from '../components/common/DataProvenanceBadge';
 import { DecisionHistoryRecord } from '../types';
+import { getCountryFlag, getPortFlag } from '../utils/countryFlags';
 
 export const DecisionHistoryPage: React.FC = () => {
   const navigate = useNavigate();
@@ -135,7 +136,11 @@ export const DecisionHistoryPage: React.FC = () => {
                       {d.cargo_mt.toLocaleString()} MT <span className="text-[#0F2747]">{d.cargo_type}</span>
                     </td>
                     <td className="py-3.5 px-4 text-[#172033] font-semibold">
-                      {d.origin_port} &rarr; {d.destination_port}
+                      <span className="flex items-center gap-1">
+                        <span>{getPortFlag(d.origin_port, d.origin_country)} {d.origin_port}</span>
+                        <span>&rarr;</span>
+                        <span>🇮🇳 {d.destination_port}</span>
+                      </span>
                     </td>
                     <td className="py-3.5 px-4 font-black text-[#0F2747]">
                       {d.recommended_vessel}
@@ -252,7 +257,9 @@ export const DecisionHistoryPage: React.FC = () => {
             <div className="p-4 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC] space-y-2 text-xs">
               <div className="flex justify-between">
                 <span className="text-[#68717D] font-bold">Trade Corridor:</span>
-                <strong className="text-[#0F2747]">{activeModalDecision.origin_port} ({activeModalDecision.origin_country}) &rarr; {activeModalDecision.destination_port} (India)</strong>
+                <strong className="text-[#0F2747]">
+                  {getPortFlag(activeModalDecision.origin_port, activeModalDecision.origin_country)} {activeModalDecision.origin_port} ({activeModalDecision.origin_country}) &rarr; 🇮🇳 {activeModalDecision.destination_port} (India)
+                </strong>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#68717D] font-bold">Contract Strategy:</span>

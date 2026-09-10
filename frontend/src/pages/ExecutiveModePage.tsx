@@ -109,7 +109,7 @@ export const ExecutiveModePage: React.FC = () => {
               onClick={() => navigate('/decision-twin')}
               className="px-6 py-3 bg-[#D6A63B] hover:bg-[#c49530] text-[#0F2747] font-black uppercase tracking-wider text-xs rounded-[8px] shadow-sm transition-all flex items-center gap-2 shrink-0 cursor-pointer"
             >
-              <span>Explore Decision Twin</span>
+              <span>Explore Comparison Plan</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

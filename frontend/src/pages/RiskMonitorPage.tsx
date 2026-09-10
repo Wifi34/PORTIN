@@ -418,7 +418,7 @@ export const RiskMonitorPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-5 pb-8">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       {/* ========================================================================= */}
       {/* 1. TOP TITLE HEADER & PERIOD SELECTOR */}
       {/* ========================================================================= */}
@@ -426,7 +426,7 @@ export const RiskMonitorPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] font-black uppercase tracking-wider text-[#D97706]">
-              Risk Analysis
+              Ship Congestion Forecast
             </span>
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0]">
               <span>Real-Time Predictive Insights</span>
@@ -434,7 +434,7 @@ export const RiskMonitorPage: React.FC = () => {
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-[#0F2747] tracking-tight">
-            Future Risk &amp; Ship Congestion Forecast
+            Ship Congestion Forecast
           </h1>
           <p className="text-xs sm:text-sm text-[#68717D] mt-0.5 font-medium">
             Plan ahead. Avoid congestion. Charter at the right time. Get AI-powered vessel traffic and port congestion forecasts.
@@ -678,11 +678,14 @@ export const RiskMonitorPage: React.FC = () => {
               <tbody className="divide-y divide-slate-100">
                 {ds.portCongestion.map((row, idx) => (
                   <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-2 px-1.5 font-bold text-[#0F2747] flex items-center gap-1 whitespace-nowrap">
+                    <td className="py-2 px-1.5 font-bold text-[#0F2747] flex items-center gap-1.5 whitespace-nowrap">
                       <div className="w-4 h-4 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
                         <MapPin className="w-2.5 h-2.5 text-[#1E65B8]" />
                       </div>
-                      <span className="text-[11px]">{row.port}</span>
+                      <span className="text-[11px] flex items-center gap-1">
+                        <span className="text-xs">🇮🇳</span>
+                        <span>{row.port}</span>
+                      </span>
                     </td>
                     <td className="py-2 px-1 text-[10px] text-slate-600 whitespace-nowrap">{row.date}</td>
                     <td className="py-2 px-1 text-[10px] text-slate-500 whitespace-nowrap">{row.timeRange}</td>
@@ -826,7 +829,7 @@ export const RiskMonitorPage: React.FC = () => {
                 <AlertTriangle className="w-4 h-4 text-[#DC2626] shrink-0 mt-0.5" />
                 <div>
                   <div className="text-xs font-bold text-[#0F2747] group-hover:text-[#DC2626] transition-colors leading-tight">
-                    High vessel congestion expected in Paradip Port
+                    High vessel congestion expected in 🇮🇳 Paradip Port
                   </div>
                   <div className="text-[10px] text-slate-500 font-semibold mt-1">
                     8 Sep 2026, 14:00 – 20:00
@@ -912,8 +915,9 @@ export const RiskMonitorPage: React.FC = () => {
               <MapPin className="w-3.5 h-3.5" />
               <span>Suggested Port for Lower Congestion</span>
             </div>
-            <div className="text-sm font-black text-[#0F2747]">
-              {ds.aiRecommendation.suggestedPort.name}
+            <div className="text-sm font-black text-[#0F2747] flex items-center gap-1">
+              <span>🇮🇳</span>
+              <span>{ds.aiRecommendation.suggestedPort.name}</span>
             </div>
             <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
               {ds.aiRecommendation.suggestedPort.window}
