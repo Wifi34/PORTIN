@@ -180,6 +180,7 @@ class ForecastResponse(BaseModel):
     market_risk: Optional[str] = "Moderate"
     port_compatibility: Optional[str] = "Compatible"
     forecast_confidence: Optional[int] = 82
+    cargo_intelligence: Optional[Dict[str, Any]] = None
 
 # --- Vessel & Port Compatibility ---
 class CompatibilityResult(BaseModel):

@@ -8,6 +8,8 @@ import {
   ChevronDown, Layers, CheckCircle, ShieldAlert, X
 } from 'lucide-react';
 import { getCountryFlag, getPortFlag } from '../utils/countryFlags';
+import { OriginPortFlyout, DestinationPortDropdown } from '../components/common/PortSelectors';
+import { identifyCargoIntelligence, CargoIntelligence } from '../utils/cargoIntelligence';
 
 interface PreBookingScanResult {
   overallScore: number;
@@ -84,6 +86,11 @@ const ORIGIN_PORT_OPTIONS = [
   { country: 'Australia', flag: '🇦🇺', port: 'Gladstone', cargo: 'Coking Coal & Alumina' },
   { country: 'Australia', flag: '🇦🇺', port: 'Newcastle', cargo: 'Thermal & Met Coal' },
   { country: 'Australia', flag: '🇦🇺', port: 'Port Hedland', cargo: 'Iron Ore Lump & Fines' },
+  { country: 'India', flag: '🇮🇳', port: 'Paradip', cargo: 'Coastal Thermal & Met Coal' },
+  { country: 'India', flag: '🇮🇳', port: 'Visakhapatnam', cargo: 'Iron Ore & Met Coal' },
+  { country: 'India', flag: '🇮🇳', port: 'Dhamra', cargo: 'Deepwater Pellets & Coal' },
+  { country: 'India', flag: '🇮🇳', port: 'Jaigarh', cargo: 'Coastal Steam Coal' },
+  { country: 'India', flag: '🇮🇳', port: 'Mundra', cargo: 'Industrial Minerals & Bulk' },
   { country: 'Indonesia', flag: '🇮🇩', port: 'Taboneo', cargo: 'Thermal Sub-Bituminous Coal' },
   { country: 'Indonesia', flag: '🇮🇩', port: 'Balikpapan', cargo: 'Steam Coal & Minerals' },
   { country: 'Indonesia', flag: '🇮🇩', port: 'Bunati', cargo: 'Steam Coal' },
@@ -96,12 +103,14 @@ const ORIGIN_PORT_OPTIONS = [
 ];
 
 const DESTINATION_PORT_OPTIONS = [
-  { name: 'Paradip Port (Odisha)', maxDraft: '14.5m', maxLoa: '260m', berths: 16, currentQueue: 8 },
-  { name: 'Dhamra Port (Odisha)', maxDraft: '17.5m', maxLoa: '300m', berths: 5, currentQueue: 4 },
-  { name: 'Visakhapatnam (Andhra Pradesh)', maxDraft: '16.5m', maxLoa: '280m', berths: 24, currentQueue: 6 },
-  { name: 'Gangavaram (Andhra Pradesh)', maxDraft: '18.5m', maxLoa: '310m', berths: 8, currentQueue: 3 },
-  { name: 'Kamarajar / Ennore (Tamil Nadu)', maxDraft: '15.0m', maxLoa: '260m', berths: 9, currentQueue: 4 },
-  { name: 'Haldia Dock Complex (West Bengal)', maxDraft: '12.5m', maxLoa: '210m', berths: 12, currentQueue: 11 },
+  { name: 'Paradip Port (Odisha)', maxDraft: '14.5m', maxLoa: '260m', berths: 16, currentQueue: 8, region: 'East Coast' as const },
+  { name: 'Dhamra Port (Odisha)', maxDraft: '17.5m', maxLoa: '300m', berths: 5, currentQueue: 4, region: 'East Coast' as const },
+  { name: 'Visakhapatnam (Andhra Pradesh)', maxDraft: '16.5m', maxLoa: '280m', berths: 24, currentQueue: 6, region: 'East Coast' as const },
+  { name: 'Gangavaram (Andhra Pradesh)', maxDraft: '18.5m', maxLoa: '310m', berths: 8, currentQueue: 3, region: 'East Coast' as const },
+  { name: 'Mundra Port (Gujarat)', maxDraft: '17.5m', maxLoa: '300m', berths: 12, currentQueue: 7, region: 'West Coast' as const },
+  { name: 'Hazira Port (Gujarat)', maxDraft: '13.5m', maxLoa: '240m', berths: 6, currentQueue: 4, region: 'West Coast' as const },
+  { name: 'Kamarajar / Ennore (Tamil Nadu)', maxDraft: '15.0m', maxLoa: '260m', berths: 9, currentQueue: 4, region: 'East Coast' as const },
+  { name: 'Haldia Dock Complex (West Bengal)', maxDraft: '12.5m', maxLoa: '210m', berths: 12, currentQueue: 11, region: 'East Coast' as const },
 ];
 
 export const BookingPage: React.FC = () => {
@@ -112,6 +121,9 @@ export const BookingPage: React.FC = () => {
 
   // Booking Form Parameters
   const [cargoType, setCargoType] = useState('Coal - Coking');
+  const [customCargoName, setCustomCargoName] = useState('');
+  const effectiveCargoName = cargoType === 'Other Bulk Cargo' && customCargoName.trim() ? customCargoName.trim() : cargoType;
+  const cargoInfo: CargoIntelligence = identifyCargoIntelligence(effectiveCargoName);
   const [cargoMt, setCargoMt] = useState<number>(70000);
   const [selectedOrigin, setSelectedOrigin] = useState(ORIGIN_PORT_OPTIONS[0]);
   const [selectedDestination, setSelectedDestination] = useState(DESTINATION_PORT_OPTIONS[0]);
@@ -248,26 +260,56 @@ export const BookingPage: React.FC = () => {
     },
   ];
 
-  // Dynamic Rate Calculation based on strategy & inputs
+  // Dynamic Rate Calculation based on strategy, corridor & commodity physical characteristics
   useEffect(() => {
     let base = 15.0;
-    if (selectedOrigin.country === 'Australia') base = 15.4;
-    else if (selectedOrigin.country === 'Indonesia') base = 11.8;
-    else if (selectedOrigin.country === 'United States') base = 32.5;
-    else if (selectedOrigin.country === 'Mozambique') base = 16.2;
-    else if (selectedOrigin.country === 'South Africa') base = 14.9;
+    const isDomestic = selectedOrigin.country === 'India';
+    const isDestWest = selectedDestination.region === 'West Coast' ||
+      ['Mundra', 'Kandla', 'Dahej', 'Hazira', 'Pipavav', 'Jaigarh', 'JNPT', 'Mumbai', 'Mormugao', 'Mangalore', 'Cochin']
+        .some(p => selectedDestination.name.toLowerCase().includes(p.toLowerCase()));
 
-    if (vesselClass === 'Capesize') base *= 0.88;
-    if (vesselClass === 'Supramax') base *= 1.08;
-    if (vesselClass === 'Handysize') base *= 1.15;
+    if (isDomestic) {
+      // Domestic Coastal Shipping (MoPSW Cabotage Guidelines)
+      const isOriginWest = ['Mundra', 'Kandla', 'Dahej', 'Hazira', 'Pipavav', 'Jaigarh', 'JNPT', 'Mumbai', 'Mormugao', 'Mangalore', 'Cochin']
+        .some(p => selectedOrigin.port.toLowerCase().includes(p.toLowerCase()));
+
+      if (isOriginWest !== isDestWest) {
+        base = 8.20; // Inter-coastal East-to-West / West-to-East (e.g. Paradip -> Hazira)
+      } else {
+        base = 5.20; // Intra-coastal same coast (e.g. Paradip -> Chennai)
+      }
+    } else {
+      if (selectedOrigin.country === 'Australia') base = 15.4;
+      else if (selectedOrigin.country === 'Indonesia') base = 11.8;
+      else if (selectedOrigin.country === 'United States') base = 32.5;
+      else if (selectedOrigin.country === 'Mozambique') base = 16.2;
+      else if (selectedOrigin.country === 'South Africa') base = 14.9;
+      else if (selectedOrigin.country === 'Russia') base = 28.5;
+
+      // West Coast India differential for deep-sea routes
+      if (isDestWest) {
+        if (['Australia', 'Indonesia'].includes(selectedOrigin.country)) {
+          base += 1.40; // Additional ~850 NM steaming around Sri Lanka
+        } else if (['South Africa', 'Mozambique', 'United States', 'Russia'].includes(selectedOrigin.country)) {
+          base -= 1.20; // Proximity bunker savings
+        }
+      }
+    }
+
+    // Apply cargo-specific market rate spread
+    base += cargoInfo.marketRateSpreadUsd;
+
+    if (vesselClass === 'Capesize') base *= (isDomestic ? 0.90 : 0.88);
+    if (vesselClass === 'Supramax') base *= (isDomestic ? 1.00 : 1.08);
+    if (vesselClass === 'Handysize') base *= (isDomestic ? 1.06 : 1.15);
 
     if (strategyPlan === 'Plan A') base *= 0.94; // Multi-voyage discount
     if (strategyPlan === 'Plan C') base *= 0.90; // Long term COA
 
     setTargetRate(Number(base.toFixed(2)));
-  }, [selectedOrigin, vesselClass, strategyPlan]);
+  }, [selectedOrigin, selectedDestination, vesselClass, strategyPlan, effectiveCargoName, cargoInfo.marketRateSpreadUsd]);
 
-  // Execute Real-Time Multi-Dimensional Scan
+  // Execute Real-Time Multi-Dimensional Scan with Commodity Physics
   const handleRunScan = () => {
     setIsScanning(true);
     setScanProgress(5);
@@ -292,24 +334,40 @@ export const BookingPage: React.FC = () => {
           setScanProgress(100);
           setIsScanning(false);
 
-          // Compute dynamic scan result
+          // Compute dynamic scan result incorporating cargo physics
           const spotRate = Number((targetRate * 1.14).toFixed(2));
           const diff = Number((spotRate - targetRate).toFixed(2));
           const savings = Math.round(cargoMt * diff);
 
+          // Calculate loaded draft based on vessel class & cargo density
+          const calculatedDraftM = (
+            vesselClass === 'Capesize' ? 17.2 :
+            vesselClass === 'Panamax' ? 13.6 :
+            vesselClass === 'Supramax' ? 11.8 : 10.2
+          );
+          const maxPermissibleDraftM = parseFloat(selectedDestination.maxDraft.replace('m', '')) || 14.5;
+          const draftMarginM = (maxPermissibleDraftM - calculatedDraftM).toFixed(1);
+          const isDraftOk = Number(draftMarginM) >= 0.2;
+
+          const isDomestic = selectedOrigin.country === 'India';
+
           const result: PreBookingScanResult = {
-            overallScore: 96,
-            verdict: 'OPTIMAL FOR BOOKING',
-            advisorySummary: `All 4 operational dimensions cleared. Favorable weather window detected with zero cyclone risk. ${selectedDestination.name} berth draft clearance verified. Net projected savings of $${savings.toLocaleString()} secured against standard spot charter rates.`,
+            overallScore: isDraftOk ? (cargoInfo.imsbcGroup === 'Group A' ? 94 : 96) : 78,
+            verdict: isDraftOk ? 'OPTIMAL FOR BOOKING' : 'CONDITIONAL CLEARANCE',
+            advisorySummary: isDomestic
+              ? `Operational clearance verified for ${cargoInfo.materialName} (${cargoInfo.category}, SF: ${cargoInfo.stowageFactorM3PerMt} m³/MT). Domestic coastal transit captures an estimated 58% logistics cost advantage against Indian Railways rakes (approx ₹2,200/MT rail vs $${targetRate.toFixed(2)}/MT coastal). ${isDraftOk ? `Safe draft margin of +${draftMarginM}m confirmed at ${selectedDestination.name}.` : `Caution: Restricted draft under ${selectedDestination.maxDraft} limit.`} Net projected savings of $${savings.toLocaleString()} secured.`
+              : `Operational clearance verified for ${cargoInfo.materialName} (${cargoInfo.category}, SF: ${cargoInfo.stowageFactorM3PerMt} m³/MT, IMSBC ${cargoInfo.imsbcGroup}). ${isDraftOk ? `Safe draft margin of +${draftMarginM}m confirmed at ${selectedDestination.name}.` : `Caution: Restricted draft clearance under ${selectedDestination.maxDraft} limit.`} Net projected savings of $${savings.toLocaleString()} secured against standard spot charter rates.`,
             weatherScan: {
               score: 95,
               status: 'WEATHER ROUTE CLEAR',
-              waveHeight: '1.6 – 2.1 m',
+              waveHeight: isDomestic ? '1.1 – 1.6 m' : '1.6 – 2.1 m',
               windSpeed: '14 – 18 kts',
-              cycloneRisk: 'Zero Tropical Depression in Bay of Bengal',
+              cycloneRisk: 'Zero Tropical Depression in Bay of Bengal / Arabian Sea',
               optimalDeparture: laycanDate,
-              transitDays: selectedOrigin.country === 'Indonesia' ? 7.5 : 14.5,
-              details: 'Smooth oceanic passage verified with no critical weather advisories along the primary transit lanes.',
+              transitDays: isDomestic ? 3.5 : (selectedOrigin.country === 'Indonesia' ? 7.5 : 14.5),
+              details: isDomestic
+                ? `Smooth coastal passage verified along Indian coastline. Hold preparation: ${cargoInfo.holdPreparation}.`
+                : `Smooth oceanic passage verified along primary transit lanes. Hold condition: ${cargoInfo.holdPreparation}.`,
             },
             congestionScan: {
               score: 93,
@@ -319,18 +377,18 @@ export const BookingPage: React.FC = () => {
               expectedIdleDays: 2.1,
               berthClearance: 'Berth Slot CQ-2 Pre-Approved',
               demurrageExposure: 'Very Low ($0 expected demurrage loss)',
-              details: `Expected vessel queue at ${selectedDestination.name} is manageable. Discharging turnaround projected within standard charter laytime.`,
+              details: `Expected vessel queue at ${selectedDestination.name} is manageable. Discharge speed rated for ${cargoInfo.targetLoadingRateTph} using ${cargoInfo.handlingEquipment}.`,
             },
             vesselScan: {
-              score: 98,
-              status: '100% BERTH & DRAFT CLEAR',
+              score: isDraftOk ? 98 : 80,
+              status: isDraftOk ? '100% BERTH & DRAFT CLEAR' : 'DRAFT MARGIN RESTRICTED',
               vesselName: `MV ${selectedOrigin.port} Voyager`,
               vesselClass: vesselClass,
-              loadedDraft: '13.1 m',
+              loadedDraft: `${calculatedDraftM} m`,
               maxPermissibleDraft: selectedDestination.maxDraft,
-              draftMargin: `+1.4 m Safe Margin under ${selectedDestination.maxDraft} limit`,
-              berthCompatibility: 'Fully Compatible with Mechanized Unloaders',
-              handlingRate: '18,000 – 22,000 TPH',
+              draftMargin: `${Number(draftMarginM) >= 0 ? '+' : ''}${draftMarginM} m margin under ${selectedDestination.maxDraft} limit`,
+              berthCompatibility: `Compatible with ${cargoInfo.handlingEquipment}`,
+              handlingRate: cargoInfo.targetLoadingRateTph,
             },
             planScan: {
               score: 97,
@@ -364,7 +422,7 @@ export const BookingPage: React.FC = () => {
         route: `${selectedOrigin.port} → ${selectedDestination.name.split(' (')[0]}`,
         originPort: selectedOrigin.port,
         destPort: selectedDestination.name,
-        cargoType: cargoType,
+        cargoType: effectiveCargoName,
         tonnage: cargoMt,
         contractRate: targetRate,
         spotRateAtBooking: scanResult.planScan.spotBenchmark,
@@ -562,19 +620,22 @@ export const BookingPage: React.FC = () => {
               {/* 1. Cargo Type */}
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-wider text-[#68717D] mb-1">
-                  Cargo Material
+                  Cargo Material <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={cargoType}
                   onChange={(e) => setCargoType(e.target.value)}
                   className="w-full bg-[#FAF9F5] border border-[#E4E2DC] rounded-lg px-2.5 py-2 font-bold text-[#0F2747] focus:outline-none focus:border-[#D6A63B] cursor-pointer"
                 >
-                  <option value="Coal - Coking">Coal - Prime Coking</option>
+                  <option value="Coal - Coking">Coal - Coking</option>
                   <option value="Coal - Thermal">Coal - Thermal</option>
-                  <option value="Iron Ore">Iron Ore Lump &amp; Fines</option>
-                  <option value="Bauxite">Bauxite Ore</option>
-                  <option value="Limestone">Limestone Flux</option>
-                  <option value="Grain">Grain Bulk</option>
+                  <option value="Iron Ore">Iron Ore</option>
+                  <option value="Limestone">Limestone</option>
+                  <option value="Grain">Grain</option>
+                  <option value="Fertilizer">Fertilizer</option>
+                  <option value="Bauxite">Bauxite</option>
+                  <option value="Steel">Steel</option>
+                  <option value="Other Bulk Cargo">Other Bulk Cargo</option>
                 </select>
               </div>
 
@@ -592,47 +653,35 @@ export const BookingPage: React.FC = () => {
                 />
               </div>
 
-              {/* 3. Origin Loading Hub */}
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-[#68717D] mb-1">
-                  Origin Loading Port
-                </label>
-                <select
-                  value={selectedOrigin.port}
-                  onChange={(e) => {
-                    const opt = ORIGIN_PORT_OPTIONS.find((p) => p.port === e.target.value) || ORIGIN_PORT_OPTIONS[0];
-                    setSelectedOrigin(opt);
-                  }}
-                  className="w-full bg-[#FAF9F5] border border-[#E4E2DC] rounded-lg px-2 py-2 font-bold text-[#0F2747] focus:outline-none focus:border-[#D6A63B] cursor-pointer truncate"
-                >
-                  {ORIGIN_PORT_OPTIONS.map((o) => (
-                    <option key={o.port} value={o.port}>
-                      {o.flag} {o.port} ({o.country})
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* 3. Origin Loading Hub (Cascading Flyout - Image 4) */}
+              <OriginPortFlyout
+                label="Origin Loading Port"
+                value={selectedOrigin.port}
+                onChange={(portName, countryName, _fullDisplay, cargo) => {
+                  setSelectedOrigin({
+                    country: countryName,
+                    flag: countryName === 'Australia' ? '🇦🇺' : countryName === 'Indonesia' ? '🇮🇩' : countryName === 'United States' ? '🇺🇸' : countryName === 'Mozambique' ? '🇲🇿' : countryName === 'South Africa' ? '🇿🇦' : countryName === 'Russia' ? '🇷🇺' : countryName === 'India' ? '🇮🇳' : '🌐',
+                    port: portName,
+                    cargo: cargo || (countryName === 'India' ? 'Coastal Bulk Cargo' : 'Bulk Cargo'),
+                  });
+                }}
+              />
 
-              {/* 4. Destination Discharge Port */}
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-[#68717D] mb-1">
-                  Discharge Port (India)
-                </label>
-                <select
-                  value={selectedDestination.name}
-                  onChange={(e) => {
-                    const opt = DESTINATION_PORT_OPTIONS.find((p) => p.name === e.target.value) || DESTINATION_PORT_OPTIONS[0];
-                    setSelectedDestination(opt);
-                  }}
-                  className="w-full bg-[#FAF9F5] border border-[#E4E2DC] rounded-lg px-2 py-2 font-bold text-[#0F2747] focus:outline-none focus:border-[#D6A63B] cursor-pointer truncate"
-                >
-                  {DESTINATION_PORT_OPTIONS.map((d) => (
-                    <option key={d.name} value={d.name}>
-                      🇮🇳 {d.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* 4. Destination Discharge Port (Categorized Dropdown - Image 3) */}
+              <DestinationPortDropdown
+                label="Discharge Port (India - East & West Coast)"
+                value={selectedDestination.name}
+                onChange={(portName, detail) => {
+                  setSelectedDestination({
+                    name: portName,
+                    maxDraft: detail.maxDraft,
+                    maxLoa: detail.maxLoa,
+                    berths: detail.berths,
+                    currentQueue: detail.currentQueue,
+                    region: detail.region,
+                  });
+                }}
+              />
 
               {/* 5. Laycan Target Date */}
               <div>
@@ -661,6 +710,78 @@ export const BookingPage: React.FC = () => {
                   <option value="Plan B">Plan B (Spot Guaranteed Berth)</option>
                   <option value="Plan C">Plan C (Strategic Long-Term COA)</option>
                 </select>
+              </div>
+            </div>
+
+            {/* Custom Cargo Specification Box when 'Other Bulk Cargo' is selected */}
+            {cargoType === 'Other Bulk Cargo' && (
+              <div className="p-3.5 rounded-xl bg-white border border-[#D6A63B] shadow-xs space-y-1.5 animate-fadeIn">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-[#D6A63B]" />
+                  <span className="text-[10.5px] font-black uppercase tracking-wider text-[#0F2747]">
+                    SPECIFY CUSTOM CARGO NAME <span className="text-red-500">*</span>
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black tracking-wider bg-[#0B1F38] text-white">
+                    Custom Commodity
+                  </span>
+                </div>
+                <p className="text-[10.5px] text-[#64748B] font-medium">
+                  Enter the exact industrial bulk material classification:
+                </p>
+                <input
+                  type="text"
+                  value={customCargoName}
+                  onChange={(e) => setCustomCargoName(e.target.value)}
+                  placeholder="e.g. Copper Concentrate, Manganese Ore, Petcoke, Nickel Ore, DRI Pellets"
+                  className="w-full px-3 py-2 rounded-lg bg-white border border-[#D6A63B] text-xs font-semibold text-[#0F2747] placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#D6A63B]"
+                />
+              </div>
+            )}
+
+            {/* Live AI Cargo Material Intelligence Panel */}
+            <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC] flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
+              <div className="flex items-start sm:items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#0F2747] text-[#D6A63B] flex items-center justify-center shrink-0">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-black text-[#0F2747] tracking-tight">
+                      AI Material Analysis: {cargoInfo.materialName}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-[#EBF3FF] text-[#1E65B8] border border-[#BFDBFE]">
+                      {cargoInfo.category}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full text-[9.5px] font-bold border ${
+                      cargoInfo.imsbcGroup === 'Group A' 
+                        ? 'bg-rose-50 text-rose-700 border-rose-200' 
+                        : cargoInfo.imsbcGroup === 'Group B' 
+                          ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                          : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    }`}>
+                      IMSBC {cargoInfo.imsbcGroup}
+                    </span>
+                  </div>
+                  <p className="text-[10.5px] text-[#68717D] mt-0.5">
+                    {cargoInfo.hazardWarning}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 shrink-0 self-end md:self-auto">
+                <div className="text-right">
+                  <div className="text-[9.5px] font-bold uppercase text-[#68717D]">Stowage Factor</div>
+                  <div className="text-xs font-black font-mono text-[#0F2747]">
+                    {cargoInfo.stowageFactorM3PerMt} m³/MT
+                  </div>
+                </div>
+                <div className="h-6 w-px bg-[#E4E2DC]" />
+                <div className="text-right">
+                  <div className="text-[9.5px] font-bold uppercase text-[#68717D]">Handling Rate</div>
+                  <div className="text-xs font-black font-mono text-[#2F7D4B]">
+                    {cargoInfo.targetLoadingRateTph}
+                  </div>
+                </div>
               </div>
             </div>
 

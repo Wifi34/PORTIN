@@ -124,9 +124,8 @@ export const AppLayout: React.FC = () => {
       {/* FIXED DEEP NAVY LEFT SIDEBAR (#102A4C) */}
       {/* ========================================================================= */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col transition-all duration-200 shrink-0 ${
-          collapsed ? 'w-20' : 'w-64'
-        } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+        className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col transition-all duration-200 shrink-0 ${collapsed ? 'w-20' : 'w-64'
+          } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
         style={{
           backgroundColor: '#102A4C',
           borderRight: '1px solid rgba(228, 226, 220, 0.15)',
@@ -191,11 +190,10 @@ export const AppLayout: React.FC = () => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setMobileOpen(false)}
-                    className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all select-none ${
-                      isActive
+                    className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all select-none ${isActive
                         ? 'font-bold shadow-xs'
                         : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                    }`}
+                      }`}
                     style={{
                       backgroundColor: isActive ? '#F3E3B7' : 'transparent',
                       color: isActive ? '#0F2747' : undefined,
@@ -212,11 +210,10 @@ export const AppLayout: React.FC = () => {
 
                     {!collapsed && item.badge !== undefined && (
                       <span
-                        className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold ${
-                          isActive
+                        className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold ${isActive
                             ? 'bg-[#0F2747] text-[#F3E3B7]'
                             : 'bg-slate-800 text-slate-300'
-                        }`}
+                          }`}
                       >
                         {item.badge}
                       </span>
@@ -320,14 +317,14 @@ export const AppLayout: React.FC = () => {
                         {location.pathname === '/route-analysis'
                           ? 'Route Analysis'
                           : location.pathname === '/decision-twin'
-                          ? 'Comparison Plan'
-                          : location.pathname === '/weather-forecasting'
-                          ? 'Weather Forecasting'
-                          : location.pathname === '/booking' || location.pathname === '/charter-operations'
-                          ? 'Smart Booking'
-                          : location.pathname === '/dashboard'
-                          ? 'Dashboard'
-                          : location.pathname.replace('/', '').replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                            ? 'Comparison Plan'
+                            : location.pathname === '/weather-forecasting'
+                              ? 'Weather Forecasting'
+                              : location.pathname === '/booking' || location.pathname === '/charter-operations'
+                                ? 'Smart Booking'
+                                : location.pathname === '/dashboard'
+                                  ? 'Dashboard'
+                                  : location.pathname.replace('/', '').replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
                       </span>
                     </div>
                     {location.pathname !== '/decision-twin' && location.pathname !== '/weather-forecasting' && (

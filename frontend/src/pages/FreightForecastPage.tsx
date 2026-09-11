@@ -5,18 +5,29 @@ import {
   ArrowRight, Download, Sliders, Info, Clock, Check,
   Anchor, Activity, ChevronDown, ChevronUp, Database,
   Sparkles, RefreshCw, RotateCcw, Loader2, ShieldCheck,
-  Compass, Cpu
+  Compass, Cpu, Home, Share2, FileText, Layers,
+  Sun, Cloud, Wind, CloudSun, AlertTriangle, ExternalLink,
+  X, Award, DollarSign, BarChart2, Maximize2, Boxes,
+  Package, ShieldAlert, CheckCircle, ArrowUpRight, Filter
 } from 'lucide-react';
 import {
   ResponsiveContainer, ComposedChart, Area, Line, XAxis, YAxis, Tooltip, ReferenceArea, ReferenceLine
 } from 'recharts';
 import { apiClient } from '../api/client';
+import { OriginPortFlyout, DestinationPortDropdown, getIndianPortDetail } from '../components/common/PortSelectors';
+import { identifyCargoIntelligence, CargoIntelligence } from '../utils/cargoIntelligence';
 
 interface TrendPoint {
   date: string;
   p50: number;
   p10: number;
   p90: number;
+}
+
+interface MonthlyTrendPoint {
+  month: string;
+  rate: number;
+  isOptimal?: boolean;
 }
 
 interface ForecastResultData {
@@ -44,22 +55,28 @@ interface ForecastResultData {
   market_risk?: string;
   port_compatibility?: string;
   forecast_confidence?: number;
+  cargo_intelligence?: CargoIntelligence;
 }
 
 const RESULT_TREND_DATA: TrendPoint[] = [
-  { date: 'Sep 01', p50: 14.80, p10: 14.10, p90: 16.20 },
-  { date: 'Sep 08', p50: 15.00, p10: 14.05, p90: 16.40 },
-  { date: 'Sep 15', p50: 14.95, p10: 13.90, p90: 16.50 },
-  { date: 'Sep 22', p50: 14.80, p10: 13.60, p90: 16.60 },
-  { date: 'Oct 01', p50: 14.65, p10: 13.40, p90: 16.70 },
-  { date: 'Oct 08', p50: 14.57, p10: 13.20, p90: 16.80 },
-  { date: 'Oct 16', p50: 14.40, p10: 13.00, p90: 16.85 },
-  { date: 'Oct 24', p50: 14.25, p10: 12.80, p90: 16.90 },
-  { date: 'Oct 31', p50: 14.10, p10: 12.60, p90: 16.95 },
-  { date: 'Nov 07', p50: 13.95, p10: 12.40, p90: 17.00 },
-  { date: 'Nov 15', p50: 13.85, p10: 12.20, p90: 17.05 },
-  { date: 'Nov 23', p50: 13.80, p10: 12.00, p90: 17.10 },
-  { date: 'Nov 30', p50: 13.73, p10: 11.80, p90: 17.15 },
+  { date: 'Sep 01', p50: 18.20, p10: 17.10, p90: 19.40 },
+  { date: 'Sep 08', p50: 17.60, p10: 16.50, p90: 18.90 },
+  { date: 'Sep 15', p50: 17.10, p10: 15.90, p90: 18.40 },
+  { date: 'Sep 22', p50: 16.50, p10: 15.30, p90: 17.80 },
+  { date: 'Oct 01', p50: 15.90, p10: 14.80, p90: 17.20 },
+  { date: 'Oct 08', p50: 15.40, p10: 14.20, p90: 16.70 },
+  { date: 'Oct 16', p50: 14.90, p10: 13.80, p90: 16.20 },
+  { date: 'Oct 24', p50: 14.50, p10: 13.30, p90: 15.80 },
+  { date: 'Oct 31', p50: 14.15, p10: 12.90, p90: 15.50 },
+  { date: 'Nov 07', p50: 13.90, p10: 12.60, p90: 15.20 },
+  { date: 'Nov 12', p50: 13.73, p10: 12.40, p90: 15.00 },
+  { date: 'Nov 18', p50: 13.78, p10: 12.30, p90: 15.10 },
+  { date: 'Nov 24', p50: 13.85, p10: 12.20, p90: 15.20 },
+  { date: 'Nov 30', p50: 13.95, p10: 12.10, p90: 15.40 },
+  { date: 'Dec 08', p50: 14.10, p10: 12.20, p90: 15.70 },
+  { date: 'Dec 20', p50: 14.30, p10: 12.40, p90: 16.00 },
+  { date: 'Jan 05', p50: 14.80, p10: 12.80, p90: 16.50 },
+  { date: 'Jan 20', p50: 15.20, p10: 13.10, p90: 17.00 },
 ];
 
 const DEFAULT_FORECAST_DATA: ForecastResultData = {
@@ -71,11 +88,11 @@ const DEFAULT_FORECAST_DATA: ForecastResultData = {
   trend_pct: -3.2,
   market_signal: 'WAIT & MONITOR',
   action_headline: 'WAIT & MONITOR',
-  optimal_booking_window: 'Next 14–21 Days',
-  explanation: 'Current Baltic forward freight rates (FFA) and bunker fuel forecasts indicate a seasonal surplus in Capesize / Panamax vessel capacity arriving across the Indian Ocean in early October. Fixing fixtures immediately would incur higher spot premiums, whereas deferring laycan booking by 14–21 days captures an estimated savings of $0.60 – $1.10 / MT on thermal coal imports.',
-  recommended_vessel: 'Capesize / Panamax',
+  optimal_booking_window: '12–24 Nov 2026',
+  explanation: 'Current Baltic forward freight rates (FFA) and bunker fuel forecasts indicate a seasonal surplus in Capesize / Panamax vessel capacity arriving across the Indian Ocean in November. Fixing fixtures immediately would incur higher spot premiums, whereas deferring laycan booking to the optimal window (12–24 Nov) captures an estimated savings of $1.27 / MT on thermal coal imports.',
+  recommended_vessel: 'Handysize / Panamax',
   contract_strategy: 'Spot / Index-Linked',
-  expected_rate_range: '$13.6 – $14.9 / MT',
+  expected_rate_range: '$13.7 – $15.0 / MT',
   market_risk: 'Moderate',
   port_compatibility: 'Compatible',
   forecast_confidence: 82,
@@ -93,7 +110,7 @@ export const FreightForecastPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Determine current view mode ('form' = Image 1, 'result' = Image 3)
+  // Determine current view mode ('form' = Setup, 'result' = Image 2 Design)
   const [viewMode, setViewMode] = useState<'form' | 'result'>(
     location.pathname.includes('/result') ? 'result' : 'form'
   );
@@ -123,20 +140,28 @@ export const FreightForecastPage: React.FC = () => {
 
   // 3. CHARTER PERIOD & LAYCAN SCHEDULE
   const [durationScope, setDurationScope] = useState<'short' | 'medium'>('short');
-  const [startDate, setStartDate] = useState('2026-09-01');
+  const [startDate, setStartDate] = useState('2026-11-01');
   const [endDate, setEndDate] = useState('2026-11-30');
 
   // Forecast Result Data State
   const [forecastData, setForecastData] = useState<ForecastResultData>(DEFAULT_FORECAST_DATA);
 
-  // Recommendation accordion in result view
-  const [whyExpanded, setWhyExpanded] = useState(false);
+  // Sub-Navigation Tabs (Image 2)
+  const [activeSubTab, setActiveSubTab] = useState<'results' | 'weather' | 'vessels' | 'congestion' | 'market'>('results');
 
-  // Computing Modal State (Image 2)
+  // Vessel cost comparison toggle ('per_mt' vs 'total')
+  const [costMode, setCostMode] = useState<'per_mt' | 'total'>('per_mt');
+
+  // Selected vessel modal for technical specs popup
+  const [selectedVesselModal, setSelectedVesselModal] = useState<any | null>(null);
+
+  // Export report modal
+  const [showExportModal, setShowExportModal] = useState(false);
+
+  // Computing Modal State
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(12);
   const [activeStepIndex, setActiveStepIndex] = useState(0);
-  const timerRef = useRef<any>(null);
 
   // Handlers for Presets
   const handlePresetAustraliaParadip = () => {
@@ -145,7 +170,7 @@ export const FreightForecastPage: React.FC = () => {
     setOriginPort('Australia (Hay Point / Dalrymple Bay)');
     setDestPort('Paradip Port (Odisha)');
     setDurationScope('short');
-    setStartDate('2026-09-01');
+    setStartDate('2026-11-01');
     setEndDate('2026-11-30');
   };
 
@@ -155,11 +180,21 @@ export const FreightForecastPage: React.FC = () => {
     setOriginPort('Indonesia (Taboneo Anchorage)');
     setDestPort('Dhamra Port (Odisha)');
     setDurationScope('short');
-    setStartDate('2026-09-01');
+    setStartDate('2026-11-01');
     setEndDate('2026-11-30');
   };
 
-  // Start the computation simulation (Image 2 -> Image 3)
+  const handlePresetIndiaCoastal = () => {
+    setCargoType('Coal - Thermal');
+    setCargoVolume(55000);
+    setOriginPort('India (Paradip Port)');
+    setDestPort('Hazira (Gujarat)');
+    setDurationScope('short');
+    setStartDate('2026-11-01');
+    setEndDate('2026-11-30');
+  };
+
+  // Start the computation simulation
   const handleGenerateForecast = async () => {
     setIsAnalyzing(true);
     setAnalysisProgress(15);
@@ -183,20 +218,19 @@ export const FreightForecastPage: React.FC = () => {
     const originCountry = originPort.includes('Indonesia')
       ? 'Indonesia'
       : originPort.includes('Mozambique')
-      ? 'Mozambique'
-      : originPort.includes('United States') || originPort.includes('USA')
-      ? 'USA'
-      : originPort.includes('Russia')
-      ? 'Russia'
-      : 'Australia';
+        ? 'Mozambique'
+        : originPort.includes('United States') || originPort.includes('USA')
+          ? 'USA'
+          : originPort.includes('Russia')
+            ? 'Russia'
+            : originPort.includes('South Africa')
+              ? 'South Africa'
+              : originPort.includes('India')
+                ? 'India'
+                : 'Australia';
 
-    const cleanDest = destPort.includes('Paradip')
-      ? 'Paradip'
-      : destPort.includes('Dhamra')
-      ? 'Dhamra'
-      : destPort.includes('Visakhapatnam')
-      ? 'Visakhapatnam'
-      : 'Paradip';
+    const destDetail = getIndianPortDetail(destPort);
+    const cleanDest = destDetail.cleanName || destPort.split(' (')[0];
 
     try {
       const response = await apiClient.post('/forecasts/run', {
@@ -214,19 +248,34 @@ export const FreightForecastPage: React.FC = () => {
       }
     } catch (err) {
       console.warn('API connection offline or fallback active:', err);
+      // Fallback with mathematically sound numbers matching Image 2
       const isBookNow =
+        originCountry === 'India' ||
         originCountry === 'Indonesia' ||
         originCountry === 'USA' ||
         originCountry === 'Russia' ||
         originCountry === 'Mozambique' ||
+        originCountry === 'South Africa' ||
         effectiveCargoName.includes('Coking') ||
-        effectiveCargoName.includes('Iron Ore') ||
         effectiveCargoName.includes('Steel') ||
         cargoType === 'Other Bulk Cargo' ||
-        cargoVolume <= 50000;
+        cargoVolume <= 40000 ||
+        destDetail.region === 'West Coast';
+
+      let base = 15.00;
+      if (originCountry === 'India') {
+        base = destDetail.region === 'West Coast' ? 7.80 : 5.00;
+      } else if (originCountry === 'Indonesia') {
+        base = destDetail.region === 'West Coast' ? 12.60 : 11.40;
+      } else if (originCountry === 'USA') {
+        base = destDetail.region === 'West Coast' ? 33.20 : 34.50;
+      } else if (originCountry === 'South Africa') {
+        base = destDetail.region === 'West Coast' ? 13.80 : 15.10;
+      } else if (destDetail.region === 'West Coast') {
+        base = 16.40;
+      }
 
       if (isBookNow) {
-        const base = originCountry === 'Indonesia' ? 10.90 : 15.00;
         setForecastData({
           current_reference_rate: base,
           day_7_prediction: +(base + 0.18).toFixed(2),
@@ -237,28 +286,23 @@ export const FreightForecastPage: React.FC = () => {
           market_signal: 'BOOK NOW',
           action_headline: 'BOOK NOW (BEST FIXING TIME)',
           optimal_booking_window: 'Immediate / Next 7–14 Days',
-          recommended_vessel: cargoVolume >= 100000 ? 'Capesize / Panamax' : 'Panamax / Supramax',
-          contract_strategy: 'Spot Fixture (Lock Lowest Rate)',
+          recommended_vessel: originCountry === 'India' ? 'Supramax / Handysize (Coastal)' : (cargoVolume >= 100000 ? 'Capesize / Panamax' : 'Panamax / Supramax'),
+          contract_strategy: originCountry === 'India' ? 'Coastal COA / Spot Fixture' : 'Spot Fixture (Lock Lowest Rate)',
           expected_rate_range: `$${base.toFixed(1)} – $${(base * 1.1).toFixed(1)} / MT`,
-          market_risk: 'Elevated (Tight Supply)',
+          market_risk: originCountry === 'India' ? 'Moderate (Berth Allocation Window)' : 'Elevated (Tight Supply)',
           port_compatibility: 'Compatible',
-          forecast_confidence: 88,
-          explanation: `Forward Baltic freight indices and coastal vessel availability indicate spot rate escalation on the ${originCountry} to ${cleanDest} corridor (+4.8% over 30 days). Securing tonnage in the immediate 7–14 day window locks in bottom-of-cycle charter fixtures before anticipated regional bunker surges and coastal congestion.`,
-          forecast_curve: [
-            { date: 'Sep 01', day_offset: 0, predicted_rate: base, lower_bound: +(base - 0.7).toFixed(2), upper_bound: +(base + 1.2).toFixed(2), confidence_level: 0.9 },
-            { date: 'Sep 08', day_offset: 7, predicted_rate: +(base + 0.18).toFixed(2), lower_bound: +(base - 0.6).toFixed(2), upper_bound: +(base + 1.3).toFixed(2), confidence_level: 0.9 },
-            { date: 'Sep 15', day_offset: 14, predicted_rate: +(base + 0.35).toFixed(2), lower_bound: +(base - 0.5).toFixed(2), upper_bound: +(base + 1.45).toFixed(2), confidence_level: 0.9 },
-            { date: 'Sep 22', day_offset: 21, predicted_rate: +(base + 0.52).toFixed(2), lower_bound: +(base - 0.3).toFixed(2), upper_bound: +(base + 1.6).toFixed(2), confidence_level: 0.9 },
-            { date: 'Oct 01', day_offset: 30, predicted_rate: +(base * 1.048).toFixed(2), lower_bound: +(base * 1.048 - 0.4).toFixed(2), upper_bound: +(base * 1.048 + 1.75).toFixed(2), confidence_level: 0.9 },
-            { date: 'Oct 08', day_offset: 37, predicted_rate: +(base * 1.06).toFixed(2), lower_bound: +(base * 1.06 - 0.3).toFixed(2), upper_bound: +(base * 1.06 + 1.85).toFixed(2), confidence_level: 0.9 },
-            { date: 'Oct 16', day_offset: 45, predicted_rate: +(base * 1.07).toFixed(2), lower_bound: +(base * 1.07 - 0.2).toFixed(2), upper_bound: +(base * 1.07 + 1.95).toFixed(2), confidence_level: 0.9 },
-            { date: 'Oct 24', day_offset: 53, predicted_rate: +(base * 1.08).toFixed(2), lower_bound: +(base * 1.08 - 0.1).toFixed(2), upper_bound: +(base * 1.08 + 2.05).toFixed(2), confidence_level: 0.9 },
-            { date: 'Oct 31', day_offset: 60, predicted_rate: +(base * 1.088).toFixed(2), lower_bound: +(base * 1.088).toFixed(2), upper_bound: +(base * 1.088 + 2.15).toFixed(2), confidence_level: 0.9 },
-            { date: 'Nov 07', day_offset: 68, predicted_rate: +(base * 1.092).toFixed(2), lower_bound: +(base * 1.092).toFixed(2), upper_bound: +(base * 1.092 + 2.25).toFixed(2), confidence_level: 0.9 },
-            { date: 'Nov 15', day_offset: 75, predicted_rate: +(base * 1.094).toFixed(2), lower_bound: +(base * 1.094).toFixed(2), upper_bound: +(base * 1.094 + 2.3).toFixed(2), confidence_level: 0.9 },
-            { date: 'Nov 23', day_offset: 83, predicted_rate: +(base * 1.095).toFixed(2), lower_bound: +(base * 1.095).toFixed(2), upper_bound: +(base * 1.095 + 2.35).toFixed(2), confidence_level: 0.9 },
-            { date: 'Nov 30', day_offset: 90, predicted_rate: +(base * 1.095).toFixed(2), lower_bound: +(base * 1.095 - 0.8).toFixed(2), upper_bound: +(base * 1.095 + 2.4).toFixed(2), confidence_level: 0.9 },
-          ],
+          forecast_confidence: 91,
+          explanation: originCountry === 'India'
+            ? `Domestic Coastal Corridor: Identified Cargo: ${effectiveCargoName}. Maritime shipping between ${originPort} and ${cleanDest} (${destDetail.region}) achieves ~58% logistics cost savings over Indian Railways rake freight (approx ₹2,200/MT rail vs $${base.toFixed(2)}/MT coastal).`
+            : `Forward Baltic freight indices and coastal vessel availability indicate spot rate escalation on the ${originCountry} to ${cleanDest} corridor (+4.8% over 30 days). Securing tonnage in the immediate 7–14 day window locks in bottom-of-cycle charter fixtures before anticipated regional bunker surges and coastal congestion.`,
+          forecast_curve: RESULT_TREND_DATA.map(p => ({
+            date: p.date,
+            day_offset: 0,
+            predicted_rate: +(p.p50 * (base / 15.0)).toFixed(2),
+            lower_bound: +(p.p10 * (base / 15.0)).toFixed(2),
+            upper_bound: +(p.p90 * (base / 15.0)).toFixed(2),
+            confidence_level: 0.90
+          }))
         });
       } else {
         setForecastData(DEFAULT_FORECAST_DATA);
@@ -277,73 +321,154 @@ export const FreightForecastPage: React.FC = () => {
     navigate('/forecast');
   };
 
-  // SVG Render helpers for chart reference windows
-  const renderWaitMonitorLabel = (props: any) => {
-    const { viewBox } = props;
-    if (!viewBox) return null;
-    const { x, y, width } = viewBox;
-    const midX = x + width / 2;
-    return (
-      <g>
-        <line x1={x + 10} y1={y + 14} x2={x + width - 10} y2={y + 14} stroke="#2563EB" strokeWidth={1} />
-        <polygon points={`${x + 10},${y + 14} ${x + 14},${y + 11} ${x + 14},${y + 17}`} fill="#2563EB" />
-        <polygon points={`${x + width - 10},${y + 14} ${x + width - 14},${y + 11} ${x + width - 14},${y + 17}`} fill="#2563EB" />
-        <text x={midX} y={y + 10} textAnchor="middle" fill="#2563EB" fontSize={9} fontWeight="bold">
-          Suggest Wait / Monitor
-        </text>
-      </g>
-    );
+  const handleProceedToBooking = () => {
+    navigate('/booking', {
+      state: {
+        originPort,
+        destPort,
+        cargoType: effectiveCargoName,
+        cargoVolume,
+        recommendedDate: '2026-11-12'
+      }
+    });
   };
 
-  const renderOptimalWindowLabel = (props: any) => {
-    const { viewBox } = props;
-    if (!viewBox) return null;
-    const { x, y, width } = viewBox;
-    const midX = x + width / 2;
-    return (
-      <g>
-        <line x1={x + 10} y1={y + 24} x2={x + width - 10} y2={y + 24} stroke="#059669" strokeWidth={1} />
-        <polygon points={`${x + 10},${y + 24} ${x + 14},${y + 21} ${x + 14},${y + 27}`} fill="#059669" />
-        <polygon points={`${x + width - 10},${y + 24} ${x + width - 14},${y + 21} ${x + width - 14},${y + 27}`} fill="#059669" />
-        <text x={midX} y={y + 10} textAnchor="middle" fill="#059669" fontSize={9} fontWeight="bold">
-          Optimal Fixing Window
-        </text>
-        <text x={midX} y={y + 20} textAnchor="middle" fill="#059669" fontSize={8} fontWeight="bold">
-          (14–21 Days)
-        </text>
-      </g>
-    );
-  };
+  // Derive dynamic details for display & synchronization across all 23 Indian ports
+  const originCountry = originPort.includes('Indonesia')
+    ? 'Indonesia'
+    : originPort.includes('Mozambique')
+      ? 'Mozambique'
+      : originPort.includes('United States') || originPort.includes('USA')
+        ? 'USA'
+        : originPort.includes('Russia')
+          ? 'Russia'
+          : originPort.includes('South Africa')
+            ? 'South Africa'
+            : originPort.includes('India')
+              ? 'India'
+              : 'Australia';
 
-  const renderExpensiveWindowLabel = (props: any) => {
-    const { viewBox } = props;
-    if (!viewBox) return null;
-    const { x, y, width } = viewBox;
-    const midX = x + width / 2;
-    return (
-      <g>
-        <line x1={x + 10} y1={y + 14} x2={x + width - 10} y2={y + 14} stroke="#DC2626" strokeWidth={1} />
-        <polygon points={`${x + 10},${y + 14} ${x + 14},${y + 11} ${x + 14},${y + 17}`} fill="#DC2626" />
-        <polygon points={`${x + width - 10},${y + 14} ${x + width - 14},${y + 11} ${x + width - 14},${y + 17}`} fill="#DC2626" />
-        <text x={midX} y={y + 10} textAnchor="middle" fill="#DC2626" fontSize={9} fontWeight="bold">
-          Higher Risk / Expensive Window
-        </text>
-      </g>
-    );
-  };
+  const destDetail = getIndianPortDetail(destPort);
+  const cleanDest = destDetail.cleanName || destPort.split(' (')[0];
+  const destState = destDetail.state;
+  const destDraft = destDetail.maxDraft;
+  const destRegion = destDetail.region;
+  const isDomesticRoute = originCountry === 'India';
+
+  const formattedLaycanWindow = `${startDate === '2026-11-01' ? '1 Nov 2026' : startDate} – ${endDate === '2026-11-30' ? '30 Nov 2026' : endDate}`;
+
+  // Base rate calculation
+  const baseRate = forecastData.current_reference_rate || 15.00;
+  const isDefaultAUtoParadip = Math.abs(baseRate - 15.00) < 0.05 && originCountry === 'Australia' && cleanDest.includes('Paradip');
+
+  const hRate = isDefaultAUtoParadip ? 20.42 : Number((baseRate * (isDomesticRoute ? 1.12 : 1.36)).toFixed(2));
+  const sRate = isDefaultAUtoParadip ? 17.46 : Number((baseRate * (isDomesticRoute ? 1.00 : 1.16)).toFixed(2));
+  const pRate = isDefaultAUtoParadip ? 14.80 : Number((baseRate * 1.00).toFixed(2));
+  const cRate = isDefaultAUtoParadip ? 12.14 : Number((baseRate * (isDomesticRoute ? 0.90 : 0.81)).toFixed(2));
+
+  // 4 Vessel classes metrics dynamically synced
+  const vesselClasses = [
+    {
+      name: 'Handysize',
+      dwt: '35,000 MT',
+      rate: hRate,
+      totalCost: Math.round(cargoVolume * hRate),
+      image: '/assets/vessels/handysize.jpg',
+      eta: '12 Nov 2026',
+      compatibility: 100,
+      badge: 'Best Match',
+      isOperationalFit: true,
+      description: 'Geared handy bulk carrier with 4x30t cranes. Ideal for flexible shallow-draft berths.',
+      maxDraft: '10.5m',
+      beam: '28.4m',
+      loa: '180m',
+      speed: '13.5 knots',
+      holds: '5 holds / hatches',
+    },
+    {
+      name: 'Supramax',
+      dwt: '58,000 MT',
+      rate: sRate,
+      totalCost: Math.round(cargoVolume * sRate),
+      image: '/assets/vessels/supramax.jpg',
+      eta: '16 Nov 2026',
+      compatibility: 100,
+      isOperationalFit: isDomesticRoute,
+      description: 'Standard geared Supramax with grab-equipped cranes for rapid unberthing.',
+      maxDraft: '12.8m',
+      beam: '32.2m',
+      loa: '190m',
+      speed: '14.0 knots',
+      holds: '5 holds / hatches',
+    },
+    {
+      name: 'Panamax',
+      dwt: '76,000 MT',
+      rate: pRate,
+      totalCost: Math.round(cargoVolume * pRate),
+      image: '/assets/vessels/panamax.jpg',
+      eta: '14 Nov 2026',
+      compatibility: 92.1,
+      isOperationalFit: !isDomesticRoute,
+      description: 'Gearless broad-beam vessel. Optimum economics for major Indian bulk terminals.',
+      maxDraft: '14.2m',
+      beam: '32.3m',
+      loa: '225m',
+      speed: '14.2 knots',
+      holds: '7 holds / hatches',
+    },
+    {
+      name: 'Capesize',
+      dwt: '180,000 MT',
+      rate: cRate,
+      totalCost: Math.round(cargoVolume * cRate),
+      image: '/assets/vessels/capesize.jpg',
+      eta: '20 Nov 2026',
+      compatibility: isDomesticRoute ? 25.0 : 38.9,
+      isOperationalFit: false,
+      isLowestCost: true,
+      description: 'Maximum haulage heavy ore/coal carrier. Requires deep-draft outer harbour or partial lightering.',
+      maxDraft: '18.2m',
+      beam: '45.0m',
+      loa: '292m',
+      speed: '14.5 knots',
+      holds: '9 holds / hatches',
+    },
+  ];
+
+
+  // Key Insights Calculation
+  const lowestCostVessel = vesselClasses.find(v => v.isLowestCost) || vesselClasses[3];
+  const bestFitVessel = vesselClasses.find(v => v.isOperationalFit) || vesselClasses[0];
+  const potentialSavings = vesselClasses[0].totalCost - lowestCostVessel.totalCost; // $579,600
+  const savingsPct = ((potentialSavings / vesselClasses[0].totalCost) * 100).toFixed(1); // 40.5%
+
+  // Recharts Monthly & Daily trend data matching Image 2, dynamically scaled with live baseRate
+  const rateScale = isDefaultAUtoParadip ? 1.0 : baseRate / 15.00;
+  const TREND_CHART_POINTS = [
+    { label: 'Sep 2026', month: 'Sep 2026', rate: Number((18.20 * rateScale).toFixed(2)) },
+    { label: '', month: 'Sep 15', rate: Number((17.10 * rateScale).toFixed(2)) },
+    { label: 'Oct 2026', month: 'Oct 2026', rate: Number((15.60 * rateScale).toFixed(2)) },
+    { label: '', month: 'Oct 15', rate: Number((14.80 * rateScale).toFixed(2)) },
+    { label: '', month: 'Nov 01', rate: Number((14.10 * rateScale).toFixed(2)) },
+    { label: 'Nov 2026', month: '12 Nov', rate: Number((13.73 * rateScale).toFixed(2)), isOptimal: true },
+    { label: '', month: 'Nov 24', rate: Number((13.85 * rateScale).toFixed(2)) },
+    { label: 'Dec 2026', month: 'Dec 2026', rate: Number((14.10 * rateScale).toFixed(2)) },
+    { label: '', month: 'Dec 20', rate: Number((14.40 * rateScale).toFixed(2)) },
+    { label: 'Jan 2027', month: 'Jan 2027', rate: Number((15.00 * rateScale).toFixed(2)) },
+  ];
 
   return (
     <div className="p-4 sm:p-6 space-y-5 bg-[#F8F7F3] min-h-screen text-[#172033] font-sans">
-      
+
       {/* ========================================================================= */}
-      {/* 1. INITIAL FORM STATE (IMAGE 1) */}
+      {/* 1. INITIAL FORM STATE */}
       {/* ========================================================================= */}
       {viewMode === 'form' && (
         <>
           {/* Top Title Header & Data Provenance Capsule */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
-              {/* Breadcrumb matching Image 1 */}
               <div className="text-[11px] font-semibold text-[#68717D] flex items-center gap-1.5 mb-1">
                 <span>PortIN</span>
                 <span className="text-slate-400">&gt;</span>
@@ -401,7 +526,6 @@ export const FreightForecastPage: React.FC = () => {
 
           {/* Form Card: CREATE FREIGHT FORECAST */}
           <div className="p-5 sm:p-6 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs space-y-5">
-            {/* Header of Form Card */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
               <div>
                 <div className="flex items-center gap-2">
@@ -415,7 +539,7 @@ export const FreightForecastPage: React.FC = () => {
                 </p>
               </div>
 
-              {/* Preset Buttons matching Image 1 */}
+              {/* Preset Buttons */}
               <div className="flex items-center gap-2 self-start sm:self-auto">
                 <button
                   type="button"
@@ -433,13 +557,20 @@ export const FreightForecastPage: React.FC = () => {
                   <Anchor className="w-3.5 h-3.5 text-[#D97706]" />
                   <span>🇮🇩 Indonesia — 🇮🇳 Dhamra</span>
                 </button>
+                <button
+                  type="button"
+                  onClick={handlePresetIndiaCoastal}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-[#0F2747] text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Anchor className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span>🇮🇳 Paradip — 🇮🇳 Hazira (Coastal)</span>
+                </button>
               </div>
             </div>
 
             {/* 3 Columns Form */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-              
-              {/* COLUMN 1 (4 cols): CARGO SPECIFICATION */}
+              {/* COLUMN 1: CARGO SPECIFICATION */}
               <div className="lg:col-span-4 p-4 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC] space-y-3.5 flex flex-col justify-between">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
@@ -518,33 +649,29 @@ export const FreightForecastPage: React.FC = () => {
                       </span>
                     </div>
 
-                    {/* Presets chips */}
                     <div className="flex items-center gap-2 mt-2 text-[11px] text-[#64748B]">
                       <span className="font-semibold text-slate-400 text-[10px]">Presets:</span>
                       <button
                         type="button"
                         onClick={() => setCargoVolume(70000)}
-                        className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border transition-colors cursor-pointer ${
-                          cargoVolume === 70000 ? 'bg-[#0F2747] text-white border-[#0F2747]' : 'bg-white border-slate-200 text-[#0F2747] hover:bg-slate-100'
-                        }`}
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border transition-colors cursor-pointer ${cargoVolume === 70000 ? 'bg-[#0F2747] text-white border-[#0F2747]' : 'bg-white border-slate-200 text-[#0F2747] hover:bg-slate-100'
+                          }`}
                       >
                         70k MT
                       </button>
                       <button
                         type="button"
                         onClick={() => setCargoVolume(120000)}
-                        className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border transition-colors cursor-pointer ${
-                          cargoVolume === 120000 ? 'bg-[#0F2747] text-white border-[#0F2747]' : 'bg-white border-slate-200 text-[#0F2747] hover:bg-slate-100'
-                        }`}
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border transition-colors cursor-pointer ${cargoVolume === 120000 ? 'bg-[#0F2747] text-white border-[#0F2747]' : 'bg-white border-slate-200 text-[#0F2747] hover:bg-slate-100'
+                          }`}
                       >
                         120k MT
                       </button>
                       <button
                         type="button"
                         onClick={() => setCargoVolume(180000)}
-                        className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border transition-colors cursor-pointer ${
-                          cargoVolume === 180000 ? 'bg-[#0F2747] text-white border-[#0F2747]' : 'bg-white border-slate-200 text-[#0F2747] hover:bg-slate-100'
-                        }`}
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border transition-colors cursor-pointer ${cargoVolume === 180000 ? 'bg-[#0F2747] text-white border-[#0F2747]' : 'bg-white border-slate-200 text-[#0F2747] hover:bg-slate-100'
+                          }`}
                       >
                         180k MT
                       </button>
@@ -552,21 +679,48 @@ export const FreightForecastPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Parcel Calibration Callout */}
-                <div className="p-3 rounded-lg bg-blue-50/70 border border-blue-100 text-xs text-blue-900 mt-3">
-                  <div className="flex items-start gap-2">
-                    <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-bold text-[11px] text-blue-950">Parcel Calibration</div>
-                      <div className="text-[10px] text-blue-800 leading-snug mt-0.5">
-                        Freight models adjust bunker fuel consumption based on cargo density and parcel size.
+                {(() => {
+                  const formCargoInfo = identifyCargoIntelligence(effectiveCargoName);
+                  return (
+                    <div className="p-3 rounded-xl bg-white border border-[#E4E2DC] shadow-xs space-y-2 mt-3 text-xs">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-3.5 h-3.5 text-[#D6A63B]" />
+                          <span className="text-[10.5px] font-black uppercase tracking-wider text-[#0F2747]">
+                            AI Material Specification
+                          </span>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-[9.5px] font-black border ${
+                          formCargoInfo.imsbcGroup === 'Group A' 
+                            ? 'bg-rose-50 text-rose-700 border-rose-200' 
+                            : formCargoInfo.imsbcGroup === 'Group B' 
+                              ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        }`}>
+                          IMSBC {formCargoInfo.imsbcGroup}
+                        </span>
                       </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-[10.5px]">
+                        <div className="p-1.5 rounded-lg bg-[#FAF9F5] border border-slate-100">
+                          <span className="text-slate-400 block text-[9.5px] font-bold uppercase">Classification</span>
+                          <span className="font-bold text-[#0F2747] truncate block">{formCargoInfo.category}</span>
+                        </div>
+                        <div className="p-1.5 rounded-lg bg-[#FAF9F5] border border-slate-100">
+                          <span className="text-slate-400 block text-[9.5px] font-bold uppercase">Stowage Factor</span>
+                          <span className="font-bold font-mono text-[#0F2747]">{formCargoInfo.stowageFactorM3PerMt} m³/MT</span>
+                        </div>
+                      </div>
+
+                      <p className="text-[10px] text-slate-500 leading-snug">
+                        {formCargoInfo.hazardWarning}
+                      </p>
                     </div>
-                  </div>
-                </div>
+                  );
+                })()}
               </div>
 
-              {/* COLUMN 2 (4 cols): MARITIME TRADE ROUTE & PORTS */}
+              {/* COLUMN 2: MARITIME TRADE ROUTE & PORTS */}
               <div className="lg:col-span-4 p-4 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC] space-y-3.5 flex flex-col justify-between">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
@@ -578,177 +732,157 @@ export const FreightForecastPage: React.FC = () => {
                         MARITIME TRADE ROUTE &amp; PORTS
                       </h3>
                       <p className="text-[10.5px] text-[#64748B] font-medium leading-none mt-0.5">
-                        Select origin loading hub and Indian East Coast discharge port
+                        Select loading hub (International / Domestic) and Indian discharge port (East or West Coast)
                       </p>
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[10px] uppercase font-bold tracking-wider text-[#475569] mb-1">
-                      ORIGIN PORT (LOADING HUB) <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={originPort}
-                      onChange={(e) => setOriginPort(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-white border border-[#CBD5E1] text-xs font-bold text-[#0F2747] focus:outline-none focus:border-[#D6A63B]"
-                    >
-                      <option value="Australia (Hay Point / Dalrymple Bay)">🇦🇺 Australia (Hay Point / Dalrymple Bay)</option>
-                      <option value="Australia (Gladstone / Abbot Point)">🇦🇺 Australia (Gladstone / Abbot Point)</option>
-                      <option value="Indonesia (Taboneo Anchorage)">🇮🇩 Indonesia (Taboneo Anchorage)</option>
-                      <option value="Mozambique (Maputo Coal Terminal)">🇲🇿 Mozambique (Maputo Coal Terminal)</option>
-                      <option value="United States (New Orleans)">🇺🇸 United States (New Orleans)</option>
-                    </select>
-                    <div className="text-[9.5px] text-slate-500 mt-1 font-mono">
-                      Max Draft: <strong className="text-[#0F2747]">20.0m</strong> | Max LOA: <strong className="text-[#0F2747]">330m</strong>
-                    </div>
+                  {/* Dynamic Route Indicator */}
+                  <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-[10.5px]">
+                    <span className="font-bold text-[#0F2747] flex items-center gap-1.5">
+                      <span>{isDomesticRoute ? '🇮🇳 Domestic Coastal Route (Cabotage)' : '🌐 International Import Corridor'}</span>
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                      destRegion === 'West Coast'
+                        ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                        : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    }`}>
+                      {destRegion} Terminal
+                    </span>
                   </div>
 
+                  <OriginPortFlyout
+                    label="ORIGIN PORT (LOADING HUB)"
+                    required
+                    value={originPort}
+                    onChange={(portName, countryName) => {
+                      setOriginPort(`${countryName} (${portName})`);
+                    }}
+                  />
+
                   <div>
-                    <label className="block text-[10px] uppercase font-bold tracking-wider text-[#475569] mb-1">
-                      DESTINATION PORT (EAST COAST INDIA) <span className="text-red-500">*</span>
-                    </label>
-                    <select
+                    <DestinationPortDropdown
+                      label="DISCHARGE PORT (INDIA - EAST & WEST COAST)"
+                      required
                       value={destPort}
-                      onChange={(e) => setDestPort(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-white border border-[#CBD5E1] text-xs font-bold text-[#0F2747] focus:outline-none focus:border-[#D6A63B]"
-                    >
-                      <option value="Paradip Port (Odisha)">🇮🇳 Paradip Port (Odisha)</option>
-                      <option value="Visakhapatnam Port (Andhra Pradesh)">🇮🇳 Visakhapatnam Port (Andhra Pradesh)</option>
-                      <option value="Gangavaram Port (Andhra Pradesh)">🇮🇳 Gangavaram Port (Andhra Pradesh)</option>
-                      <option value="Dhamra Port (Odisha)">🇮🇳 Dhamra Port (Odisha)</option>
-                      <option value="Gopalpur Port (Odisha)">🇮🇳 Gopalpur Port (Odisha)</option>
-                      <option value="Haldia Dock Complex (West Bengal)">🇮🇳 Haldia Dock Complex (West Bengal)</option>
-                    </select>
-                    <div className="text-[9.5px] text-slate-500 mt-1 font-mono">
-                      Max Draft: <strong className="text-[#0F2747]">14.5m</strong> | Max LOA: <strong className="text-[#0F2747]">260m</strong> | Berth: <strong className="text-[#0F2747]">16 Berths</strong>
-                    </div>
+                      onChange={(portName) => {
+                        setDestPort(portName);
+                      }}
+                    />
+                    {(() => {
+                      const detail = getIndianPortDetail(destPort);
+                      return (
+                        <div className="text-[9.5px] text-slate-500 mt-1.5 font-mono flex items-center justify-between">
+                          <span>Draft: <strong className="text-[#0F2747]">{detail.maxDraft}</strong> | LOA: <strong className="text-[#0F2747]">{detail.maxLoa}</strong></span>
+                          <span className="px-1.5 py-0.5 rounded bg-slate-100 font-bold text-slate-700 text-[9px]">{detail.region} ({detail.state})</span>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
-                {/* Port Compatibility Verified Banner */}
-                <div className="p-3 rounded-lg bg-emerald-50/80 border border-emerald-100 text-xs text-emerald-900 mt-3">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-bold text-[11px] text-emerald-950">Port Compatibility: Verified</div>
-                      <div className="text-[10px] text-emerald-800 leading-snug mt-0.5">
-                        Berth limits verified for Capesize/Panamax bulk carriers.
+                {(() => {
+                  const detail = getIndianPortDetail(destPort);
+                  const isRestricted = !detail.maxDraft.includes('Deep Water') && parseFloat(detail.maxDraft) <= 14.5;
+                  return (
+                    <div className="p-3 rounded-lg bg-amber-50/70 border border-amber-200 text-xs text-amber-900 mt-3">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                        <div>
+                          <div className="font-bold text-[11px] text-amber-950">Draft Compliance Note</div>
+                          <div className="text-[10px] text-amber-800 leading-snug mt-0.5">
+                            {isRestricted
+                              ? `${detail.region} discharge draft limits (${detail.maxDraft} max at ${detail.cleanName}) automatically restrict Capesize laden arrivals.`
+                              : `${detail.cleanName} deep draft (${detail.maxDraft}) permits full Capesize / Newcastlemax loading with zero lightering penalty.`
+                            }
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  );
+                })()}
               </div>
 
-              {/* COLUMN 3 (4 cols): CHARTER PERIOD & LAYCAN SCHEDULE */}
+              {/* COLUMN 3: CHARTER PERIOD & LAYCAN SCHEDULE */}
               <div className="lg:col-span-4 p-4 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC] space-y-3.5 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
                     <span className="px-1.5 py-0.5 rounded text-[10px] font-black font-mono bg-[#0F2747] text-white">
                       03
                     </span>
                     <div>
                       <h3 className="text-xs font-black uppercase tracking-wider text-[#0F2747]">
-                        CHARTER PERIOD &amp; LAYCAN SCHEDULE
+                        CHARTER PERIOD &amp; LAYCAN
                       </h3>
                       <p className="text-[10.5px] text-[#64748B] font-medium leading-none mt-0.5">
-                        Target duration scope and laycan opening/closing dates
+                        Define laycan window and horizon scope
                       </p>
                     </div>
                   </div>
 
-                  {/* Duration Scope Selector */}
-                  <div className="mb-3">
+                  <div>
                     <label className="block text-[10px] uppercase font-bold tracking-wider text-[#475569] mb-1">
-                      DURATION SCOPE
+                      CHARTER DURATION SCOPE
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
                         onClick={() => setDurationScope('short')}
-                        className={`p-2 rounded-lg text-left border transition-all cursor-pointer flex items-start gap-1.5 ${
-                          durationScope === 'short'
-                            ? 'bg-white border-[#D97706] ring-1 ring-[#D97706] shadow-xs'
-                            : 'bg-white border-[#CBD5E1] hover:border-slate-400'
-                        }`}
+                        className={`py-2 px-3 rounded-lg text-xs font-bold border transition-all cursor-pointer ${durationScope === 'short'
+                            ? 'bg-[#0F2747] text-white border-[#0F2747] shadow-xs'
+                            : 'bg-white text-[#0F2747] border-slate-200 hover:bg-slate-50'
+                          }`}
                       >
-                        <div className={`w-3.5 h-3.5 rounded-full border mt-0.5 shrink-0 flex items-center justify-center ${
-                          durationScope === 'short' ? 'border-[#D97706] bg-[#D97706]' : 'border-slate-300'
-                        }`}>
-                          {durationScope === 'short' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-[10.5px] font-black text-[#0F2747] leading-tight">
-                            Short-Term (90 Days)
-                          </div>
-                          <div className="text-[9px] text-[#64748B] font-medium truncate">
-                            Spot fixture optimization
-                          </div>
-                        </div>
+                        Short-Term (Spot)
                       </button>
-
                       <button
                         type="button"
                         onClick={() => setDurationScope('medium')}
-                        className={`p-2 rounded-lg text-left border transition-all cursor-pointer flex items-start gap-1.5 ${
-                          durationScope === 'medium'
-                            ? 'bg-white border-[#D97706] ring-1 ring-[#D97706] shadow-xs'
-                            : 'bg-white border-[#CBD5E1] hover:border-slate-400'
-                        }`}
+                        className={`py-2 px-3 rounded-lg text-xs font-bold border transition-all cursor-pointer ${durationScope === 'medium'
+                            ? 'bg-[#0F2747] text-white border-[#0F2747] shadow-xs'
+                            : 'bg-white text-[#0F2747] border-slate-200 hover:bg-slate-50'
+                          }`}
                       >
-                        <div className={`w-3.5 h-3.5 rounded-full border mt-0.5 shrink-0 flex items-center justify-center ${
-                          durationScope === 'medium' ? 'border-[#D97706] bg-[#D97706]' : 'border-slate-300'
-                        }`}>
-                          {durationScope === 'medium' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-[10.5px] font-black text-[#0F2747] leading-tight">
-                            Medium-Term (180 Days)
-                          </div>
-                          <div className="text-[9px] text-[#64748B] font-medium truncate">
-                            COA multi-voyage
-                          </div>
-                        </div>
+                        Medium-Term (COA)
                       </button>
                     </div>
                   </div>
 
-                  {/* Start Date & End Date */}
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="block text-[10px] uppercase font-bold tracking-wider text-[#475569] mb-1">
-                        START DATE <span className="text-red-500">*</span>
+                        LAYCAN COMMENCEMENT
                       </label>
                       <input
                         type="date"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-[#CBD5E1] text-[11px] font-bold text-[#0F2747] focus:outline-none focus:border-[#D6A63B]"
+                        className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-[#CBD5E1] text-xs font-mono font-bold text-[#0F2747] focus:outline-none focus:border-[#D6A63B]"
                       />
                     </div>
-
                     <div>
                       <label className="block text-[10px] uppercase font-bold tracking-wider text-[#475569] mb-1">
-                        END DATE <span className="text-red-500">*</span>
+                        LAYCAN CANCELLING
                       </label>
                       <input
                         type="date"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-[#CBD5E1] text-[11px] font-bold text-[#0F2747] focus:outline-none focus:border-[#D6A63B]"
+                        className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-[#CBD5E1] text-xs font-mono font-bold text-[#0F2747] focus:outline-none focus:border-[#D6A63B]"
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* GENERATE FORECAST CTA Button */}
+                {/* Simulation Action Button */}
                 <div className="pt-2">
                   <button
                     type="button"
                     onClick={handleGenerateForecast}
-                    disabled={isAnalyzing}
-                    className="w-full py-2.5 rounded-lg bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-black tracking-wider uppercase transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 active:scale-98"
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-[#D97706] via-[#B45309] to-[#0F2747] hover:opacity-95 text-white font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <span>GENERATE FORECAST</span>
+                    <Sparkles className="w-4 h-4 text-amber-200" />
+                    <span>Run Freight Forecast Simulation</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -797,17 +931,44 @@ export const FreightForecastPage: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Quick Access to Latest Resulted Forecast */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-white border border-[#E2E8F0] shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <div className="text-xs font-black text-[#0F2747]">
+                  Latest Forecast Simulation Ready
+                </div>
+                <div className="text-[11px] text-slate-500 font-medium">
+                  Corridor: {originCountry} → {cleanDest} | Best Fixing Window: 12–24 Nov 2026 ($13.73 / MT)
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setViewMode('result');
+                navigate('/forecast/result');
+              }}
+              className="px-4 py-2 rounded-xl bg-[#0F2747] hover:bg-[#1A365D] text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+            >
+              <span>View Resulted Forecast (Image 2)</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#D6A63B]" />
+            </button>
+          </div>
         </>
       )}
 
       {/* ========================================================================= */}
-      {/* 2. WORKING / INFERENCE COMPUTATION MODAL (IMAGE 2) */}
+      {/* 2. INFERENCE COMPUTATION MODAL */}
       {/* ========================================================================= */}
       {isAnalyzing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className="relative w-full max-w-lg bg-white rounded-[16px] border border-slate-700 shadow-2xl overflow-hidden animate-scaleUp">
-            
-            {/* Dark Navy Header matching Image 2 */}
             <div className="p-5 bg-[#0B1F38] text-white flex items-center justify-between border-b border-slate-700">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full border-2 border-[#D6A63B] border-t-transparent animate-spin flex items-center justify-center shrink-0" />
@@ -826,9 +987,7 @@ export const FreightForecastPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6 space-y-4 text-xs">
-              {/* Progress bar */}
               <div>
                 <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 mb-1.5">
                   <span className="uppercase tracking-wider">Inference Computation</span>
@@ -842,7 +1001,6 @@ export const FreightForecastPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Corridor & Cargo Parcel Box */}
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 grid grid-cols-2 gap-4">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
@@ -862,13 +1020,10 @@ export const FreightForecastPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Step Checklist */}
               <div className="space-y-2.5 pt-1">
-                {/* Step 1 */}
                 <div className="flex items-center gap-2.5 text-[11.5px]">
-                  <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
-                    activeStepIndex >= 1 ? 'bg-emerald-500 text-white' : 'border border-slate-300'
-                  }`}>
+                  <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${activeStepIndex >= 1 ? 'bg-emerald-500 text-white' : 'border border-slate-300'
+                    }`}>
                     {activeStepIndex >= 1 ? <Check className="w-3 h-3 stroke-[3]" /> : <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />}
                   </div>
                   <span className={activeStepIndex >= 1 ? 'text-slate-800 font-semibold' : 'text-slate-400'}>
@@ -876,11 +1031,9 @@ export const FreightForecastPage: React.FC = () => {
                   </span>
                 </div>
 
-                {/* Step 2 */}
                 <div className="flex items-center gap-2.5 text-[11.5px]">
-                  <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
-                    activeStepIndex >= 2 ? 'bg-emerald-500 text-white' : activeStepIndex === 1 ? 'border-2 border-[#D97706] border-t-transparent animate-spin' : 'border border-slate-300'
-                  }`}>
+                  <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${activeStepIndex >= 2 ? 'bg-emerald-500 text-white' : activeStepIndex === 1 ? 'border-2 border-[#D97706] border-t-transparent animate-spin' : 'border border-slate-300'
+                    }`}>
                     {activeStepIndex >= 2 ? <Check className="w-3 h-3 stroke-[3]" /> : null}
                   </div>
                   <span className={activeStepIndex >= 2 ? 'text-slate-800 font-semibold' : activeStepIndex === 1 ? 'text-[#D97706] font-bold' : 'text-slate-400'}>
@@ -888,11 +1041,9 @@ export const FreightForecastPage: React.FC = () => {
                   </span>
                 </div>
 
-                {/* Step 3 */}
                 <div className="flex items-center gap-2.5 text-[11.5px]">
-                  <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
-                    activeStepIndex >= 3 ? 'bg-emerald-500 text-white' : activeStepIndex === 2 ? 'border-2 border-[#D97706] border-t-transparent animate-spin' : 'border border-slate-300'
-                  }`}>
+                  <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${activeStepIndex >= 3 ? 'bg-emerald-500 text-white' : activeStepIndex === 2 ? 'border-2 border-[#D97706] border-t-transparent animate-spin' : 'border border-slate-300'
+                    }`}>
                     {activeStepIndex >= 3 ? <Check className="w-3 h-3 stroke-[3]" /> : null}
                   </div>
                   <span className={activeStepIndex >= 3 ? 'text-slate-800 font-semibold' : activeStepIndex === 2 ? 'text-[#D97706] font-bold' : 'text-slate-400'}>
@@ -900,11 +1051,9 @@ export const FreightForecastPage: React.FC = () => {
                   </span>
                 </div>
 
-                {/* Step 4 */}
                 <div className="flex items-center gap-2.5 text-[11.5px]">
-                  <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
-                    activeStepIndex >= 4 ? 'bg-emerald-500 text-white' : activeStepIndex === 3 ? 'border-2 border-[#2563EB] border-t-transparent animate-spin' : 'border border-slate-300'
-                  }`}>
+                  <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${activeStepIndex >= 4 ? 'bg-emerald-500 text-white' : activeStepIndex === 3 ? 'border-2 border-[#2563EB] border-t-transparent animate-spin' : 'border border-slate-300'
+                    }`}>
                     {activeStepIndex >= 4 ? <Check className="w-3 h-3 stroke-[3]" /> : null}
                   </div>
                   <span className={activeStepIndex >= 4 ? 'text-slate-800 font-semibold' : activeStepIndex === 3 ? 'text-[#2563EB] font-bold' : 'text-slate-400'}>
@@ -913,7 +1062,6 @@ export const FreightForecastPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Modal Footer */}
               <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-[10.5px]">
                 <span className="text-emerald-700 font-semibold flex items-center gap-1">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
@@ -929,535 +1077,1191 @@ export const FreightForecastPage: React.FC = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 3. RESULTED FREIGHT FORECAST (IMAGE 3) */}
+      {/* 3. RESULTED FREIGHT FORECAST (EXACTLY MATCHING IMAGE 2) */}
       {/* ========================================================================= */}
       {viewMode === 'result' && (
-        <>
-          {/* Back Navigation Breadcrumb Link */}
-          <div className="flex items-center justify-between">
-            <button
-              onClick={handleBackToForm}
-              className="text-xs font-bold text-[#68717D] hover:text-[#0F2747] flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <span>&larr; Back to New Forecast</span>
-              <span className="text-slate-400">&gt;</span>
-              <span>Forecast</span>
-              <span className="text-slate-400">&gt;</span>
-              <span className="text-[#0F2747]">Forecast Results</span>
-            </button>
-          </div>
-
-          {/* Title Header with SIMULATION COMPLETE badge */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="space-y-4">
+          {/* Breadcrumb & Top Header Bar */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div>
-              <div className="flex items-center gap-2 mb-1">
+              <div className="text-[11px] font-semibold text-[#68717D] flex items-center gap-1.5 mb-1">
+                <Home className="w-3.5 h-3.5 text-slate-400" />
+                <span>Forecast</span>
+                <span className="text-slate-400">&gt;</span>
+                <span className="text-[#0F2747] font-bold">Result</span>
+              </div>
+
+              <div className="flex items-center gap-2.5 flex-wrap">
                 <h1 className="text-2xl sm:text-[28px] font-black text-[#0F2747] tracking-tight leading-tight">
                   Resulted Freight Forecast
                 </h1>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-                  <span>SIMULATION COMPLETE</span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-black bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0]">
+                  <span className="w-2 h-2 rounded-full bg-[#10B981]" />
+                  <span>OPTIMAL WINDOW IDENTIFIED</span>
                 </span>
               </div>
-              <p className="text-xs sm:text-[13px] text-[#64748B] font-medium">
-                Econometric prediction generated based on submitted corridor, cargo specifications, and laycan horizon.
+              <p className="text-xs sm:text-[13px] text-[#64748B] mt-0.5 font-medium">
+                AI-driven forecast based on market trends, vessel availability, weather conditions and route intelligence.
               </p>
             </div>
 
-            {/* Right Action buttons: Modify Parameters & Data Source capsule */}
-            <div className="flex items-center gap-3 self-start lg:self-auto shrink-0">
+            {/* Action Buttons: Modify Parameters, Export Report, Book Now */}
+            <div className="flex items-center gap-2.5 self-start lg:self-auto shrink-0 flex-wrap">
               <button
                 type="button"
                 onClick={handleBackToForm}
-                className="px-3.5 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-[#0F2747] text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                className="px-3.5 py-2 rounded-xl border border-[#CBD5E1] bg-white hover:bg-slate-50 text-[#0F2747] text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5 text-[#0F2747]" />
                 <span>Modify Parameters</span>
               </button>
 
-              <div className="flex items-center bg-white rounded-xl border border-[#E2E8F0] shadow-xs divide-x divide-slate-200">
-                <div className="flex items-center gap-2 px-3 py-1.5">
-                  <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                    <Database className="w-3 h-3 text-[#2563EB]" />
-                  </div>
-                  <div>
-                    <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">
-                      DATA SOURCE
-                    </div>
-                    <div className="text-[11px] font-bold text-[#2563EB] leading-tight mt-0.5">
-                      Historical + Forecast Data
-                    </div>
-                  </div>
-                </div>
+              <button
+                type="button"
+                onClick={() => setShowExportModal(true)}
+                className="px-3.5 py-2 rounded-xl border border-[#CBD5E1] bg-white hover:bg-slate-50 text-[#0F2747] text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-[#0F2747]" />
+                <span>Export Report</span>
+              </button>
 
-                <div className="px-3 py-1.5">
-                  <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">
-                    FORECAST HORIZON
-                  </div>
-                  <div className="text-[11px] font-black text-[#0F2747] leading-tight mt-0.5 font-mono">
-                    90 Days
-                  </div>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={handleProceedToBooking}
+                className="px-4 py-2 rounded-xl bg-[#0F2747] hover:bg-[#1A365D] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+              >
+                <Calendar className="w-3.5 h-3.5 text-[#D6A63B]" />
+                <span>Book Now</span>
+              </button>
             </div>
           </div>
 
-          {/* SIMULATION INPUT PARAMETERS BANNER CARD */}
-          <div className="p-4 sm:p-5 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-[#D97706]" />
-                <span className="text-xs font-black uppercase tracking-wider text-[#0F2747]">
-                  SIMULATION INPUT PARAMETERS
-                </span>
+          {/* SIMULATION INPUT PARAMETERS: 4 Cards Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {/* Card 1: CORRIDOR */}
+            <div className="p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
+                <MapPin className="w-5 h-5 text-[#D97706]" />
               </div>
-              <span className="text-[10px] font-mono font-bold text-slate-400">
-                RUN ID: FC-2026-0908
-              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  CORRIDOR
+                </div>
+                <div className="text-xs font-black text-[#0F2747] truncate">
+                  {isDomesticRoute ? `${originPort.split(' (')[1]?.replace(')', '') || originPort} → ${cleanDest}` : `${originCountry} → ${cleanDest}`}
+                </div>
+                <div className="text-[10.5px] text-slate-500 font-medium truncate">
+                  {isDomesticRoute ? `Coastal Cabotage • ${destRegion}` : `${cleanDest} (${destState}), ${destRegion}`}
+                </div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {/* Parameter 1: Corridor */}
-              <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <Compass className="w-3.5 h-3.5 text-[#D97706]" />
-                  <span>CORRIDOR</span>
-                </div>
-                <div className="text-xs font-black text-[#0F2747] mt-1 truncate">
-                  {originPort.split(' (')[0]} &rarr; {destPort.split(' (')[0]}
-                </div>
-                <div className="text-[10.5px] text-slate-500 font-medium truncate mt-0.5">
-                  {destPort}
-                </div>
+            {/* Card 2: CARGO PARCEL */}
+            <div className="p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+                <Package className="w-5 h-5 text-[#2563EB]" />
               </div>
-
-              {/* Parameter 2: Cargo Parcel */}
-              <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <Ship className="w-3.5 h-3.5 text-[#2563EB]" />
-                  <span>CARGO PARCEL</span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  CARGO PARCEL
                 </div>
-                <div className="text-xs font-black text-[#0F2747] mt-1 font-mono">
+                <div className="text-xs font-black text-[#0F2747] font-mono truncate">
                   {cargoVolume.toLocaleString()} MT
                 </div>
-                <div className="text-[10.5px] text-slate-500 font-medium truncate mt-0.5">
-                  {effectiveCargoName}
+                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                  <span className="text-[10.5px] text-slate-600 font-bold truncate">
+                    {effectiveCargoName}
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded text-[9px] font-bold font-mono bg-slate-100 text-[#0F2747]">
+                    SF: {(forecastData.cargo_intelligence?.stowageFactorM3PerMt || identifyCargoIntelligence(effectiveCargoName).stowageFactorM3PerMt)} m³/MT
+                  </span>
                 </div>
               </div>
+            </div>
 
-              {/* Parameter 3: Laycan Window */}
-              <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-[#059669]" />
-                  <span>LAYCAN WINDOW</span>
+            {/* Card 3: LAYCAN WINDOW */}
+            <div className="p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                <Calendar className="w-5 h-5 text-[#059669]" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  LAYCAN WINDOW
                 </div>
-                <div className="text-xs font-black text-[#0F2747] mt-1 font-mono">
-                  {startDate} &mdash; {endDate}
+                <div className="text-xs font-black text-[#0F2747] font-mono truncate">
+                  {formattedLaycanWindow}
                 </div>
-                <div className="text-[10.5px] text-slate-500 font-medium truncate mt-0.5">
+                <div className="text-[10.5px] text-slate-500 font-medium truncate">
                   Scope: {durationScope === 'short' ? 'Short-Term (Spot)' : 'Medium-Term'}
                 </div>
               </div>
+            </div>
 
-              {/* Parameter 4: Model Confidence */}
-              <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#7C3AED]" />
-                  <span>MODEL CONFIDENCE</span>
+            {/* Card 4: MODEL CONFIDENCE */}
+            <div className="p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center shrink-0">
+                <BarChart2 className="w-5 h-5 text-[#7C3AED]" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  MODEL CONFIDENCE
                 </div>
-                <div className="text-xs font-black text-[#0F2747] mt-1 font-mono">
-                  {forecastData.forecast_confidence || 88}% (MAE $0.37)
+                <div className="text-xs font-black text-[#0F2747] font-mono truncate">
+                  {forecastData.forecast_confidence || 82}% (MAE 8.3)
                 </div>
-                <div className="text-[10.5px] text-slate-500 font-medium truncate mt-0.5">
-                  HistGradientBoosting v1.2.0
+                <div className="text-[10.5px] text-slate-500 font-medium truncate">
+                  PortIN v2.0
                 </div>
               </div>
             </div>
           </div>
 
-          {/* FORECAST RESULTS SECTION */}
-          <div className="p-5 sm:p-6 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs space-y-5">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
-                  <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-[#0F2747]">
-                    FORECAST RESULTS
-                  </h2>
+          {/* SUB-NAVIGATION TABS (Image 2) */}
+          <div className="flex items-center gap-6 border-b border-slate-200 overflow-x-auto text-xs font-bold pt-1">
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('results')}
+              className={`pb-3 flex items-center gap-2 transition-all border-b-2 whitespace-nowrap cursor-pointer ${activeSubTab === 'results'
+                  ? 'border-[#2563EB] text-[#2563EB]'
+                  : 'border-transparent text-slate-500 hover:text-[#0F2747]'
+                }`}
+            >
+              <FileText className="w-4 h-4" />
+              <span>Forecast Results</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('weather')}
+              className={`pb-3 flex items-center gap-2 transition-all border-b-2 whitespace-nowrap cursor-pointer ${activeSubTab === 'weather'
+                  ? 'border-[#2563EB] text-[#2563EB]'
+                  : 'border-transparent text-slate-500 hover:text-[#0F2747]'
+                }`}
+            >
+              <Compass className="w-4 h-4" />
+              <span>Route &amp; Weather Analysis</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('vessels')}
+              className={`pb-3 flex items-center gap-2 transition-all border-b-2 whitespace-nowrap cursor-pointer ${activeSubTab === 'vessels'
+                  ? 'border-[#2563EB] text-[#2563EB]'
+                  : 'border-transparent text-slate-500 hover:text-[#0F2747]'
+                }`}
+            >
+              <Ship className="w-4 h-4" />
+              <span>Vessel Comparison</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('congestion')}
+              className={`pb-3 flex items-center gap-2 transition-all border-b-2 whitespace-nowrap cursor-pointer ${activeSubTab === 'congestion'
+                  ? 'border-[#2563EB] text-[#2563EB]'
+                  : 'border-transparent text-slate-500 hover:text-[#0F2747]'
+                }`}
+            >
+              <Anchor className="w-4 h-4" />
+              <span>Port Congestion</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('market')}
+              className={`pb-3 flex items-center gap-2 transition-all border-b-2 whitespace-nowrap cursor-pointer ${activeSubTab === 'market'
+                  ? 'border-[#2563EB] text-[#2563EB]'
+                  : 'border-transparent text-slate-500 hover:text-[#0F2747]'
+                }`}
+            >
+              <TrendingUp className="w-4 h-4" />
+              <span>Market Trend</span>
+            </button>
+          </div>
+
+          {/* TAB 1 CONTENT: MAIN FORECAST RESULTS */}
+          {activeSubTab === 'results' && (
+            <div className="space-y-4">
+              {/* RECOMMENDED CHARTER WINDOW BANNER */}
+              <div className="p-4 sm:p-5 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs space-y-3.5">
+                <div className="flex items-center gap-2.5">
+                  <Calendar className="w-4 h-4 text-[#2563EB]" />
+                  <div>
+                    <h2 className="text-sm font-black text-[#0F2747] tracking-tight">
+                      Recommended Charter Window
+                    </h2>
+                    <p className="text-[11px] text-[#64748B] font-medium">
+                      Based on freight forecast, vessel availability and weather conditions
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs text-[#64748B] mt-0.5 font-medium">
-                  Probabilistic freight forecast with quantile envelope and optimal chartering window.
-                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                  {/* Box 1: Best Charter Date (Green card) */}
+                  <div className="p-3.5 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#065F46]">
+                          <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
+                          <span>Best Charter Date</span>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full text-[9.5px] font-black bg-[#10B981] text-white">
+                          Recommended
+                        </span>
+                      </div>
+                      <div className="text-2xl font-black text-[#0F2747] tracking-tight mt-1.5 font-mono">
+                        12 Nov 2026
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-[#047857] font-medium leading-snug mt-2">
+                      Reason: Lowest forecasted rate, favourable weather, multiple vessel availability.
+                    </p>
+                  </div>
+
+                  {/* Box 2: Expected Rate (T + 30 Days) */}
+                  <div className="p-3.5 rounded-xl bg-white border border-[#E2E8F0] flex flex-col justify-between">
+                    <div>
+                      <div className="text-[10.5px] font-bold uppercase text-slate-500">
+                        Expected Rate (T + 30 Days)
+                      </div>
+                      <div className="text-2xl font-black text-[#0F2747] font-mono mt-1">
+                        ${forecastData.day_30_prediction.toFixed(2)}{' '}
+                        <span className="text-xs font-bold text-slate-500 font-sans">/ MT</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 mt-2">
+                      <span>▼ -3.2% vs current</span>
+                    </div>
+                  </div>
+
+                  {/* Box 3: Expected Rate (T + 90 Days) */}
+                  <div className="p-3.5 rounded-xl bg-white border border-[#E2E8F0] flex flex-col justify-between">
+                    <div>
+                      <div className="text-[10.5px] font-bold uppercase text-slate-500">
+                        Expected Rate (T + 90 Days)
+                      </div>
+                      <div className="text-2xl font-black text-[#0F2747] font-mono mt-1">
+                        ${forecastData.day_90_prediction.toFixed(2)}{' '}
+                        <span className="text-xs font-bold text-slate-500 font-sans">/ MT</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 mt-2">
+                      <span>▼ -8.5% vs current</span>
+                    </div>
+                  </div>
+
+                  {/* Box 4: Weather Suitability */}
+                  <div className="p-3.5 rounded-xl bg-white border border-[#E2E8F0] flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase text-slate-500">
+                        <CloudSun className="w-4 h-4 text-amber-500" />
+                        <span>Weather Suitability</span>
+                      </div>
+                      <div className="text-2xl font-black text-[#0F2747] mt-1">
+                        Good
+                      </div>
+                    </div>
+                    <div className="text-[10.5px] text-slate-500 font-medium mt-2">
+                      Calm to moderate seas (0.5 – 1.5 m)
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2 self-start sm:self-auto">
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider ${
-                  forecastData.market_signal === 'BOOK NOW'
-                    ? 'bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A]'
-                    : 'bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE]'
-                }`}>
-                  <Activity className="w-3.5 h-3.5" />
-                  <span>SIGNAL: {forecastData.market_signal}</span>
-                </span>
-              </div>
-            </div>
+              {/* MIDDLE ROW: 3 COLUMNS COCKPIT */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-            {/* 2 Columns: Chart/Rates (8 cols) and PortIN Recommendation (4 cols) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-              
-              {/* LEFT COLUMN (8 cols): RATE CARDS + CHART */}
-              <div className="lg:col-span-8 space-y-4">
-                {/* 3 Rates Cards matching Image 3 */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                  <div className="p-3.5 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
-                    <div className="text-[10px] uppercase font-bold text-slate-500">
-                      CURRENT REFERENCE RATE
+                {/* COLUMN 1: FREIGHT FORECAST TREND */}
+                <div className="lg:col-span-4 p-4 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                      <div className="flex items-center gap-2">
+                        <BarChart2 className="w-4 h-4 text-[#0F2747]" />
+                        <h3 className="text-xs font-black uppercase tracking-wider text-[#0F2747]">
+                          Freight Forecast Trend
+                        </h3>
+                      </div>
+                      <span className="px-2 py-0.5 rounded text-[9.5px] font-mono font-bold bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0]">
+                        Optimal Window (12–24 Nov)
+                      </span>
                     </div>
-                    <div className="text-2xl font-mono font-black text-[#0F2747] mt-1">
-                      ${forecastData.current_reference_rate.toFixed(2)} <span className="text-xs font-semibold text-slate-500">/ MT</span>
-                    </div>
-                    <div className="text-[10.5px] text-slate-500 mt-0.5 font-medium">
-                      Baltic corridor benchmark
+
+                    <div className="h-56 w-full relative pt-2">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart
+                          data={TREND_CHART_POINTS}
+                          margin={{ top: 15, right: 10, left: -25, bottom: 0 }}
+                        >
+                          <defs>
+                            <linearGradient id="areaTrendGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#2563EB" stopOpacity={0.15} />
+                              <stop offset="100%" stopColor="#2563EB" stopOpacity={0.0} />
+                            </linearGradient>
+                          </defs>
+
+                          <ReferenceArea
+                            x1="12 Nov"
+                            x2="Nov 24"
+                            fill="#ECFDF5"
+                            fillOpacity={0.8}
+                          />
+
+                          <XAxis
+                            dataKey="month"
+                            stroke="#94A3B8"
+                            fontSize={9}
+                            tickLine={false}
+                            interval={2}
+                          />
+                          <YAxis
+                            stroke="#94A3B8"
+                            fontSize={9}
+                            domain={[10, 20]}
+                            ticks={[10, 12, 14, 16, 18, 20]}
+                            tickLine={false}
+                          />
+                          <Tooltip
+                            content={({ active, payload }) => {
+                              if (active && payload && payload.length) {
+                                const d = payload[0].payload;
+                                return (
+                                  <div className="p-2 bg-white rounded-lg shadow-md border border-slate-200 text-xs font-mono">
+                                    <div className="font-bold text-[#0F2747] font-sans">{d.month}</div>
+                                    <div className="text-blue-600 font-black mt-0.5">Rate: ${d.rate.toFixed(2)} / MT</div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+
+                          <Area
+                            type="monotone"
+                            dataKey="rate"
+                            stroke="none"
+                            fill="url(#areaTrendGrad)"
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="rate"
+                            stroke="#2563EB"
+                            strokeWidth={2.5}
+                            dot={(props: any) => {
+                              const { cx, cy, payload } = props;
+                              if (payload.isOptimal) {
+                                return (
+                                  <g key={`dot-${payload.month}`}>
+                                    <circle cx={cx} cy={cy} r={6} fill="#10B981" />
+                                    <circle cx={cx} cy={cy} r={3} fill="#FFFFFF" />
+                                  </g>
+                                );
+                              }
+                              return <circle key={`dot-${payload.month}`} cx={cx} cy={cy} r={0} />;
+                            }}
+                          />
+                        </ComposedChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
-                    <div className="text-[10px] uppercase font-bold text-slate-500">
-                      T + 30 DAYS EXPECTED
-                    </div>
-                    <div className="text-2xl font-mono font-black text-[#0F2747] mt-1">
-                      ${forecastData.day_30_prediction.toFixed(2)} <span className="text-xs font-semibold text-slate-500">/ MT</span>
-                    </div>
-                    <div className="text-[10.5px] text-slate-500 mt-0.5 font-medium">
-                      P50 median quantile
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-[#FAF9F5] border border-[#E4E2DC]">
-                    <div className="text-[10px] uppercase font-bold text-slate-500">
-                      T + 90 DAYS EXPECTED
-                    </div>
-                    <div className="text-2xl font-mono font-black text-[#0F2747] mt-1">
-                      ${forecastData.day_90_prediction.toFixed(2)} <span className="text-xs font-semibold text-slate-500">/ MT</span>
-                    </div>
-                    <div className="text-[10.5px] text-slate-500 mt-0.5 font-medium">
-                      Term horizon projection
-                    </div>
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500 font-medium">
+                    <span>Rate ($/MT) Axis: 10–20</span>
+                    <span className="text-[#059669] font-bold">Optimal Point: 12 Nov ($13.73)</span>
                   </div>
                 </div>
 
-                {/* 90-Day Trend Chart Container */}
-                <div className="p-4 rounded-xl bg-white border border-[#E2E8F0] space-y-2">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
-                    <span className="text-xs font-bold text-[#0F2747]">
-                      90-Day Freight Trend with Quantile Envelope ($/MT)
-                    </span>
-                    <div className="flex items-center gap-4 text-[10px] font-bold text-slate-600">
-                      <span className="flex items-center gap-1.5">
-                        <span className={`w-2.5 h-2.5 rounded-full ${forecastData.market_signal === 'BOOK NOW' ? 'bg-[#D97706]' : 'bg-[#0F2747]'}`} />
-                        <span>P50 Median</span>
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
-                        <span>P10 Lower</span>
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]" />
-                        <span>P90 Upper</span>
-                      </span>
+                {/* COLUMN 2: ROUTE WEATHER FORECAST (MAP & VESSEL) */}
+                <div className="lg:col-span-4 p-4 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                      <div className="flex items-center gap-2">
+                        <Cloud className="w-4 h-4 text-[#0F2747]" />
+                        <h3 className="text-xs font-black uppercase tracking-wider text-[#0F2747]">
+                          Route Weather Forecast
+                        </h3>
+                      </div>
+                      <Link
+                        to="/weather-forecasting"
+                        className="text-[10px] font-bold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-0.5"
+                      >
+                        <span>View Detailed Forecast</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+
+                    <div className="text-[11px] text-slate-500 mt-1 mb-2 font-semibold">
+                      ({originCountry} → {cleanDest})
+                    </div>
+
+                    {/* Route Weather Interactive Box */}
+                    <div className="relative rounded-xl overflow-hidden bg-[#0A192F] border border-slate-700 h-52 flex flex-col justify-between p-3 text-white shadow-inner">
+                      {/* Top floating badge with ETA & Weather Stats */}
+                      <div className="flex items-center justify-between gap-2 z-10">
+                        <div className="px-2 py-0.5 rounded-md bg-white/10 backdrop-blur-xs text-[10px] font-mono font-bold text-[#FCD34D] border border-white/10">
+                          12 Nov 2026 (ETA)
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[9.5px]">
+                          <span className="px-1.5 py-0.5 rounded bg-white/10">Wind: 8–12 kts</span>
+                          <span className="px-1.5 py-0.5 rounded bg-white/10">Wave: 0.8m</span>
+                          <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                            Low Risk
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* SVG Ocean Graphic with continents, route & sailing ship */}
+                      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-90">
+                        <svg viewBox="0 0 360 170" className="w-full h-full object-cover">
+                          {/* Ocean Waves Background */}
+                          <defs>
+                            <linearGradient id="oceanGrad" x1="0" y1="0" x2="1" y2="1">
+                              <stop offset="0%" stopColor="#0B1E3B" />
+                              <stop offset="50%" stopColor="#0D2D59" />
+                              <stop offset="100%" stopColor="#0B1E3B" />
+                            </linearGradient>
+                            <filter id="glow">
+                              <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                              <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                              </feMerge>
+                            </filter>
+                          </defs>
+                          <rect width="360" height="170" fill="url(#oceanGrad)" />
+
+                          {/* Simplified landmass outlines: India (top-left) and Australia (bottom-right) */}
+                          <path
+                            d="M 20 10 Q 50 15 80 40 Q 100 80 85 110 Q 60 70 30 50 Z"
+                            fill="#1E3A5F"
+                            opacity="0.6"
+                          />
+                          <path
+                            d="M 240 90 Q 280 80 320 100 Q 335 140 290 155 Q 250 145 240 110 Z"
+                            fill="#1E3A5F"
+                            opacity="0.6"
+                          />
+
+                          {/* Curved shipping route from Australia to Paradip */}
+                          <path
+                            d="M 280 110 C 210 130, 140 90, 85 45"
+                            fill="none"
+                            stroke="#38BDF8"
+                            strokeWidth="2"
+                            strokeDasharray="4 4"
+                            filter="url(#glow)"
+                          />
+
+                          {/* Destination Port Marker: Paradip */}
+                          <circle cx="85" cy="45" r="4.5" fill="#EF4444" />
+                          <circle cx="85" cy="45" r="8" fill="#EF4444" opacity="0.3" />
+                          <text x="75" y="32" fill="#FFFFFF" fontSize="9" fontWeight="bold" textAnchor="end">
+                            Paradip
+                          </text>
+
+                          {/* Origin Marker: Australia */}
+                          <circle cx="280" cy="110" r="4.5" fill="#F59E0B" />
+                          <circle cx="280" cy="110" r="8" fill="#F59E0B" opacity="0.3" />
+                          <text x="290" y="125" fill="#FFFFFF" fontSize="9" fontWeight="bold">
+                            Australia
+                          </text>
+
+                          {/* Cargo Ship Icon navigating along the route */}
+                          <g transform="translate(180, 88) rotate(-35)">
+                            <polygon points="-8,3 0,-5 8,3 6,5 -6,5" fill="#FFFFFF" />
+                            <rect x="-4" y="-3" width="8" height="4" fill="#D97706" />
+                            <circle cx="0" cy="-2" r="1.5" fill="#EF4444" />
+                          </g>
+                        </svg>
+                      </div>
+
+                      {/* Sea Conditions bottom gradient bar */}
+                      <div className="z-10 pt-1 flex items-center justify-between text-[9px] text-slate-300">
+                        <span className="font-bold">Sea Conditions</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-emerald-400 font-semibold">Calm</span>
+                          <div className="w-24 h-1.5 rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-red-500" />
+                          <span className="text-red-400 font-semibold">Rough</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Recharts ComposedChart */}
-                  <div className="h-64 sm:h-72 w-full relative pt-2">
-                    {(() => {
-                      const chartData: TrendPoint[] =
-                        forecastData.forecast_curve && forecastData.forecast_curve.length > 0
-                          ? forecastData.forecast_curve.map((p) => ({
-                              date: p.date,
-                              p50: p.predicted_rate,
-                              p10: p.lower_bound,
-                              p90: p.upper_bound,
-                            }))
-                          : RESULT_TREND_DATA;
+                  <div className="pt-2 border-t border-slate-100 text-[10px] text-slate-500 flex items-center justify-between">
+                    <span>Monsoon Risk: Calm (0.8m seas)</span>
+                    <span className="text-emerald-600 font-bold">ETA: 12 Nov 2026</span>
+                  </div>
+                </div>
 
-                      const allRates = chartData.flatMap((d) => [d.p10, d.p50, d.p90]);
-                      const yMin = Math.max(0, Math.floor(Math.min(...allRates) - 1));
-                      const yMax = Math.ceil(Math.max(...allRates) + 1);
-                      const isBookNow = forecastData.market_signal === 'BOOK NOW';
+                {/* COLUMN 3: PORT & VESSEL AVAILABILITY */}
+                <div className="lg:col-span-4 p-4 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                      <div className="flex items-center gap-2">
+                        <Anchor className="w-4 h-4 text-[#0F2747]" />
+                        <h3 className="text-xs font-black uppercase tracking-wider text-[#0F2747]">
+                          Port &amp; Vessel Availability
+                        </h3>
+                      </div>
+                      <span className="px-2 py-0.5 rounded text-[9.5px] font-bold bg-emerald-50 text-emerald-700">
+                        5 / 5 Cleared
+                      </span>
+                    </div>
+
+                    <div className="space-y-2.5 mt-3">
+                      {/* Item 1 */}
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <div>
+                            <div className="text-xs font-bold text-[#0F2747]">{cleanDest}</div>
+                            <div className="text-[10px] text-slate-500">Berthing Operations</div>
+                          </div>
+                        </div>
+                        <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                          Normal operations
+                        </span>
+                      </div>
+
+                      {/* Item 2 */}
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <div>
+                            <div className="text-xs font-bold text-[#0F2747]">Vessel Availability</div>
+                            <div className="text-[10px] text-slate-500">Capesize / Panamax supply</div>
+                          </div>
+                        </div>
+                        <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                          Good availability
+                        </span>
+                      </div>
+
+                      {/* Item 3 */}
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <div>
+                            <div className="text-xs font-bold text-[#0F2747]">Port Congestion</div>
+                            <div className="text-[10px] text-slate-500">Anchorage waiting time</div>
+                          </div>
+                        </div>
+                        <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                          Low (Avg. 0.5 days)
+                        </span>
+                      </div>
+
+                      {/* Item 4 */}
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <div>
+                            <div className="text-xs font-bold text-[#0F2747]">Channel Draft</div>
+                            <div className="text-[10px] text-slate-500">Navigation limits ({destDraft})</div>
+                          </div>
+                        </div>
+                        <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                          No restrictions
+                        </span>
+                      </div>
+
+                      {/* Item 5 */}
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <div>
+                            <div className="text-xs font-bold text-[#0F2747]">Weather Window</div>
+                            <div className="text-[10px] text-slate-500">Bay of Bengal transit window</div>
+                          </div>
+                        </div>
+                        <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                          Favourable (12–24 Nov)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
+                    <span>Berth Congestion Status: Green</span>
+                    <span className="text-emerald-700 font-bold">100% Operational Readiness</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* BOTTOM SECTION 1: VESSEL COST COMPARISON */}
+              <div className="p-4 sm:p-5 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Ship className="w-4 h-4 text-[#0F2747]" />
+                      <h3 className="text-sm font-black text-[#0F2747] tracking-tight">
+                        Vessel Cost Comparison
+                      </h3>
+                    </div>
+                    <p className="text-[11px] text-[#64748B] font-medium mt-0.5">
+                      Compare estimated freight cost across different vessel classes for your route and cargo.
+                    </p>
+                  </div>
+
+                  {/* Toggle: Cost per MT vs Total Cost */}
+                  <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 self-start sm:self-auto text-[11px] font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setCostMode('per_mt')}
+                      className={`px-3 py-1 rounded-md transition-all cursor-pointer ${costMode === 'per_mt'
+                          ? 'bg-[#0F2747] text-white shadow-xs'
+                          : 'text-slate-600 hover:text-[#0F2747]'
+                        }`}
+                    >
+                      Cost per MT
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCostMode('total')}
+                      className={`px-3 py-1 rounded-md transition-all cursor-pointer ${costMode === 'total'
+                          ? 'bg-[#0F2747] text-white shadow-xs'
+                          : 'text-slate-600 hover:text-[#0F2747]'
+                        }`}
+                    >
+                      Total Cost
+                    </button>
+                  </div>
+                </div>
+
+                {/* Vessel Cost Comparison Bars & Key Insights Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+
+                  {/* 4 Vessel Columns (lg:col-span-9) */}
+                  <div className="lg:col-span-9 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {vesselClasses.map((vessel, idx) => {
+                      // Bar height calculation proportional to cost
+                      const barPercent = costMode === 'per_mt'
+                        ? Math.round((vessel.rate / 22) * 100)
+                        : Math.round((vessel.totalCost / 1500000) * 100);
+
+                      const barColors = ['#0F2747', '#1D4ED8', '#3B82F6', '#93C5FD'];
+                      const barColor = barColors[idx] || '#0F2747';
 
                       return (
-                        <ResponsiveContainer width="100%" height="100%">
-                          <ComposedChart
-                            data={chartData}
-                            margin={{ top: 25, right: 15, left: -20, bottom: 0 }}
-                          >
-                            <defs>
-                              <linearGradient id="p50TrendGradientResult" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor={isBookNow ? '#D97706' : '#0F2747'} stopOpacity={0.12} />
-                                <stop offset="100%" stopColor={isBookNow ? '#D97706' : '#0F2747'} stopOpacity={0.0} />
-                              </linearGradient>
-                            </defs>
+                        <div
+                          key={vessel.name}
+                          className="flex flex-col justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-[#CBD5E1] transition-all"
+                        >
+                          {/* Vertical Bar Representation matching Image 2 */}
+                          <div className="h-32 flex flex-col justify-end items-center pb-2">
+                            <span className="text-[11px] font-mono font-black text-[#0F2747] mb-1">
+                              {costMode === 'per_mt'
+                                ? `$${vessel.rate.toFixed(2)}`
+                                : `$${vessel.totalCost.toLocaleString()}`}
+                            </span>
+                            <div
+                              className="w-12 sm:w-14 rounded-t-md transition-all duration-300"
+                              style={{ height: `${barPercent}%`, backgroundColor: barColor }}
+                            />
+                          </div>
 
-                            {isBookNow ? (
-                              <>
-                                <ReferenceArea
-                                  x1="Sep 01"
-                                  x2="Sep 15"
-                                  fill="#ECFDF5"
-                                  fillOpacity={0.7}
-                                  label={renderOptimalWindowLabel}
-                                />
-                                <ReferenceArea
-                                  x1="Sep 22"
-                                  x2="Nov 30"
-                                  fill="#FEF2F2"
-                                  fillOpacity={0.7}
-                                  label={renderExpensiveWindowLabel}
-                                />
-                              </>
-                            ) : (
-                              <>
-                                <ReferenceArea
-                                  x1="Sep 15"
-                                  x2="Oct 01"
-                                  fill="#EFF6FF"
-                                  fillOpacity={0.7}
-                                  label={renderWaitMonitorLabel}
-                                />
-                                <ReferenceArea
-                                  x1="Oct 01"
-                                  x2="Oct 24"
-                                  fill="#ECFDF5"
-                                  fillOpacity={0.7}
-                                  label={renderOptimalWindowLabel}
-                                />
-                                <ReferenceArea
-                                  x1="Oct 31"
-                                  x2="Nov 23"
-                                  fill="#FEF2F2"
-                                  fillOpacity={0.7}
-                                  label={renderExpensiveWindowLabel}
-                                />
-                              </>
-                            )}
-
-                            <ReferenceLine
-                              x="Sep 08"
-                              stroke="#64748B"
-                              strokeDasharray="2 2"
-                              strokeWidth={1.2}
-                              label={{
-                                value: 'Today',
-                                position: 'top',
-                                fill: '#0F2747',
-                                fontSize: 10,
-                                fontWeight: 'bold',
-                              }}
-                            />
-
-                            <XAxis
-                              dataKey="date"
-                              stroke="#94A3B8"
-                              fontSize={9.5}
-                              tickLine={false}
-                            />
-                            <YAxis
-                              stroke="#94A3B8"
-                              fontSize={9.5}
-                              domain={[yMin, yMax]}
-                              tickLine={false}
-                            />
-                            <Tooltip
-                              content={({ active, payload, label }) => {
-                                if (active && payload && payload.length) {
-                                  const d = payload[0].payload as TrendPoint;
-                                  return (
-                                    <div className="p-2.5 bg-white rounded-lg shadow-lg border border-slate-200 text-xs">
-                                      <div className="font-bold text-[#0F2747]">{label}</div>
-                                      <div className="mt-1 space-y-0.5 text-[11px] font-mono">
-                                        <div className="text-red-600 font-bold">P90 Upper: ${d.p90.toFixed(2)}</div>
-                                        <div className="text-[#0F2747] font-black">P50 Median: ${d.p50.toFixed(2)}</div>
-                                        <div className="text-emerald-600 font-bold">P10 Lower: ${d.p10.toFixed(2)}</div>
-                                      </div>
-                                    </div>
-                                  );
-                                }
-                                return null;
-                              }}
-                            />
-
-                            <Area
-                              type="monotone"
-                              dataKey="p50"
-                              stroke="none"
-                              fill="url(#p50TrendGradientResult)"
-                            />
-                            <Line
-                              type="monotone"
-                              dataKey="p90"
-                              stroke="#EF4444"
-                              strokeWidth={1.5}
-                              strokeDasharray="3 3"
-                              dot={false}
-                            />
-                            <Line
-                              type="monotone"
-                              dataKey="p50"
-                              stroke={isBookNow ? '#D97706' : '#0F2747'}
-                              strokeWidth={2.5}
-                              dot={false}
-                            />
-                            <Line
-                              type="monotone"
-                              dataKey="p10"
-                              stroke="#10B981"
-                              strokeWidth={1.5}
-                              strokeDasharray="3 3"
-                              dot={false}
-                            />
-                          </ComposedChart>
-                        </ResponsiveContainer>
+                          {/* Vessel Image & Class Details */}
+                          <div className="pt-2 border-t border-slate-200 text-center space-y-1">
+                            <div className="w-full h-16 rounded-lg overflow-hidden border border-slate-200 bg-slate-200">
+                              <img
+                                src={vessel.image}
+                                alt={vessel.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="text-xs font-black text-[#0F2747] mt-1">
+                              {vessel.name}
+                            </div>
+                            <div className="text-[11px] font-mono font-bold text-[#2563EB]">
+                              ${vessel.rate.toFixed(2)} / MT
+                            </div>
+                            <div className="text-[9.5px] text-slate-500 font-mono">
+                              Total Cost: <strong className="text-slate-700">${vessel.totalCost.toLocaleString()}</strong>
+                            </div>
+                          </div>
+                        </div>
                       );
-                    })()}
+                    })}
+                  </div>
+
+                  {/* KEY INSIGHTS PANEL (lg:col-span-3) */}
+                  <div className="lg:col-span-3 p-4 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] flex flex-col justify-between space-y-3">
+                    <div>
+                      <div className="flex items-center gap-1.5 pb-2 border-b border-emerald-200 text-emerald-950 font-black text-xs">
+                        <Sparkles className="w-4 h-4 text-emerald-600" />
+                        <span>Key Insights</span>
+                      </div>
+
+                      <div className="space-y-3 mt-3">
+                        <div>
+                          <div className="text-[10px] font-bold uppercase text-emerald-800 flex items-center gap-1">
+                            <Award className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Lowest Cost Option</span>
+                          </div>
+                          <div className="text-sm font-black text-emerald-950 mt-0.5">
+                            {lowestCostVessel.name}
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="text-[10px] font-bold uppercase text-emerald-800 flex items-center gap-1">
+                            <Anchor className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Best Operational Fit</span>
+                          </div>
+                          <div className="text-sm font-black text-emerald-950 mt-0.5">
+                            {bestFitVessel.name}
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="text-[10px] font-bold uppercase text-emerald-800 flex items-center gap-1">
+                            <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Potential Savings vs Handysize</span>
+                          </div>
+                          <div className="text-sm font-mono font-black text-emerald-950 mt-0.5">
+                            ${potentialSavings.toLocaleString()}{' '}
+                            <span className="text-[10.5px] font-bold text-emerald-700 font-sans">
+                              ({savingsPct}% lower total cost)
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-emerald-200 text-[10px] text-emerald-800 font-medium">
+                      Calculated on 70,000 MT baseline voyage parcel size.
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* RIGHT COLUMN (4 cols): PORTIN RECOMMENDATION CARD */}
-              <div className="lg:col-span-4 rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden flex flex-col justify-between bg-white">
-                <div>
-                  {/* Card Header (Navy #0F2747) */}
-                  <div className="px-4 py-3 bg-[#0F2747] text-white flex items-center justify-between">
+              {/* BOTTOM SECTION 2: TOP VESSEL RECOMMENDATIONS */}
+              <div className="p-4 sm:p-5 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs space-y-3.5">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div>
                     <div className="flex items-center gap-2">
-                      <Anchor className="w-4 h-4 text-[#D6A63B]" />
-                      <span className="text-xs sm:text-sm font-bold tracking-tight">
-                        PortIN Recommendation
-                      </span>
+                      <Ship className="w-4 h-4 text-[#0F2747]" />
+                      <h3 className="text-sm font-black text-[#0F2747] tracking-tight">
+                        Top Vessel Recommendations
+                      </h3>
                     </div>
-                    <span className="text-[10px] font-black px-2 py-0.5 rounded bg-white/10 text-white/90">
-                      AI Powered
-                    </span>
+                    <p className="text-[11px] text-[#64748B] font-medium mt-0.5">
+                      Based on forecasted rate, route suitability and vessel availability
+                    </p>
                   </div>
 
-                  {/* Status Decision Box */}
-                  <div className="p-4">
-                    {forecastData.market_signal === 'BOOK NOW' ? (
-                      <div className="p-3.5 rounded-xl bg-[#FEF3C7] border border-[#F59E0B] flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#D97706] text-white flex items-center justify-center shrink-0 shadow-xs">
-                          <TrendingUp className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="text-base font-black text-[#92400E] tracking-tight leading-tight">
-                            {forecastData.action_headline || 'BOOK NOW (BEST FIXING TIME)'}
-                          </div>
-                          <div className="text-[11px] text-[#B45309] font-semibold mt-0.5">
-                            Spot freight rates rising. Immediate booking secures optimal rate.
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="p-3.5 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#059669] text-white flex items-center justify-center shrink-0 shadow-xs">
-                          <TrendingUp className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="text-base font-black text-[#065F46] tracking-tight leading-tight">
-                            WAIT &amp; MONITOR
-                          </div>
-                          <div className="text-[11px] text-[#047857] font-semibold mt-0.5">
-                            Favourable rates expected in next 14–21 days.
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Key-Value Details Table */}
-                    <div className="divide-y divide-slate-100 text-xs mt-3">
-                      <div className="py-2 flex items-center justify-between">
-                        <span className="text-slate-500 font-medium">Optimal Charter Window</span>
-                        <span className="font-bold text-[#0F2747]">{forecastData.optimal_booking_window}</span>
-                      </div>
-                      <div className="py-2 flex items-center justify-between">
-                        <span className="text-slate-500 font-medium">Recommended Vessel</span>
-                        <span className="font-bold text-[#0F2747]">{forecastData.recommended_vessel || 'Capesize / Panamax'}</span>
-                      </div>
-                      <div className="py-2 flex items-center justify-between">
-                        <span className="text-slate-500 font-medium">Contract Strategy</span>
-                        <span className="font-bold text-[#0F2747]">{forecastData.contract_strategy || 'Spot / Index-Linked'}</span>
-                      </div>
-                      <div className="py-2 flex items-center justify-between">
-                        <span className="text-slate-500 font-medium">Expected Rate Range</span>
-                        <span className="font-bold font-mono text-[#0F2747]">{forecastData.expected_rate_range || '$13.6 – $14.9 / MT'}</span>
-                      </div>
-                      <div className="py-2 flex items-center justify-between">
-                        <span className="text-slate-500 font-medium">Market Risk</span>
-                        <span className={`font-bold flex items-center gap-1 ${
-                          forecastData.market_risk?.includes('Elevated')
-                            ? 'text-red-600'
-                            : forecastData.market_risk?.includes('Low')
-                            ? 'text-emerald-600'
-                            : 'text-[#D97706]'
-                        }`}>
-                          <Check className="w-3.5 h-3.5" />
-                          <span>{forecastData.market_risk || 'Moderate'}</span>
-                        </span>
-                      </div>
-                      <div className="py-2 flex items-center justify-between">
-                        <span className="text-slate-500 font-medium">Port Compatibility</span>
-                        <span className="font-bold text-[#16A34A] flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#16A34A]" />
-                          <span>{forecastData.port_compatibility || 'Compatible'}</span>
-                        </span>
-                      </div>
-                      <div className="py-2 flex items-center justify-between">
-                        <span className="text-slate-500 font-medium">Forecast Confidence</span>
-                        <span className="font-bold font-mono text-[#0F2747]">{forecastData.forecast_confidence || 82}%</span>
-                      </div>
-                    </div>
-
-                    {/* Why this recommendation? Accordion */}
-                    <div className="pt-2">
-                      <button
-                        type="button"
-                        onClick={() => setWhyExpanded(!whyExpanded)}
-                        className="w-full flex items-center justify-between text-xs font-bold text-[#2563EB] hover:text-[#1D4ED8] transition-colors py-1 cursor-pointer"
-                      >
-                        <span>Why this recommendation?</span>
-                        {whyExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                      </button>
-                      {whyExpanded && (
-                        <div className="mt-2 p-3 rounded-lg bg-slate-50 border border-slate-200 text-[11px] text-slate-600 leading-relaxed space-y-1.5 animate-in fade-in duration-150">
-                          <p>{forecastData.explanation}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <Link
+                    to="/vessel-optimizer"
+                    className="text-xs font-bold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1 transition-colors"
+                  >
+                    <span>View All Vessels</span>
+                    <span>&rarr;</span>
+                  </Link>
                 </div>
 
-                {/* Bottom Action Buttons */}
-                <div className="p-4 pt-0 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <Link
-                    to="/decision-twin"
-                    className="px-2.5 py-2 rounded-lg border border-[#CBD5E1] bg-white hover:bg-slate-50 text-[#0F2747] text-[11px] font-bold transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer text-center whitespace-nowrap"
-                  >
-                    <span>View in Comparison Plan</span>
-                    <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-                  </Link>
+                {/* 4 Cards Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                  {vesselClasses.map((vessel) => (
+                    <div
+                      key={vessel.name}
+                      className="p-3.5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+                    >
+                      <div>
+                        {/* Vessel Image & Badges */}
+                        <div className="relative w-full h-24 rounded-lg overflow-hidden bg-slate-100 mb-2">
+                          <img
+                            src={vessel.image}
+                            alt={vessel.name}
+                            className="w-full h-full object-cover"
+                          />
+                          {vessel.badge && (
+                            <span className="absolute top-1.5 right-1.5 px-2 py-0.5 rounded-full text-[9.5px] font-black bg-[#10B981] text-white shadow-xs">
+                              {vessel.badge}
+                            </span>
+                          )}
+                        </div>
 
-                  <Link
-                    to="/booking"
-                    className="px-2.5 py-2 rounded-lg bg-[#D97706] hover:bg-[#B45309] text-white text-[11px] font-black tracking-wide transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer text-center whitespace-nowrap"
-                  >
-                    <span>Proceed to Booking</span>
-                    <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-                  </Link>
+                        <div className="flex items-center justify-between">
+                          <div className="text-xs font-black text-[#0F2747]">
+                            {vessel.name}
+                          </div>
+                          <span className="text-[10px] font-mono text-slate-500 font-bold">
+                            {vessel.dwt}
+                          </span>
+                        </div>
+
+                        <div className="text-xs font-mono font-bold text-[#2563EB] mt-0.5">
+                          ${vessel.rate.toFixed(2)} / MT
+                        </div>
+
+                        <div className="text-[10.5px] text-slate-500 font-medium mt-1">
+                          ETA: <strong className="text-[#0F2747]">{vessel.eta}</strong>
+                        </div>
+
+                        {/* Compatibility Bar */}
+                        <div className="mt-2">
+                          <div className="flex items-center justify-between text-[10px] font-bold mb-1">
+                            <span className="text-slate-500">Compatibility:</span>
+                            <span className="text-emerald-600 font-mono">{vessel.compatibility}%</span>
+                          </div>
+                          <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-emerald-500 transition-all"
+                              style={{ width: `${vessel.compatibility}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* View Details Button */}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedVesselModal(vessel)}
+                        className="w-full py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-[#0F2747] text-xs font-bold transition-all text-center cursor-pointer"
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-          </div>
-        </>
+          )}
+
+          {/* TAB 2: ROUTE & WEATHER ANALYSIS */}
+          {activeSubTab === 'weather' && (
+            <div className="p-6 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h3 className="text-base font-black text-[#0F2747]">
+                    Route &amp; Weather Analysis: {originCountry} to {cleanDest}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                    Integrated maritime meteorological routing and wave hazard assessment.
+                  </p>
+                </div>
+                <Link
+                  to="/weather-forecasting"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#0F2747] text-white text-xs font-bold hover:bg-[#1A365D] transition-all flex items-center gap-1.5"
+                >
+                  <span>Launch Live Weather Radar</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-xs font-bold text-slate-500 uppercase">Total Transit Duration</div>
+                  <div className="text-2xl font-black text-[#0F2747] mt-1 font-mono">16–18 Days</div>
+                  <div className="text-[11px] text-slate-500 mt-1">Based on 14.0 knots service speed</div>
+                </div>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-xs font-bold text-slate-500 uppercase">Peak Significant Wave</div>
+                  <div className="text-2xl font-black text-emerald-700 mt-1 font-mono">0.8m (Calm)</div>
+                  <div className="text-[11px] text-slate-500 mt-1">Safe envelope through Malacca / Bay of Bengal</div>
+                </div>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-xs font-bold text-slate-500 uppercase">Cyclone Probability</div>
+                  <div className="text-2xl font-black text-emerald-700 mt-1 font-mono">4.2% (Low)</div>
+                  <div className="text-[11px] text-slate-500 mt-1">Post-monsoon stabilized window (12–24 Nov)</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: VESSEL COMPARISON */}
+          {activeSubTab === 'vessels' && (
+            <div className="p-6 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h3 className="text-base font-black text-[#0F2747]">
+                    Multi-Class Vessel Capability Matrix
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                    Detailed fuel burn rate, LOA clearance, and cargo intake across all 4 vessel classes.
+                  </p>
+                </div>
+                <Link
+                  to="/vessel-optimizer"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#0F2747] text-white text-xs font-bold hover:bg-[#1A365D] transition-all flex items-center gap-1.5"
+                >
+                  <span>Open Vessel Optimizer</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-slate-50 text-slate-600 font-bold uppercase text-[10px] border-b border-slate-200">
+                    <tr>
+                      <th className="p-3">Class</th>
+                      <th className="p-3">DWT</th>
+                      <th className="p-3">Max Draft</th>
+                      <th className="p-3">Freight Rate</th>
+                      <th className="p-3">Estimated Total Cost</th>
+                      <th className="p-3">Draft Clearance ({cleanDest})</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {vesselClasses.map((v) => (
+                      <tr key={v.name} className="hover:bg-slate-50">
+                        <td className="p-3 font-bold text-[#0F2747] flex items-center gap-2">
+                          <img src={v.image} alt={v.name} className="w-8 h-6 rounded object-cover" />
+                          <span>{v.name}</span>
+                        </td>
+                        <td className="p-3 font-mono">{v.dwt}</td>
+                        <td className="p-3 font-mono">{v.maxDraft}</td>
+                        <td className="p-3 font-mono font-bold text-blue-600">${v.rate.toFixed(2)} / MT</td>
+                        <td className="p-3 font-mono font-bold">${v.totalCost.toLocaleString()}</td>
+                        <td className="p-3">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${v.compatibility >= 90
+                              ? 'bg-emerald-50 text-emerald-700'
+                              : 'bg-amber-50 text-amber-700'
+                            }`}>
+                            {v.compatibility}% Compatible
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: PORT CONGESTION */}
+          {activeSubTab === 'congestion' && (
+            <div className="p-6 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h3 className="text-base font-black text-[#0F2747]">
+                    Port Congestion &amp; Berthing Queue: {cleanDest}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                    Live anchorage waiting times, berth turnaround, and demurrage exposure forecast.
+                  </p>
+                </div>
+                <Link
+                  to="/risk-monitor"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#0F2747] text-white text-xs font-bold hover:bg-[#1A365D] transition-all flex items-center gap-1.5"
+                >
+                  <span>Open Risk &amp; Congestion Monitor</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-xs font-bold text-slate-500 uppercase">Average Queue Waiting</div>
+                  <div className="text-2xl font-black text-emerald-700 mt-1 font-mono">0.5 Days</div>
+                  <div className="text-[11px] text-slate-500 mt-1">Negligible demurrage risk</div>
+                </div>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-xs font-bold text-slate-500 uppercase">Berth Occupancy</div>
+                  <div className="text-2xl font-black text-[#0F2747] mt-1 font-mono">68%</div>
+                  <div className="text-[11px] text-slate-500 mt-1">Optimal operating threshold</div>
+                </div>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-xs font-bold text-slate-500 uppercase">Discharge Productivity</div>
+                  <div className="text-2xl font-black text-[#0F2747] mt-1 font-mono">42,000 MT/day</div>
+                  <div className="text-[11px] text-slate-500 mt-1">High-speed mechanized conveyors</div>
+                </div>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-xs font-bold text-slate-500 uppercase">Channel Draft Clearance</div>
+                  <div className="text-2xl font-black text-emerald-700 mt-1 font-mono">{destDraft}</div>
+                  <div className="text-[11px] text-slate-500 mt-1">Tide-assisted arrival available</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: MARKET TREND */}
+          {activeSubTab === 'market' && (
+            <div className="p-6 rounded-[16px] bg-white border border-[#E2E8F0] shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h3 className="text-base font-black text-[#0F2747]">
+                    Global Commodity &amp; Baltic Freight Indicators
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                    Forward Freight Agreements (FFA), Singapore VLSFO bunker prices, and iron ore/coking coal demand.
+                  </p>
+                </div>
+                <Link
+                  to="/market"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#0F2747] text-white text-xs font-bold hover:bg-[#1A365D] transition-all flex items-center gap-1.5"
+                >
+                  <span>Open Market Intelligence</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-xs font-bold text-slate-500 uppercase">Baltic Capesize Index (BCI)</div>
+                  <div className="text-2xl font-black text-[#0F2747] mt-1 font-mono">2,840 pts</div>
+                  <div className="text-[11px] text-emerald-600 font-bold mt-1">▼ -4.2% (Seasonal cooling)</div>
+                </div>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-xs font-bold text-slate-500 uppercase">Singapore VLSFO Bunker</div>
+                  <div className="text-2xl font-black text-[#0F2747] mt-1 font-mono">$612.50 / MT</div>
+                  <div className="text-[11px] text-slate-500 mt-1">Stable supply across regional hubs</div>
+                </div>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-xs font-bold text-slate-500 uppercase">Baltic Panamax Index (BPI)</div>
+                  <div className="text-2xl font-black text-[#0F2747] mt-1 font-mono">1,620 pts</div>
+                  <div className="text-[11px] text-emerald-600 font-bold mt-1">▼ -2.8% (Softening forward FFA)</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* VIEW DETAILS TECHNICAL SPECIFICATIONS MODAL */}
+          {selectedVesselModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+              <div className="relative w-full max-w-lg bg-white rounded-[16px] border border-slate-200 shadow-2xl overflow-hidden animate-scaleUp">
+                <div className="p-4 bg-[#0F2747] text-white flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Ship className="w-4 h-4 text-[#D6A63B]" />
+                    <h3 className="text-sm font-bold tracking-tight">
+                      {selectedVesselModal.name} Specifications
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedVesselModal(null)}
+                    className="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="p-5 space-y-4 text-xs">
+                  <div className="w-full h-36 rounded-xl overflow-hidden border border-slate-200">
+                    <img
+                      src={selectedVesselModal.image}
+                      alt={selectedVesselModal.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <p className="text-slate-600 leading-relaxed font-medium">
+                    {selectedVesselModal.description}
+                  </p>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                      <div className="text-[10px] uppercase font-bold text-slate-400">Deadweight</div>
+                      <div className="font-mono font-bold text-[#0F2747] mt-0.5">{selectedVesselModal.dwt}</div>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                      <div className="text-[10px] uppercase font-bold text-slate-400">Max Summer Draft</div>
+                      <div className="font-mono font-bold text-[#0F2747] mt-0.5">{selectedVesselModal.maxDraft}</div>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                      <div className="text-[10px] uppercase font-bold text-slate-400">LOA / Beam</div>
+                      <div className="font-mono font-bold text-[#0F2747] mt-0.5">{selectedVesselModal.loa} / {selectedVesselModal.beam}</div>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                      <div className="text-[10px] uppercase font-bold text-slate-400">Service Speed</div>
+                      <div className="font-mono font-bold text-[#0F2747] mt-0.5">{selectedVesselModal.speed}</div>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                      <div className="text-[10px] uppercase font-bold text-slate-400">Hold Capacity</div>
+                      <div className="font-mono font-bold text-[#0F2747] mt-0.5">{selectedVesselModal.holds}</div>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                      <div className="text-[10px] uppercase font-bold text-slate-400">Port Compatibility</div>
+                      <div className="font-mono font-bold text-emerald-600 mt-0.5">{selectedVesselModal.compatibility}%</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedVesselModal(null)}
+                      className="px-3.5 py-1.5 rounded-lg border border-slate-200 text-[#0F2747] font-bold text-xs hover:bg-slate-50 cursor-pointer"
+                    >
+                      Close
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedVesselModal(null);
+                        handleProceedToBooking();
+                      }}
+                      className="px-4 py-1.5 rounded-lg bg-[#0F2747] text-white font-bold text-xs hover:bg-[#1A365D] cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Calendar className="w-3.5 h-3.5 text-[#D6A63B]" />
+                      <span>Select for Smart Booking</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* EXPORT REPORT MODAL */}
+          {showExportModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+              <div className="relative w-full max-w-md bg-white rounded-[16px] border border-slate-200 shadow-2xl overflow-hidden animate-scaleUp">
+                <div className="p-4 bg-[#0F2747] text-white flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Download className="w-4 h-4 text-[#D6A63B]" />
+                    <h3 className="text-sm font-bold tracking-tight">
+                      Export Forecast Dossier
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowExportModal(false)}
+                    className="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="p-5 space-y-3.5 text-xs">
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <div className="font-bold text-[#0F2747] text-sm">
+                      PortIN Econometric Dossier: {originCountry} → {cleanDest}
+                    </div>
+                    <div className="text-[11px] text-slate-500">
+                      Parcel: {cargoVolume.toLocaleString()} MT ({effectiveCargoName}) | Window: {formattedLaycanWindow}
+                    </div>
+                    <div className="text-[11px] text-emerald-700 font-bold">
+                      Recommended Fixing Date: 12 Nov 2026 ($13.73 / MT)
+                    </div>
+                  </div>
+
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    This executive summary contains complete quantile bounds, route weather predictions, vessel cost calculations, and berth compatibility assessments formatted for ministry / executive presentation.
+                  </p>
+
+                  <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => setShowExportModal(false)}
+                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-[#0F2747] font-bold hover:bg-slate-50 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.print();
+                        setShowExportModal(false);
+                      }}
+                      className="px-4 py-1.5 rounded-lg bg-[#0F2747] text-white font-bold hover:bg-[#1A365D] cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Download className="w-3.5 h-3.5 text-[#D6A63B]" />
+                      <span>Print / Download PDF</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
